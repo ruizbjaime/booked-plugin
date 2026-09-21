@@ -3,6 +3,19 @@
 Cada versión publicada actualiza los manifiestos de los tres paquetes y las
 entradas del marketplace de Claude, y lleva un tag `vX.Y.Z`.
 
+## 0.3.0 — 2026-09-21
+
+- El servidor pasa a veintidós herramientas y una escribe:
+  `convertir_bloqueo_en_reserva`. La skill deja de decir «solo lectura» y
+  enseña el flujo listar → preparar → preguntar lo que falta → confirmar →
+  convertir, sin inventar ningún dato.
+- La regla de datos personales se acota: al convertir un bloqueo, los datos del
+  huésped se le preguntan al anfitrión.
+- La credencial decide si se puede escribir: un token aparte en `booked`, o
+  volver a autorizar marcando el permiso en los paquetes OAuth.
+- Requiere desplegar primero Booked con la conversión de bloqueos y
+  `INTEGRATION_WRITES_ENABLED=true`; sin eso, los paquetes siguen leyendo igual.
+
 ## 0.2.0 — 2026-09-21
 
 - Paquete `booked-oauth` para Claude y `booked-chatgpt` para OpenAI, con

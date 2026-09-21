@@ -4,14 +4,14 @@
     "name": "Jaime Ruiz",
     "url": "https://github.com/ruizbjaime"
   },
-  "description": "Booked para Claude: OAuth o token manual, en solo lectura.",
+  "description": "Booked para Claude: OAuth o token manual. Consultas, y convertir en reserva un bloqueo de plataforma.",
   "plugins": [
     {
       "name": "booked",
       "source": "./plugins/booked",
       "displayName": "Booked — fincas, reservas y dinero",
-      "description": "Consulta las fincas de Jaime en Booked: disponibilidad, reservas, calendario, cotizaciones, ingresos, deudas y comisiones. Solo lectura.",
-      "version": "0.2.0",
+      "description": "Consulta las fincas de Jaime en Booked: disponibilidad, reservas, calendario, cotizaciones, ingresos, deudas y comisiones. Lo único que escribe es convertir en reserva un bloqueo de Airbnb o Booking.com, y solo si el token lo permite.",
+      "version": "0.3.0",
       "author": {
         "name": "Jaime Ruiz"
       },
@@ -29,8 +29,8 @@
       "name": "booked-oauth",
       "source": "./plugins/booked-oauth",
       "displayName": "Booked — conexión con OAuth",
-      "description": "Consulta Booked iniciando sesión con tu cuenta. Autorización OAuth revocable sin caducidad fija.",
-      "version": "0.2.0",
+      "description": "Consulta Booked iniciando sesión con tu cuenta; convertir bloqueos en reservas solo si lo marcas al autorizar. Autorización OAuth revocable sin caducidad fija.",
+      "version": "0.3.0",
       "author": {
         "name": "Jaime Ruiz"
       },

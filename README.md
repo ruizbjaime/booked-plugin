@@ -1,8 +1,8 @@
 # Booked para Claude y ChatGPT
 
 Los paquetes conectan al servidor MCP de
-[Booked](https://booked.fincasdelavilla.com) —diecinueve herramientas de solo
-lectura sobre propiedades, reservas, calendario y dinero— e incluyen una skill con las
+[Booked](https://booked.fincasdelavilla.com) —veintidós herramientas sobre
+propiedades, reservas, calendario y dinero, todas de lectura salvo una— e incluyen una skill con las
 reglas de negocio que no caben en la descripción de una herramienta.
 
 Este repositorio incluye el *marketplace* de Claude y los paquetes para ambas
@@ -123,8 +123,9 @@ con su fuente. La versión del servidor MCP sigue siendo independiente.
 
 1. **Customize → Plugins → Add marketplace** y pega `ruizbjaime/booked-plugin`.
 2. Instala **Booked** desde ese marketplace.
-3. Cuando pida el **token de la integración**, pega el de solo lectura. Se emite
-   en *Booked → Ajustes → Integraciones API* y se muestra una sola vez.
+3. Cuando pida el **token de la integración**, pega el tuyo. Se emite en
+   *Booked → Ajustes → Integraciones API* y se muestra una sola vez. El token
+   decide lo que el plugin puede hacer: mira [Lectura y escritura](#lectura-y-escritura).
 
 Para actualizar: **Update** en el marketplace.
 
@@ -192,9 +193,27 @@ llevan credenciales: el cliente las obtiene al vincularse con
 `https://booked.fincasdelavilla.com/mcp/oauth`. El servidor vive en el repo de
 la aplicación, en `app/Mcp/`, y la puerta remota se monta en `routes/ai.php`.
 
-## Solo lectura
+## Lectura y escritura
 
-Ninguna herramienta escribe. `cotizar` calcula un precio; no aparta fechas.
+Veintiuna herramientas solo leen. `cotizar` calcula un precio; no aparta fechas.
+
+Una sola escribe: `convertir_bloqueo_en_reserva`, que convierte en reserva un
+bloqueo importado del calendario de Airbnb, Booking.com o VRBO. Antes pasa
+siempre por `preparar_conversion_de_bloqueo`, que no escribe y dice qué datos
+faltan; el agente se los pregunta al anfitrión, no los inventa.
+
+La credencial es el interruptor, y el permiso solo se ofrece cuando la
+instalación tiene `INTEGRATION_WRITES_ENABLED=true`. «Convertir bloqueos en
+reservas» exige además «Bloqueos» y «Cotizar estancias».
+
+- **Token manual (`booked`).** Con uno de solo lectura, el plugin no puede
+  escribir. Para convertir desde aquí, emite **un token aparte** —no amplíes
+  uno que ya use otro agente— con las lecturas y ese permiso.
+- **OAuth (`booked-oauth`, `booked-chatgpt`).** Los permisos quedan fijados al
+  autorizar. Una conexión anterior sigue siendo de solo lectura: desconecta y
+  vuelve a conectar, y marca el permiso en el bloque de escritura de la
+  pantalla de consentimiento, que nunca viene premarcado. La autorización
+  anterior de ese cliente se revoca sola.
 
 ## Licencia
 
