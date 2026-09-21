@@ -27,6 +27,19 @@ pertenece a una herramienta sino a la respuesta.
   lista. Una propiedad fuera de la lista no es inexistente: es inalcanzable, y
   se arregla en *Booked → Ajustes → Integraciones API*.
 
+## Cuando algo falla
+
+- **«No se proporcionaron credenciales válidas»** (o cualquier respuesta de
+  autenticación): el token del plugin está vacío, caducado o revocado. No
+  reintentes ni busques otra herramienta; di que hay que emitir uno nuevo en
+  *Booked → Ajustes → Integraciones API* y pegarlo en la configuración del
+  plugin.
+- **`caduca` a menos de siete días** (lo devuelve `alcance_del_token`): avísalo
+  al final de la respuesta, una sola vez por conversación, con la fecha.
+- **«Se excedió el límite de solicitudes»**: no es un dato que falte. Espera un
+  minuto, o pregunta menos de golpe — una propiedad o una fecha a la vez — y
+  di qué parte no pudiste consultar. Nunca contestes «no hay» por un límite.
+
 ## Reglas de la respuesta
 
 1. **El dinero ya viene en pesos, y siempre en pareja.** Todo importe trae un

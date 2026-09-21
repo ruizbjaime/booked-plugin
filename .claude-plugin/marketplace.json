@@ -11,7 +11,7 @@
       "source": "./plugins/booked",
       "displayName": "Booked — fincas, reservas y dinero",
       "description": "Consulta las fincas de Jaime en Booked: disponibilidad, reservas, calendario, cotizaciones, ingresos, deudas y comisiones. Solo lectura.",
-      "version": "0.1.0",
+      "version": "0.1.1",
       "author": {
         "name": "Jaime Ruiz"
       },
