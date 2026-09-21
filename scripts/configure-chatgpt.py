@@ -17,10 +17,10 @@ if args.output.name != 'booked-chatgpt' or args.output.exists():
 source = Path(__file__).resolve().parents[1] / 'plugins/booked-chatgpt'
 shutil.copytree(source, args.output)
 manifest_path = args.output / '.codex-plugin/plugin.json'
-manifest = json.loads(manifest_path.read_text())
+manifest = json.loads(manifest_path.read_text(encoding='utf-8'))
 manifest.pop('mcpServers', None)
 manifest['apps'] = './.app.json'
-manifest_path.write_text(json.dumps(manifest, ensure_ascii=False, indent=2) + '\n')
+manifest_path.write_text(json.dumps(manifest, ensure_ascii=False, indent=2) + '\n', encoding='utf-8')
 (args.output / '.mcp.json').unlink()
-(args.output / '.app.json').write_text(json.dumps({'apps': {'booked': {'id': args.app_id}}}, indent=2) + '\n')
+(args.output / '.app.json').write_text(json.dumps({'apps': {'booked': {'id': args.app_id}}}, indent=2) + '\n', encoding='utf-8')
 print(f'ChatGPT package: {args.output}')

@@ -3,7 +3,7 @@
 Cada versión publicada actualiza los manifiestos de los tres paquetes y las
 entradas del marketplace de Claude, y lleva un tag `vX.Y.Z`.
 
-## 0.2.0 — sin publicar
+## 0.2.0 — 2026-09-21
 
 - Paquete `booked-oauth` para Claude y `booked-chatgpt` para OpenAI, con
   conexión al mismo `/mcp/oauth` y autorización revocable sin caducidad fija.

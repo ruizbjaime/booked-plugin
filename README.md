@@ -163,16 +163,34 @@ está en [CHANGELOG.md](CHANGELOG.md).
 ## Qué hay dentro
 
 ```
-plugins/booked/
+shared/                          # la fuente de las skills: edita aquí, no las copias
+├── booked-fincas.md             # las reglas de la respuesta: dinero, ids, alcance
+├── auth-manual.md               # qué decir cuando falla el token manual
+└── auth-oauth.md                # qué decir cuando falla la autorización OAuth
+scripts/
+├── sync-skills.py               # genera cada SKILL.md desde shared/ (--check en CI)
+├── validate.py                  # versiones, conexiones y skills al día
+└── configure-chatgpt.py         # empaqueta ChatGPT con el ID de su conexión
+plugins/booked/                  # Claude, token manual
 ├── .claude-plugin/plugin.json   # identidad y el token que se pide al instalar
-├── .mcp.json                    # el conector HTTP, con el bearer en la cabecera
-└── skills/booked-fincas/        # las reglas de la respuesta: dinero, ids, alcance
+├── .mcp.json                    # el conector HTTP a /mcp, con el bearer en la cabecera
+└── skills/booked-fincas/        # generada
+plugins/booked-oauth/            # Claude, OAuth
+├── .claude-plugin/plugin.json   # identidad; no pide token
+├── .mcp.json                    # el conector HTTP a /mcp/oauth, sin cabeceras
+└── skills/booked-fincas/        # generada
+plugins/booked-chatgpt/          # ChatGPT, OAuth
+├── .codex-plugin/plugin.json    # manifiesto OpenAI
+├── .mcp.json                    # /mcp/oauth; el paquete generado lo cambia por .app.json
+└── skills/booked-fincas/        # generada
 ```
 
-El token viaja como `Authorization: Bearer` hacia `https://booked.fincasdelavilla.com/mcp`
-y se guarda en el almacén seguro del sistema (`sensitive: true`), nunca en este
-repositorio. El servidor vive en el repo de la aplicación, en `app/Mcp/`, y la
-puerta remota se monta en `routes/ai.php`.
+En `booked`, el token viaja como `Authorization: Bearer` hacia
+`https://booked.fincasdelavilla.com/mcp` y se guarda en el almacén seguro del
+sistema (`sensitive: true`), nunca en este repositorio. Los paquetes OAuth no
+llevan credenciales: el cliente las obtiene al vincularse con
+`https://booked.fincasdelavilla.com/mcp/oauth`. El servidor vive en el repo de
+la aplicación, en `app/Mcp/`, y la puerta remota se monta en `routes/ai.php`.
 
 ## Solo lectura
 
