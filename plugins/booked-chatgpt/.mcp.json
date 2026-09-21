@@ -1,0 +1,8 @@
+{
+  "mcpServers": {
+    "booked": {
+      "type": "http",
+      "url": "https://booked.fincasdelavilla.com/mcp/oauth"
+    }
+  }
+}

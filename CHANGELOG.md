@@ -1,9 +1,17 @@
 # Cambios
 
-Cada versión publicada sube `version` en `plugins/booked/.claude-plugin/plugin.json`
-y en `.claude-plugin/marketplace.json`, y lleva un tag `vX.Y.Z`. Un push sin
-subir la versión no llega a nadie: el plugin queda anclado a la versión que
-declara y los clientes lo cachean por ella.
+Cada versión publicada actualiza los manifiestos de los tres paquetes y las
+entradas del marketplace de Claude, y lleva un tag `vX.Y.Z`.
+
+## 0.2.0 — sin publicar
+
+- Paquete `booked-oauth` para Claude y `booked-chatgpt` para OpenAI, con
+  conexión al mismo `/mcp/oauth` y autorización revocable sin caducidad fija.
+- Se conserva `booked` con token manual y su límite de 30 días.
+- Reglas de negocio compartidas y generación comprobada en CI.
+- Script para empaquetar ChatGPT con el ID real de su conexión registrada.
+- Requiere desplegar primero el soporte OAuth de Booked; no basta actualizar
+  el marketplace.
 
 ## 0.1.1 — 2026-09-21
 

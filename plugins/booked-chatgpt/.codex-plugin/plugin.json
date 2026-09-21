@@ -1,0 +1,25 @@
+{
+  "name": "booked-chatgpt",
+  "version": "0.2.0",
+  "description": "Diecinueve herramientas de solo lectura sobre las propiedades, reservas, calendario y dinero de un anfitrión de Booked, más las reglas que no caben en la descripción de una herramienta.",
+  "author": {
+    "name": "Jaime Ruiz"
+  },
+  "skills": "./skills/",
+  "interface": {
+    "displayName": "Booked",
+    "shortDescription": "Consulta tus fincas, reservas e ingresos.",
+    "longDescription": "Acceso de solo lectura a Booked mediante OAuth y reglas compartidas con Claude.",
+    "developerName": "Jaime Ruiz",
+    "category": "Productivity",
+    "capabilities": [],
+    "defaultPrompt": [
+      "¿Qué propiedades están disponibles el próximo fin de semana?",
+      "¿Cuánto ingresaron mis propiedades este mes?"
+    ]
+  },
+  "mcpServers": "./.mcp.json",
+  "homepage": "https://github.com/ruizbjaime/booked-plugin#readme",
+  "repository": "https://github.com/ruizbjaime/booked-plugin",
+  "license": "MIT"
+}
