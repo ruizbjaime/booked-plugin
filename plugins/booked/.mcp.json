@@ -1,0 +1,11 @@
+{
+  "mcpServers": {
+    "booked": {
+      "type": "http",
+      "url": "https://booked.fincasdelavilla.com/mcp",
+      "headers": {
+        "Authorization": "Bearer ${user_config.api_token}"
+      }
+    }
+  }
+}

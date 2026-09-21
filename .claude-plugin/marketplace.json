@@ -1,0 +1,29 @@
+{
+  "name": "booked",
+  "owner": {
+    "name": "Jaime Ruiz",
+    "url": "https://github.com/ruizbjaime"
+  },
+  "description": "El plugin de Booked: el PMS de Fincas de la Villa dentro de Claude, en solo lectura.",
+  "plugins": [
+    {
+      "name": "booked",
+      "source": "./plugins/booked",
+      "displayName": "Booked — fincas, reservas y dinero",
+      "description": "Consulta las fincas de Jaime en Booked: disponibilidad, reservas, calendario, cotizaciones, ingresos, deudas y comisiones. Solo lectura.",
+      "version": "0.1.0",
+      "author": {
+        "name": "Jaime Ruiz"
+      },
+      "keywords": [
+        "booked",
+        "reservas",
+        "fincas",
+        "pms",
+        "disponibilidad",
+        "precios"
+      ],
+      "category": "productivity"
+    }
+  ]
+}
