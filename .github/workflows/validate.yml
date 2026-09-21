@@ -19,9 +19,7 @@ jobs:
         run: claude plugin validate ./plugins/booked --strict
       - name: Validar el marketplace
         run: claude plugin validate . --strict
-      - name: Las dos versiones coinciden
-        run: |
-          set -e
-          plugin=$(node -p "require('./plugins/booked/.claude-plugin/plugin.json').version")
-          market=$(node -p "require('./.claude-plugin/marketplace.json').plugins[0].version")
-          test "$plugin" = "$market" || { echo "plugin.json dice $plugin y marketplace.json dice $market"; exit 1; }
+      - name: Validar el paquete OAuth de Claude
+        run: claude plugin validate ./plugins/booked-oauth --strict
+      - name: Validar versiones, conexiones y reglas compartidas
+        run: python3 scripts/validate.py

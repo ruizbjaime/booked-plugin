@@ -1,6 +1,6 @@
 {
-  "name": "booked",
-  "displayName": "Booked — fincas, reservas y dinero",
+  "name": "booked-oauth",
+  "displayName": "Booked — conexión con OAuth",
   "version": "0.2.0",
   "description": "Diecinueve herramientas de solo lectura sobre las propiedades, reservas, calendario y dinero de un anfitrión de Booked, más las reglas que no caben en la descripción de una herramienta.",
   "author": {
@@ -16,14 +16,5 @@
     "pms",
     "disponibilidad",
     "precios"
-  ],
-  "userConfig": {
-    "api_token": {
-      "type": "string",
-      "title": "Token de la integración de Booked",
-      "description": "Se emite en Booked → Ajustes → Integraciones API y se muestra una sola vez. Caduca a los 30 días: cuando el plugin conteste «credenciales», emite uno nuevo y pégalo aquí. Solo lectura: el plugin no escribe nada.",
-      "sensitive": true,
-      "required": true
-    }
-  }
+  ]
 }
