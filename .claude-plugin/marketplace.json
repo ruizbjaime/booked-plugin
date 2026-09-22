@@ -11,7 +11,7 @@
       "source": "./plugins/booked",
       "displayName": "Booked — fincas, reservas y dinero",
       "description": "Consulta las fincas de Jaime en Booked: disponibilidad, reservas, calendario, cotizaciones, ingresos, deudas y comisiones. Con permiso del token: bloqueos a petición explícita; reservas directas y conversión de bloqueos con preparación y confirmación.",
-      "version": "0.4.0",
+      "version": "0.4.1",
       "author": {
         "name": "Jaime Ruiz"
       },
@@ -30,7 +30,7 @@
       "source": "./plugins/booked-oauth",
       "displayName": "Booked — conexión con OAuth",
       "description": "Consulta Booked iniciando sesión con tu cuenta; escribe solo lo que marques al autorizar: bloqueos a petición explícita; reservas directas y conversión de bloqueos con preparación y confirmación. Autorización OAuth revocable sin caducidad fija.",
-      "version": "0.4.0",
+      "version": "0.4.1",
       "author": {
         "name": "Jaime Ruiz"
       },

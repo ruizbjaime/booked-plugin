@@ -3,7 +3,7 @@
 Cada versión publicada actualiza los manifiestos de los tres paquetes y las
 entradas del marketplace de Claude, y lleva un tag `vX.Y.Z`.
 
-## Sin publicar
+## 0.4.1 — 2026-09-22
 
 - La validación exige el catálogo completo, versiones coordinadas,
   autenticación manual obligatoria y sensible, y rutas válidas en los paquetes

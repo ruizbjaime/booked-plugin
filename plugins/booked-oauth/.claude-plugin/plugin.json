@@ -1,7 +1,7 @@
 {
   "name": "booked-oauth",
   "displayName": "Booked — conexión con OAuth",
-  "version": "0.4.0",
+  "version": "0.4.1",
   "description": "Veintinueve herramientas sobre propiedades, reservas, calendario y dinero de un anfitrión de Booked. Seis escriben con permiso: crear y eliminar bloqueos a petición explícita; crear, cancelar y archivar reservas directas, y convertir bloqueos de plataforma, tras preparar y confirmar. Incluye las reglas de negocio compartidas.",
   "author": {
     "name": "Jaime Ruiz"
