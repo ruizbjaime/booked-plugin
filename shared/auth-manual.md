@@ -13,7 +13,7 @@
 - **Al token le falta un permiso de escritura:** dilo así, nombrando la acción
   que faltó, y no insistas. Hace falta un token aparte, emitido en
   *Booked → Ajustes → Integraciones API*, que lleve el permiso de esa acción:
-  «Crear bloqueos», «Eliminar bloqueos»,
+  «Guardar cotizaciones», «Crear bloqueos», «Eliminar bloqueos»,
   «Crear reservas manuales», «Cancelar reservas», «Eliminar reservas» o
   «Convertir bloqueos en reservas», «Crear contactos» o «Eliminar contactos».
   «Eliminar contactos» requiere además «Consultar contactos».

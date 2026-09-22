@@ -1,14 +1,14 @@
 ---
 name: booked-fincas
-description: "Gestiona las fincas de Jaime en Booked, aunque no se nombre el PMS: disponibilidad, reservas, huéspedes, contactos, calendario, precios, ingresos, pagos pendientes, deudas y comisiones de Airbnb, Booking.com, Fincas de la Villa o venta directa. Úsala para consultar quién es el huésped principal de una propiedad hoy o en otra fecha, buscar el teléfono de un contacto, crear o eliminar contactos y bloqueos, crear reservas directas, cancelarlas o archivarlas, y convertir bloqueos de plataforma en reservas. Consulta los datos existentes con las herramientas `booked`; para crear registros usa los datos proporcionados por Jaime."
+description: "Gestiona las fincas de Jaime en Booked, aunque no se nombre el PMS: disponibilidad, reservas, huéspedes, contactos, calendario, precios, ingresos, pagos pendientes, deudas y comisiones de Airbnb, Booking.com, Fincas de la Villa o venta directa. Úsala para consultar quién es el huésped principal de una propiedad hoy o en otra fecha, buscar el teléfono de un contacto, guardar cotizaciones, crear o eliminar contactos y bloqueos, crear reservas directas, cancelarlas o archivarlas, y convertir bloqueos de plataforma en reservas. Consulta los datos existentes con las herramientas `booked`; para crear registros usa los datos proporcionados por Jaime."
 ---
 
 # Booked — las fincas de Jaime
 
-Las herramientas `booked` leen el PMS de Fincas de la Villa, y ocho de ellas
+Las herramientas `booked` leen el PMS de Fincas de la Villa, y nueve de ellas
 escriben: crear y eliminar bloqueos manuales, crear una reserva directa,
 cancelarla, archivarla, convertir en reserva un bloqueo de plataforma, y crear
-o eliminar contactos.
+o eliminar contactos, además de guardar cotizaciones confirmadas.
 `cotizar` es un cálculo, no aparta fechas. Nada más crea, modifica ni cancela
 nada: pagos, reembolsos, cambios de fechas o de huésped se hacen en Booked.
 
@@ -145,6 +145,50 @@ pertenece a una herramienta sino a la respuesta.
 - **Ninguna escritura mueve dinero.** Crear no registra pagos; cancelar y
   archivar no reembolsan. Si hay dinero de por medio, dile que lo revise en
   Booked.
+
+## Guardar una cotización
+
+Si Jaime pide guardar una cotización, usa `preparar_cotizacion` con los datos
+conocidos, conservándolos en cada llamada. `cotizar` sigue siendo solo un cálculo.
+Si el servidor todavía no ofrece las dos herramientas nuevas, explica que falta
+actualizar Booked; no simules un guardado con otra herramienta.
+
+1. Resuelve la propiedad y las fechas antes de completar el resto. Propias y
+   administradas usan `tipo_inventario: administrado` y `propiedad_id`; las
+   comisionadas usan `comisionado` y `propiedad_comisionada_id`. Una propiedad
+   comisionada es distinta de un comisionista destinatario. En comisionadas la
+   disponibilidad solo cubre lo registrado en Booked, no inventario externo.
+2. Pregunta `faltan` con sus opciones y corrige `errores`; presenta
+   `impedimentos` antes de seguir. No vuelvas a preguntar datos ya entregados.
+   Adultos, niños y mascotas deben quedar explícitos; cero no se presume.
+   Puede elegir un contacto existente o crear uno al guardar: nombre y tipo
+   de contacto se preguntan cuando faltan; teléfono, email y documento son
+   opcionales. No uses `crear_contacto` por adelantado para este flujo.
+3. En propias/administradas el servidor calcula precios: presenta canal,
+   destinatario, descuentos elegibles y cualquier excepción a estadía mínima.
+   En comisionadas pregunta alojamiento total, cargos con su selección de
+   comisión y comisión configurada, porcentaje o monto fijo. Los importes de
+   entrada son centavos; `comision_porcentaje: 15` significa 15 %. No elijas
+   descuentos, cargos ni comisión por Jaime. Una lista vacía significa que
+   respondió ninguno. La vigencia sugerida también necesita aceptación.
+4. Solo cuando `lista_para_crear` sea verdadero, lee el resumen completo,
+   incluido destinatario, fechas, ocupación, desglose, comisión interna cuando
+   corresponda, vigencia y notas. Espera un sí explícito posterior en el chat.
+   Entonces llama `crear_cotizacion` únicamente con `firma` y `confirmado: true`.
+   Cambiar datos obliga a preparar y confirmar otra vez.
+5. Devuelve el número y enlace reales. Queda en borrador: no ocupa noches,
+   envía mensajes ni registra pagos. La firma está ligada a la credencial,
+   dura como máximo treinta minutos sin cruzar medianoche y no se reutiliza
+   tras guardar. Si se pierde la respuesta, verifica las cotizaciones en el
+   panel antes de crear otra; no hay consulta MCP de cotizaciones para resolver
+   ese caso ni idempotencia entre firmas distintas.
+
+Preparar requiere `quotations:read`; guardar añade `quotations:create`.
+Propias/administradas necesitan `properties:read` y `pricing:read`; comisionadas,
+`brokered:read` y `finance:read`. Un destinatario comisionista requiere además
+`finance:read` y `contacts:read`. Elegir contactos requiere `contacts:read`,
+y crearlos inline, `contacts:create`. Los permisos existentes no se amplían
+al actualizar el plugin: solicita solo los necesarios para la operación.
 
 ## Bloqueos manuales
 
