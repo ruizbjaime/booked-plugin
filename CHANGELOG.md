@@ -3,6 +3,16 @@
 Cada versión publicada actualiza los manifiestos de los tres paquetes y las
 entradas del marketplace de Claude, y lleva un tag `vX.Y.Z`.
 
+## Sin publicar
+
+- Preparación guiada y guardado confirmado de cotizaciones para propiedades
+  propias, administradas y comisionadas; teléfono opcional, elecciones del host
+  y permisos condicionales, sin ocupar fechas ni registrar pagos o envíos.
+- El catálogo preparado pasa a 34 herramientas: 25 de lectura y 9 de escritura.
+- Las tres skills se regeneran desde la fuente compartida. Requiere desplegar
+  primero las dos herramientas del backend; esta actualización no publica
+  paquetes, amplía credenciales ni modifica la versión ya publicada.
+
 ## 0.5.0 — 2026-09-22
 
 - El catálogo pasa a treinta y dos herramientas: veinticuatro de lectura y

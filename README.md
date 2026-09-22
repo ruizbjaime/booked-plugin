@@ -1,8 +1,8 @@
 # Booked para Claude y ChatGPT
 
 Los paquetes conectan al servidor MCP de
-[Booked](https://booked.fincasdelavilla.com) —treinta y dos herramientas sobre
-propiedades, reservas, contactos, calendario y dinero, ocho de ellas de escritura— e
+[Booked](https://booked.fincasdelavilla.com) —treinta y cuatro herramientas sobre
+propiedades, reservas, contactos, calendario y dinero, nueve de ellas de escritura— e
 incluyen una skill con las reglas de negocio que no caben en la descripción de
 una herramienta.
 
@@ -216,9 +216,23 @@ obtiene al vincularse con
 `https://booked.fincasdelavilla.com/mcp/oauth`. El servidor vive en el repo de
 la aplicación, en `app/Mcp/`, y la puerta remota se monta en `routes/ai.php`.
 
+## Cotizaciones persistidas (próxima publicación)
+
+La skill ya guía `preparar_cotizacion` → confirmación explícita →
+`crear_cotizacion` para propiedades propias, administradas y comisionadas.
+El servidor pregunta datos y selecciones pendientes y guarda un borrador
+con número y enlace; no reserva fechas, registra pagos ni envía mensajes.
+
+Antes de distribuir estos cambios, despliega el soporte correspondiente de
+Booked y comprueba ambas herramientas en `tools/list`. Habilita escrituras
+con `INTEGRATION_WRITES_ENABLED=true` y concede «Guardar cotizaciones» más
+las lecturas de la rama y los permisos de contactos necesarios. Los tokens y
+consentimientos existentes no ganan permisos automáticamente. Ante una
+respuesta perdida, verifica la ficha/listado de cotizaciones antes de repetir.
+
 ## Lectura y escritura
 
-Veinticuatro herramientas solo leen. `cotizar` calcula un precio; no aparta fechas.
+Veinticinco herramientas solo leen. `cotizar` calcula un precio; no aparta fechas.
 
 `ver_contactos` consulta la libreta del anfitrión con `contacts:read`: devuelve
 nombre, teléfono, email, documento y notas disponibles. Ese permiso permite
