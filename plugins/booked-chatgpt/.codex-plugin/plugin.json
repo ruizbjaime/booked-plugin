@@ -1,7 +1,7 @@
 {
   "name": "booked-chatgpt",
-  "version": "0.6.0",
-  "description": "Treinta y cuatro herramientas sobre propiedades, reservas, contactos, calendario y dinero de un anfitrión de Booked: veinticinco de lectura y nueve de escritura con permiso. Consulta datos de contactos y responsables de estancias; guarda cotizaciones confirmadas, crea contactos, bloqueos y reservas, gestiona reservas y convierte bloqueos. Toda eliminación exige explicar las consecuencias y recibir confirmación explícita. Incluye las reglas de negocio compartidas.",
+  "version": "0.7.0",
+  "description": "Treinta y seis herramientas sobre propiedades, reservas, contactos, calendario y dinero de un anfitrión de Booked: veintiséis de lectura y diez de escritura con permiso. Consulta datos de contactos y responsables de estancias; guarda cotizaciones confirmadas, crea contactos, bloqueos y reservas directas o comisionadas, gestiona reservas y convierte bloqueos. Toda eliminación exige explicar las consecuencias y recibir confirmación explícita. Incluye las reglas de negocio compartidas.",
   "author": {
     "name": "Jaime Ruiz"
   },
@@ -9,7 +9,7 @@
   "interface": {
     "displayName": "Booked",
     "shortDescription": "Consulta fincas, reservas, contactos e ingresos.",
-    "longDescription": "Consulta Booked mediante OAuth, con reglas compartidas con Claude: propiedades, reservas, contactos y dinero. Escribe solo lo que autorices al conectar: crea contactos y bloqueos a petición explícita; guarda cotizaciones tras preparar y confirmar; crea, cancela o archiva reservas y convierte bloqueos tras preparar y confirmar. Toda eliminación exige explicar las consecuencias y recibir tu sí explícito posterior; la eliminación de contactos requiere además una firma de preparación.",
+    "longDescription": "Consulta Booked mediante OAuth, con reglas compartidas con Claude: propiedades, reservas, contactos y dinero. Escribe solo lo que autorices al conectar: crea contactos y bloqueos a petición explícita; guarda cotizaciones tras preparar y confirmar; crea reservas directas o comisionadas, cancela o archiva reservas directas y convierte bloqueos tras preparar y confirmar. Toda eliminación exige explicar las consecuencias y recibir tu sí explícito posterior; la eliminación de contactos requiere además una firma de preparación.",
     "developerName": "Jaime Ruiz",
     "category": "Productivity",
     "capabilities": [],

@@ -14,8 +14,12 @@
   que faltó, y no insistas. Hace falta un token aparte, emitido en
   *Booked → Ajustes → Integraciones API*, que lleve el permiso de esa acción:
   «Guardar cotizaciones», «Crear bloqueos», «Eliminar bloqueos»,
-  «Crear reservas manuales», «Cancelar reservas», «Eliminar reservas» o
-  «Convertir bloqueos en reservas», «Crear contactos» o «Eliminar contactos».
+  «Crear reservas manuales», «Crear reservas comisionadas», «Cancelar reservas»,
+  «Eliminar reservas», «Convertir bloqueos en reservas», «Crear contactos» o
+  «Eliminar contactos».
   «Eliminar contactos» requiere además «Consultar contactos».
+  «Crear reservas comisionadas» (`brokered:create`) requiere «Reservas
+  comisionadas», «Importes y pagos» y «Consultar contactos». Actualizar el
+  plugin no amplía los permisos del token existente.
 - **`caduca` a menos de siete días** (lo devuelve `alcance_del_token`): avísalo
   al final de la respuesta, una sola vez por conversación, con la fecha.

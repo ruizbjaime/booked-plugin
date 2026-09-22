@@ -1,14 +1,15 @@
 ---
 name: booked-fincas
-description: "Gestiona las fincas de Jaime en Booked, aunque no se nombre el PMS: disponibilidad, reservas, huéspedes, contactos, calendario, precios, ingresos, pagos pendientes, deudas y comisiones de Airbnb, Booking.com, Fincas de la Villa o venta directa. Úsala para consultar quién es el huésped principal de una propiedad hoy o en otra fecha, buscar el teléfono de un contacto, guardar cotizaciones, crear o eliminar contactos y bloqueos, crear reservas directas, cancelarlas o archivarlas, y convertir bloqueos de plataforma en reservas. Consulta los datos existentes con las herramientas `booked`; para crear registros usa los datos proporcionados por Jaime."
+description: "Gestiona las fincas de Jaime en Booked, aunque no se nombre el PMS: disponibilidad, reservas, huéspedes, contactos, calendario, precios, ingresos, pagos pendientes, deudas y comisiones de Airbnb, Booking.com, Fincas de la Villa o venta directa. Úsala para consultar quién es el huésped principal de una propiedad hoy o en otra fecha, buscar el teléfono de un contacto, guardar cotizaciones, crear o eliminar contactos y bloqueos, crear reservas directas o en propiedades comisionadas, cancelar o archivar las directas, y convertir bloqueos de plataforma en reservas. Consulta los datos existentes con las herramientas `booked`; para crear registros usa los datos proporcionados por Jaime."
 ---
 
 # Booked — las fincas de Jaime
 
-Las herramientas `booked` leen el PMS de Fincas de la Villa, y nueve de ellas
-escriben: crear y eliminar bloqueos manuales, crear una reserva directa,
-cancelarla, archivarla, convertir en reserva un bloqueo de plataforma, y crear
-o eliminar contactos, además de guardar cotizaciones confirmadas.
+Las herramientas `booked` leen el PMS de Fincas de la Villa, y diez de ellas
+escriben: crear y eliminar bloqueos manuales, crear una reserva directa o
+comisionada, cancelar o archivar una directa, convertir en reserva un bloqueo
+de plataforma, y crear o eliminar contactos, además de guardar cotizaciones
+confirmadas.
 `cotizar` es un cálculo, no aparta fechas. Nada más crea, modifica ni cancela
 nada: pagos, reembolsos, cambios de fechas o de huésped se hacen en Booked.
 
@@ -137,9 +138,10 @@ pertenece a una herramienta sino a la respuesta.
   espera un «sí» explícito en el chat. Solo entonces llama a la herramienta que
   escribe, con esa firma y `confirmado: true`. No preguntes «¿confirmas?» y
   ejecutes en el mismo turno.
-- **La firma de una reserva es de un solo intento y caduca en treinta minutos.**
+- **La firma de una reserva es de un solo uso y caduca en hasta treinta minutos.**
   Si la ejecución falla, la respuesta se pierde o cambia un dato, consulta
-  primero el estado (`buscar_reservas`, `ver_reserva`, `ver_bloqueos`) y prepara de nuevo;
+  primero el estado (`buscar_reservas`, `ver_reserva`, `ver_bloqueos` o
+  `reservas_comisionadas`, según el inventario) y prepara de nuevo;
   no reintentes a ciegas, porque crearías un duplicado o repetirías una acción.
 - **Lo que venga en `impedimentos` no se arregla preguntando:** cuéntaselo.
 - **Ninguna escritura mueve dinero.** Crear no registra pagos; cancelar y
@@ -261,6 +263,48 @@ Solo por el canal Directo o por el canal del sitio público.
 3. Con `lista_para_crear: true`, léele el resumen entero y espera su sí. Solo
    entonces `crear_reserva_manual` con la firma. La reserva nace pendiente y sin
    pagos: dile que los registre en Booked.
+
+## Crear una reserva en una propiedad comisionada
+
+Usa `listar_propiedades_comisionadas` para resolver la propiedad y
+`ver_contactos` para elegir al huésped responsable. Si el contacto es nuevo,
+créalo primero con `crear_contacto`, con los datos que proporcione Jaime; la
+preparación de la reserva usa un `contacto_id` existente, de persona natural y
+con teléfono completo. No confundas una propiedad comisionada con un
+comisionista destinatario de una cotización ni con el inventario administrado.
+
+1. Llama `preparar_reserva_comisionada` con `propiedad_comisionada_id`,
+   `contacto_id`, entrada y salida, y solo los datos que Jaime ya dio. Aclara el
+   año si es ambiguo: la entrada debe ser hoy o posterior y la salida es
+   exclusiva. La disponibilidad solo refleja lo registrado en Booked; informa
+   que debe comprobarse también con el propietario. No presentes el resultado
+   como disponibilidad de sus otros canales.
+2. Pregunta lo que figure en `faltan`, pide corregir `errores` y comunica los
+   `impedimentos`; conserva las respuestas al volver a preparar. Pide adultos,
+   niños, mascotas, estado (`pending` o
+   `confirmed`), alojamiento en centavos y cargos con concepto, monto en centavos
+   y si generan comisión. No supongas cero niños, cero mascotas ni ningún cargo:
+   `cargos: []` solo si Jaime responde que no hay. Las edades de los niños son
+   opcionales; si se aportan, debe haber una por niño.
+3. Pregunta una sola forma de comisión: porcentaje (`15` significa 15 %), monto
+   fijo en centavos o `usar_comision_configurada: true` si Jaime aceptó la tasa
+   propuesta. No elijas por él. Las notas son opcionales. Si falta una firma
+   válida, explica el impedimento devuelto y no pidas confirmar la escritura.
+4. Con `lista_para_crear: true`, lee el resumen completo, incluidos huésped,
+   fechas, ocupación, estado, alojamiento, cargos, total y comisión, y espera el
+   sí explícito. Llama `crear_reserva_comisionada` únicamente con `firma` y
+   `confirmado: true`. La firma permite una creación, está ligada a la credencial
+   y caduca en hasta treinta minutos, sin pasar de medianoche en Bogotá. El
+   servidor revalida permisos, identidad, disponibilidad e importes al guardar.
+5. Comunica el número de reserva y su estado. No registra pagos ni cobros de
+   comisión; se gestionan en Booked. Ante una respuesta perdida, consulta
+   `reservas_comisionadas` antes de preparar otra creación. Si el resumen cambió
+   o venció la firma, vuelve a preparar y espera otro sí.
+
+Requiere `brokered:create` y las lecturas `brokered:read`, `finance:read` y
+`contacts:read`, dentro del alcance autorizado de propiedades comisionadas.
+Dar de alta un contacto nuevo requiere además `contacts:create`. Actualizar el
+plugin no amplía los permisos de una credencial existente.
 
 ## Cancelar o archivar una reserva
 

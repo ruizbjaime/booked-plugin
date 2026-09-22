@@ -1,8 +1,8 @@
 # Booked para Claude y ChatGPT
 
 Los paquetes conectan al servidor MCP de
-[Booked](https://booked.fincasdelavilla.com) —treinta y cuatro herramientas sobre
-propiedades, reservas, contactos, calendario y dinero, nueve de ellas de escritura— e
+[Booked](https://booked.fincasdelavilla.com) —treinta y seis herramientas sobre
+propiedades, reservas, contactos, calendario y dinero, diez de ellas de escritura— e
 incluyen una skill con las reglas de negocio que no caben en la descripción de
 una herramienta.
 
@@ -24,9 +24,11 @@ Instala una sola variante de Booked en cada cliente para evitar herramientas
 repetidas. Las reglas de negocio se mantienen en `shared/booked-fincas.md` y
 se generan con `python3 scripts/sync-skills.py`. No edites las copias generadas.
 
-**Versión 0.6.0:** para guardar cotizaciones, el backend debe incluir el
-[PR #575 de Booked](https://github.com/ruizbjaime/booked/pull/575), además del soporte
-de contactos y confirmación de eliminaciones del [PR #574](https://github.com/ruizbjaime/booked/pull/574).
+**Versión 0.7.0:** para crear reservas comisionadas, despliega primero el
+[PR #576 de Booked](https://github.com/ruizbjaime/booked/pull/576). El backend también
+debe incluir cotizaciones ([PR #575](https://github.com/ruizbjaime/booked/pull/575))
+y contactos ([PR #574](https://github.com/ruizbjaime/booked/pull/574)). Actualizar el
+plugin no despliega el servidor ni amplía permisos existentes.
 OAuth requiere además el soporte de la rama `feat/mcp-oauth` del backend.
 Estos archivos preparan los paquetes; no registran ni publican una app en ChatGPT.
 
@@ -233,9 +235,37 @@ las lecturas de la rama y los permisos de contactos necesarios. Los tokens y
 consentimientos existentes no ganan permisos automáticamente. Ante una
 respuesta perdida, verifica la ficha/listado de cotizaciones antes de repetir.
 
+## Crear reservas comisionadas
+
+`preparar_reserva_comisionada` recibe la propiedad de
+`listar_propiedades_comisionadas`, un huésped de `ver_contactos` y los datos
+proporcionados por el anfitrión. Un contacto nuevo se crea por separado con
+`crear_contacto` y su permiso `contacts:create`. La entrada debe ser hoy o
+posterior; la salida es exclusiva. Se solicitan estado pendiente o confirmado,
+ocupación, alojamiento, cargos y una sola forma de comisión (configurada,
+porcentaje o monto fijo). Los importes viajan en centavos enteros. Las edades
+son opcionales, pero una lista proporcionada debe incluir a todos los niños.
+
+La preparación no ocupa noches. Con solo permisos de lectura puede mostrar el
+resumen, pero no entrega una firma de creación. La disponibilidad únicamente
+cubre las reservas registradas en Booked; hay que comprobarla con el propietario.
+Tras leer el resumen completo y recibir el sí explícito del anfitrión,
+`crear_reserva_comisionada` recibe solo `firma` y `confirmado: true`. La firma
+está vinculada a la credencial y es válida hasta treinta minutos, sin pasar de
+medianoche en Bogotá. El servidor vuelve a comprobar los datos y la disponibilidad.
+No se registran pagos ni cobros de comisión. Si se pierde la respuesta, consulta
+`reservas_comisionadas` antes de preparar otra creación.
+
+Primero debe desplegarse el [PR #576 del servidor](https://github.com/ruizbjaime/booked/pull/576)
+y estar habilitado `INTEGRATION_WRITES_ENABLED=true`. Emite un token aparte o
+vuelve a autorizar OAuth con «Crear reservas comisionadas» (`brokered:create`)
+y `brokered:read`, `finance:read` y `contacts:read`. La integración debe incluir
+la propiedad en su alcance comisionado; autorizar propiedades administradas no
+concede acceso a las comisionadas. Actualizar el plugin no concede estos permisos.
+
 ## Lectura y escritura
 
-Veinticinco herramientas solo leen. `cotizar` calcula un precio; no aparta fechas.
+Veintiséis herramientas solo leen. `cotizar` calcula un precio; no aparta fechas.
 
 `ver_contactos` consulta la libreta del anfitrión con `contacts:read`: devuelve
 nombre, teléfono, email, documento y notas disponibles. Ese permiso permite
@@ -255,7 +285,7 @@ requiere `properties:read` y `bookings:read`, y sí respeta esa lista.
   no la lista de acompañantes. Una reserva pendiente o confirmada no prueba
   presencia física.
 
-Nueve herramientas escriben, y cada una lleva su permiso en Booked:
+Diez herramientas escriben, y cada una lleva su permiso en Booked:
 
 | Herramienta | Permiso | Qué hace |
 | --- | --- | --- |
@@ -263,6 +293,7 @@ Nueve herramientas escriben, y cada una lleva su permiso en Booked:
 | `crear_bloqueo` | Crear bloqueos | Bloquea noches de una propiedad administrada. |
 | `eliminar_bloqueo` | Eliminar bloqueos | Borra un bloqueo manual tras explicar las consecuencias y recibir confirmación explícita; nunca uno importado. |
 | `crear_reserva_manual` | Crear reservas manuales | Crea una reserva pendiente por Directo o el canal del sitio público, sin registrar pagos. |
+| `crear_reserva_comisionada` | Crear reservas comisionadas (`brokered:create`) | Crea una reserva pendiente o confirmada en una propiedad comisionada tras preparar y confirmar huésped, estancia, importes y comisión; no registra pagos ni cobros de comisión. |
 | `cancelar_reserva` | Cancelar reservas | Cancela una reserva directa o del sitio público, conservando su historial. |
 | `eliminar_reserva` | Eliminar reservas | Archiva una reserva ya cancelada y sin retención. |
 | `convertir_bloqueo_en_reserva` | Convertir bloqueos en reservas | Convierte en reserva un bloqueo importado de Airbnb, Booking.com o VRBO. |
@@ -297,9 +328,9 @@ el borrado. Si el resumen cambia o la firma caduca, vuelve a preparar y a pedir
 confirmación.
 
 Las reservas se preparan antes con una herramienta que no escribe
-(`preparar_reserva_manual`, `preparar_gestion_de_reserva`,
+(`preparar_reserva_manual`, `preparar_reserva_comisionada`, `preparar_gestion_de_reserva`,
 `preparar_conversion_de_bloqueo`): devuelve un resumen y una firma de un solo
-intento, válida treinta minutos, y el agente solo ejecuta tras leer el resumen
+uso, válida hasta treinta minutos, y el agente solo ejecuta tras leer el resumen
 y recibir el sí explícito del anfitrión. Cancelar y archivar una reserva son
 acciones separadas, cada una con su propia preparación y confirmación.
 Ninguna escritura mueve dinero: crear no registra pagos y cancelar o archivar
@@ -315,6 +346,7 @@ permiso de escritura de cada herramienta, se exigen estas lecturas acompañantes
 | `crear_bloqueo` | «Propiedades» (`properties:read`). |
 | `eliminar_bloqueo` | «Propiedades» (`properties:read`) y «Bloqueos» (`blocks:read`). |
 | `crear_reserva_manual` | «Propiedades» (`properties:read`) y «Cotizar estancias» (`pricing:read`). |
+| `crear_reserva_comisionada` | «Reservas comisionadas» (`brokered:read`), «Importes y pagos» (`finance:read`) y «Consultar contactos» (`contacts:read`). |
 | `cancelar_reserva`, `eliminar_reserva` | «Propiedades» (`properties:read`) y «Reservas» (`bookings:read`). |
 | `convertir_bloqueo_en_reserva` | «Bloqueos» (`blocks:read`) y «Cotizar estancias» (`pricing:read`). |
 | `crear_contacto` | Ninguna. |
