@@ -3,15 +3,18 @@
 Cada versión publicada actualiza los manifiestos de los tres paquetes y las
 entradas del marketplace de Claude, y lleva un tag `vX.Y.Z`.
 
-## Sin publicar
+## 0.6.0 — 2026-09-22
 
 - Preparación guiada y guardado confirmado de cotizaciones para propiedades
   propias, administradas y comisionadas; teléfono opcional, elecciones del host
   y permisos condicionales, sin ocupar fechas ni registrar pagos o envíos.
-- El catálogo preparado pasa a 34 herramientas: 25 de lectura y 9 de escritura.
+- El catálogo pasa a 34 herramientas: 25 de lectura y 9 de escritura.
 - Las tres skills se regeneran desde la fuente compartida. Requiere desplegar
-  primero las dos herramientas del backend; esta actualización no publica
-  paquetes, amplía credenciales ni modifica la versión ya publicada.
+  primero el soporte del PR #575 de Booked; actualizar el plugin no despliega
+  el backend ni amplía los permisos de las credenciales existentes.
+- El diálogo explica los permisos faltantes, las comisiones en porcentaje y
+  los límites de confirmación. Conserva el resumen de lectura cuando no puede
+  guardar, y pide volver a preparar si no puede emitirse una firma válida.
 
 ## 0.5.0 — 2026-09-22
 

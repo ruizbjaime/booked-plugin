@@ -24,8 +24,9 @@ Instala una sola variante de Booked en cada cliente para evitar herramientas
 repetidas. Las reglas de negocio se mantienen en `shared/booked-fincas.md` y
 se generan con `python3 scripts/sync-skills.py`. No edites las copias generadas.
 
-**Estado:** antes de distribuir la versión 0.5.0, despliega el soporte de contactos
-y confirmación de eliminaciones del [PR #574 de Booked](https://github.com/ruizbjaime/booked/pull/574).
+**Versión 0.6.0:** para guardar cotizaciones, el backend debe incluir el
+[PR #575 de Booked](https://github.com/ruizbjaime/booked/pull/575), además del soporte
+de contactos y confirmación de eliminaciones del [PR #574](https://github.com/ruizbjaime/booked/pull/574).
 OAuth requiere además el soporte de la rama `feat/mcp-oauth` del backend.
 Estos archivos preparan los paquetes; no registran ni publican una app en ChatGPT.
 
@@ -90,7 +91,8 @@ Consulta la [documentación oficial de empaquetado](https://developers.openai.co
 ## Preparar el backend
 
 En el repositorio de la aplicación, con el soporte OAuth y los cambios del
-[PR #574](https://github.com/ruizbjaime/booked/pull/574) revisados:
+[PR #574](https://github.com/ruizbjaime/booked/pull/574) y del
+[PR #575](https://github.com/ruizbjaime/booked/pull/575) revisados:
 
 1. Instala las dependencias bloqueadas con `composer install` y aplica las
    migraciones mediante el procedimiento de despliegue habitual.
@@ -104,7 +106,8 @@ En el repositorio de la aplicación, con el soporte OAuth y los cambios del
 5. Verifica descubrimiento, consentimiento y consulta con una cuenta de prueba
    en Claude y otra en ChatGPT antes de distribuir la versión. Confirma que el
    servidor ofrece `ver_contactos`, `crear_contacto` y `eliminar_contacto`, y que
-   `eliminar_bloqueo` exige `confirmado: true`. Actualizar solo el plugin no
+   `eliminar_bloqueo` exige `confirmado: true`. Comprueba también que ofrece
+   `preparar_cotizacion` y `crear_cotizacion`. Actualizar solo el plugin no
    incorpora estas herramientas ni sus permisos al backend.
 
 El registro dinámico permite HTTPS en `chatgpt.com`, `chat.openai.com`,
@@ -216,14 +219,14 @@ obtiene al vincularse con
 `https://booked.fincasdelavilla.com/mcp/oauth`. El servidor vive en el repo de
 la aplicación, en `app/Mcp/`, y la puerta remota se monta en `routes/ai.php`.
 
-## Cotizaciones persistidas (próxima publicación)
+## Cotizaciones persistidas
 
 La skill ya guía `preparar_cotizacion` → confirmación explícita →
 `crear_cotizacion` para propiedades propias, administradas y comisionadas.
 El servidor pregunta datos y selecciones pendientes y guarda un borrador
 con número y enlace; no reserva fechas, registra pagos ni envía mensajes.
 
-Antes de distribuir estos cambios, despliega el soporte correspondiente de
+Para usar esta función, despliega el soporte correspondiente de
 Booked y comprueba ambas herramientas en `tools/list`. Habilita escrituras
 con `INTEGRATION_WRITES_ENABLED=true` y concede «Guardar cotizaciones» más
 las lecturas de la rama y los permisos de contactos necesarios. Los tokens y
@@ -252,10 +255,11 @@ requiere `properties:read` y `bookings:read`, y sí respeta esa lista.
   no la lista de acompañantes. Una reserva pendiente o confirmada no prueba
   presencia física.
 
-Ocho herramientas escriben, y cada una lleva su permiso en Booked:
+Nueve herramientas escriben, y cada una lleva su permiso en Booked:
 
 | Herramienta | Permiso | Qué hace |
 | --- | --- | --- |
+| `crear_cotizacion` | Guardar cotizaciones (`quotations:create`) | Guarda un borrador tras preparar, presentar el resumen y recibir confirmación explícita; no reserva noches ni envía mensajes. |
 | `crear_bloqueo` | Crear bloqueos | Bloquea noches de una propiedad administrada. |
 | `eliminar_bloqueo` | Eliminar bloqueos | Borra un bloqueo manual tras explicar las consecuencias y recibir confirmación explícita; nunca uno importado. |
 | `crear_reserva_manual` | Crear reservas manuales | Crea una reserva pendiente por Directo o el canal del sitio público, sin registrar pagos. |
@@ -307,6 +311,7 @@ permiso de escritura de cada herramienta, se exigen estas lecturas acompañantes
 
 | Herramienta | Lecturas acompañantes |
 | --- | --- |
+| `crear_cotizacion` | «Cotizaciones» (`quotations:read`); propias/administradas requieren `properties:read` y `pricing:read`; comisionadas requieren `brokered:read` y `finance:read`. Elegir un contacto o comisionista requiere `contacts:read`; crear un contacto nuevo requiere además la escritura `contacts:create`. |
 | `crear_bloqueo` | «Propiedades» (`properties:read`). |
 | `eliminar_bloqueo` | «Propiedades» (`properties:read`) y «Bloqueos» (`blocks:read`). |
 | `crear_reserva_manual` | «Propiedades» (`properties:read`) y «Cotizar estancias» (`pricing:read`). |
