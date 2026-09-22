@@ -1,8 +1,8 @@
 # Booked para Claude y ChatGPT
 
 Los paquetes conectan al servidor MCP de
-[Booked](https://booked.fincasdelavilla.com) —veintinueve herramientas sobre
-propiedades, reservas, calendario y dinero, seis de ellas de escritura— e
+[Booked](https://booked.fincasdelavilla.com) —treinta y dos herramientas sobre
+propiedades, reservas, contactos, calendario y dinero, ocho de ellas de escritura— e
 incluyen una skill con las reglas de negocio que no caben en la descripción de
 una herramienta.
 
@@ -24,7 +24,9 @@ Instala una sola variante de Booked en cada cliente para evitar herramientas
 repetidas. Las reglas de negocio se mantienen en `shared/booked-fincas.md` y
 se generan con `python3 scripts/sync-skills.py`. No edites las copias generadas.
 
-**Estado:** OAuth requiere desplegar la rama `feat/mcp-oauth` del backend.
+**Estado:** antes de distribuir la versión 0.5.0, despliega el soporte de contactos
+y confirmación de eliminaciones del [PR #574 de Booked](https://github.com/ruizbjaime/booked/pull/574).
+OAuth requiere además el soporte de la rama `feat/mcp-oauth` del backend.
 Estos archivos preparan los paquetes; no registran ni publican una app en ChatGPT.
 
 ## Instalar con OAuth
@@ -87,7 +89,8 @@ Consulta la [documentación oficial de empaquetado](https://developers.openai.co
 
 ## Preparar el backend
 
-En el repositorio de la aplicación, con la rama OAuth revisada:
+En el repositorio de la aplicación, con el soporte OAuth y los cambios del
+[PR #574](https://github.com/ruizbjaime/booked/pull/574) revisados:
 
 1. Instala las dependencias bloqueadas con `composer install` y aplica las
    migraciones mediante el procedimiento de despliegue habitual.
@@ -99,7 +102,10 @@ En el repositorio de la aplicación, con la rama OAuth revisada:
 4. Verifica que el proxy admite `/mcp/oauth`, `/oauth/authorize`, `/oauth/token`,
    `/oauth/register` y `/.well-known/oauth-*` en el dominio del panel.
 5. Verifica descubrimiento, consentimiento y consulta con una cuenta de prueba
-   en Claude y otra en ChatGPT antes de distribuir la versión.
+   en Claude y otra en ChatGPT antes de distribuir la versión. Confirma que el
+   servidor ofrece `ver_contactos`, `crear_contacto` y `eliminar_contacto`, y que
+   `eliminar_bloqueo` exige `confirmado: true`. Actualizar solo el plugin no
+   incorpora estas herramientas ni sus permisos al backend.
 
 El registro dinámico permite HTTPS en `chatgpt.com`, `chat.openai.com`,
 `claude.ai` y `claude.com`, y retornos locales de Claude Code. Las URI exactas
@@ -212,36 +218,88 @@ la aplicación, en `app/Mcp/`, y la puerta remota se monta en `routes/ai.php`.
 
 ## Lectura y escritura
 
-Veintitrés herramientas solo leen. `cotizar` calcula un precio; no aparta fechas.
+Veinticuatro herramientas solo leen. `cotizar` calcula un precio; no aparta fechas.
 
-Seis escriben, y cada una lleva su permiso en Booked:
+`ver_contactos` consulta la libreta del anfitrión con `contacts:read`: devuelve
+nombre, teléfono, email, documento y notas disponibles. Ese permiso permite
+leer toda su libreta, aunque algunas propiedades queden fuera de la lista
+autorizada. Para buscar al responsable de una estancia por propiedad también
+requiere `properties:read` y `bookings:read`, y sí respeta esa lista.
+
+- «¿Cuál es el teléfono de María Pérez?» busca con `busqueda`; si hay varias
+  coincidencias, pregunta cuál antes de atribuir datos.
+- «Dame nombre y teléfono del huésped actual de Casita Artemisa» identifica la
+  propiedad con `listar_propiedades` y consulta `ver_contactos` con
+  `propiedad_id`; la fecha predeterminada es hoy.
+- «¿Quién es el huésped principal de la reserva de Casita Artemisa para el
+  25 de septiembre de 2026?» usa el mismo filtro y `fecha: "2026-09-25"`.
+  La llegada está incluida y la salida excluida; no incluye canceladas ni
+  no-show. Devuelve el responsable de la reserva, su estado y si se hospeda,
+  no la lista de acompañantes. Una reserva pendiente o confirmada no prueba
+  presencia física.
+
+Ocho herramientas escriben, y cada una lleva su permiso en Booked:
 
 | Herramienta | Permiso | Qué hace |
 | --- | --- | --- |
 | `crear_bloqueo` | Crear bloqueos | Bloquea noches de una propiedad administrada. |
-| `eliminar_bloqueo` | Eliminar bloqueos | Borra un bloqueo manual; nunca uno importado. |
+| `eliminar_bloqueo` | Eliminar bloqueos | Borra un bloqueo manual tras explicar las consecuencias y recibir confirmación explícita; nunca uno importado. |
 | `crear_reserva_manual` | Crear reservas manuales | Crea una reserva pendiente por Directo o el canal del sitio público, sin registrar pagos. |
 | `cancelar_reserva` | Cancelar reservas | Cancela una reserva directa o del sitio público, conservando su historial. |
 | `eliminar_reserva` | Eliminar reservas | Archiva una reserva ya cancelada y sin retención. |
 | `convertir_bloqueo_en_reserva` | Convertir bloqueos en reservas | Convierte en reserva un bloqueo importado de Airbnb, Booking.com o VRBO. |
+| `crear_contacto` | Crear contactos (`contacts:create`) | Crea un contacto con nombre y teléfono internacional proporcionados por el anfitrión; no crea una reserva. |
+| `eliminar_contacto` | Eliminar contactos (`contacts:delete`) y Consultar contactos (`contacts:read`) | Prepara y, tras confirmación explícita, elimina un contacto que puede borrarse. |
 
-Los bloqueos manuales se crean o eliminan con una petición explícita del
-anfitrión y todos los datos completos. Estas dos herramientas no tienen una
-preparación con firma ni una segunda confirmación; ante datos incompletos o
-ambigüedad, el agente pregunta antes de actuar.
+Los bloqueos manuales y los contactos se crean con una petición explícita del
+anfitrión y todos los datos necesarios. Ante datos incompletos o ambigüedad,
+el agente pregunta antes de actuar. Crear contactos requiere `contacts:create`,
+sin permisos de lectura acompañantes. Si se pierde la respuesta, no repitas la
+creación a ciegas: puede duplicarla; consulta `ver_contactos` si dispones de
+`contacts:read`.
+
+**Toda eliminación exige una confirmación explícita posterior al resumen de
+lo que se eliminará y sus consecuencias. La petición inicial no cuenta como
+confirmación.** Para `eliminar_bloqueo`, el agente identifica el bloqueo manual,
+muestra la propiedad, las fechas y las consecuencias, espera el sí y llama con
+`confirmado: true`. Borrar el bloqueo no garantiza disponibilidad: pueden
+existir otras reservas o bloqueos. Esta herramienta no tiene preparación con
+firma.
+
+`eliminar_contacto` usa la misma herramienta en dos etapas: primero solo
+`contacto_id`, obtenido de `ver_contactos`, para recibir el resumen y la firma
+sin borrar nada; después de mostrarlo y recibir el sí explícito, repite con el
+mismo `contacto_id`, `firma` y `confirmado: true`. La firma está vinculada a la
+credencial, caduca a los treinta minutos y no puede volver a usarse tras un
+borrado exitoso. El servidor comprueba que los datos sigan iguales y rehúsa si
+hay reservas sin archivar, cotizaciones, una cuenta de usuario o un comisionista
+vinculados. Las reservas archivadas conservan su historial y pierden únicamente
+la referencia al contacto eliminado. No se deben eliminar vínculos para forzar
+el borrado. Si el resumen cambia o la firma caduca, vuelve a preparar y a pedir
+confirmación.
 
 Las reservas se preparan antes con una herramienta que no escribe
 (`preparar_reserva_manual`, `preparar_gestion_de_reserva`,
 `preparar_conversion_de_bloqueo`): devuelve un resumen y una firma de un solo
 intento, válida treinta minutos, y el agente solo ejecuta tras leer el resumen
-y recibir el sí explícito del anfitrión. Ninguna escritura mueve dinero:
-crear no registra pagos y cancelar o archivar no reembolsa.
+y recibir el sí explícito del anfitrión. Cancelar y archivar una reserva son
+acciones separadas, cada una con su propia preparación y confirmación.
+Ninguna escritura mueve dinero: crear no registra pagos y cancelar o archivar
+no reembolsa.
 
 La credencial es el interruptor, y los permisos de escritura solo se ofrecen
-cuando la instalación tiene `INTEGRATION_WRITES_ENABLED=true`. Cada permiso
-exige además sus lecturas acompañantes: «Propiedades» para todos, «Bloqueos»
-para eliminar bloqueos y convertirlos, «Reservas» para cancelar y eliminar
-reservas, y «Cotizar estancias» para crear reservas y convertir bloqueos.
+cuando la instalación tiene `INTEGRATION_WRITES_ENABLED=true`. Además del
+permiso de escritura de cada herramienta, se exigen estas lecturas acompañantes:
+
+| Herramienta | Lecturas acompañantes |
+| --- | --- |
+| `crear_bloqueo` | «Propiedades» (`properties:read`). |
+| `eliminar_bloqueo` | «Propiedades» (`properties:read`) y «Bloqueos» (`blocks:read`). |
+| `crear_reserva_manual` | «Propiedades» (`properties:read`) y «Cotizar estancias» (`pricing:read`). |
+| `cancelar_reserva`, `eliminar_reserva` | «Propiedades» (`properties:read`) y «Reservas» (`bookings:read`). |
+| `convertir_bloqueo_en_reserva` | «Bloqueos» (`blocks:read`) y «Cotizar estancias» (`pricing:read`). |
+| `crear_contacto` | Ninguna. |
+| `eliminar_contacto` | «Consultar contactos» (`contacts:read`). |
 
 Si Booked responde que la escritura por integraciones está apagada en la
 instalación, el administrador debe revisar esa habilitación. Emitir otro token
@@ -250,12 +308,16 @@ o reconectar OAuth no resuelve ese caso; conserva el acceso de lectura.
 - **Token manual (`booked`).** Con uno de solo lectura, el plugin no puede
   escribir. Para escribir desde aquí, emite **un token aparte** —no amplíes
   uno que ya use otro agente— con las lecturas y los permisos de escritura
-  que quieras dar.
+  que quieras dar. Para usar los nuevos permisos de contactos, emite un token
+  con los permisos necesarios y sus lecturas acompañantes; los tokens existentes
+  no se amplían al actualizar el plugin.
 - **OAuth (`booked-oauth`, `booked-chatgpt`).** Los permisos quedan fijados al
   autorizar. Una conexión anterior sigue con los permisos que tenía:
-  desconecta y vuelve a conectar, y marca los permisos en el bloque de
-  escritura de la pantalla de consentimiento, que nunca viene premarcado. La
-  autorización anterior de ese cliente se revoca sola.
+  desconecta y vuelve a conectar, y selecciona «Consultar contactos» en lectura y
+  las acciones que necesites en el bloque de escritura de la pantalla de
+  consentimiento, que nunca viene premarcado. Actualizar el plugin no añade
+  permisos a la autorización. La autorización anterior de ese cliente se
+  revoca sola.
 
 ## Licencia
 

@@ -1,21 +1,22 @@
 {
   "name": "booked-chatgpt",
-  "version": "0.4.1",
-  "description": "Veintinueve herramientas sobre propiedades, reservas, calendario y dinero de un anfitrión de Booked. Seis escriben con permiso: crear y eliminar bloqueos a petición explícita; crear, cancelar y archivar reservas directas, y convertir bloqueos de plataforma, tras preparar y confirmar. Incluye las reglas de negocio compartidas.",
+  "version": "0.5.0",
+  "description": "Treinta y dos herramientas sobre propiedades, reservas, contactos, calendario y dinero de un anfitrión de Booked: veinticuatro de lectura y ocho de escritura con permiso. Consulta datos de contactos y responsables de estancias; crea contactos, bloqueos y reservas, gestiona reservas y convierte bloqueos. Toda eliminación exige explicar las consecuencias y recibir confirmación explícita. Incluye las reglas de negocio compartidas.",
   "author": {
     "name": "Jaime Ruiz"
   },
   "skills": "./skills/",
   "interface": {
     "displayName": "Booked",
-    "shortDescription": "Consulta tus fincas, reservas e ingresos.",
-    "longDescription": "Consulta Booked mediante OAuth, con reglas compartidas con Claude. Escribe solo lo que autorices al conectar: crea o elimina bloqueos a petición explícita y con datos completos; crea, cancela o archiva reservas, y convierte bloqueos en reservas, tras preparar, leer el resumen y recibir tu sí.",
+    "shortDescription": "Consulta fincas, reservas, contactos e ingresos.",
+    "longDescription": "Consulta Booked mediante OAuth, con reglas compartidas con Claude: propiedades, reservas, contactos y dinero. Escribe solo lo que autorices al conectar: crea contactos y bloqueos a petición explícita; crea, cancela o archiva reservas y convierte bloqueos tras preparar y confirmar. Toda eliminación exige explicar las consecuencias y recibir tu sí explícito posterior; la eliminación de contactos requiere además una firma de preparación.",
     "developerName": "Jaime Ruiz",
     "category": "Productivity",
     "capabilities": [],
     "defaultPrompt": [
       "¿Qué propiedades están disponibles el próximo fin de semana?",
-      "¿Cuánto ingresaron mis propiedades este mes?"
+      "¿Cuánto ingresaron mis propiedades este mes?",
+      "¿Cuál es el nombre y teléfono del responsable de la estancia actual de Casita Artemisa?"
     ]
   },
   "mcpServers": "./.mcp.json",
