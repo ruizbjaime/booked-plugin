@@ -58,7 +58,9 @@ El servidor admite registro dinámico de clientes para los retornos permitidos.
    `https://booked.fincasdelavilla.com/mcp/oauth`, autenticación OAuth y registro
    dinámico. Inicia sesión en Booked y autoriza el alcance.
 3. Copia el ID técnico de la conexión real (`plugin_asdk_app_…`).
-4. Genera el paquete con esa conexión. El directorio de salida debe ser nuevo:
+4. Genera el paquete con esa conexión. El directorio de salida debe ser nuevo,
+   llamarse `booked-chatgpt` y quedar fuera de `plugins/booked-chatgpt`, incluso
+   si se accede a él mediante un enlace simbólico:
 
 ```bash
 python3 scripts/configure-chatgpt.py --app-id ID_REAL --output /tmp/booked-chatgpt
@@ -114,11 +116,20 @@ al recuperar la columna de caducidad obligatoria.
 ```bash
 python3 scripts/sync-skills.py
 python3 scripts/validate.py
+PYTHONDONTWRITEBYTECODE=1 python3 -m unittest discover -s tests -v
 ```
 
 Las versiones de los tres paquetes y las entradas del marketplace de Claude
-se publican coordinadas. CI comprueba las conexiones y que las skills coincidan
-con su fuente. La versión del servidor MCP sigue siendo independiente.
+se publican coordinadas. CI exige el catálogo completo, versiones coincidentes,
+la configuración de autenticación y rutas válidas a las skills y conexiones,
+tanto en la fuente como en el paquete generado. También comprueba que las
+skills coincidan con su fuente y ejecuta las pruebas de regresión en copias
+temporales. La versión del servidor MCP sigue siendo independiente.
+
+Las comprobaciones Python no requieren red y se ejecutan antes de instalar
+Claude Code. CI fija Claude Code en `2.1.278`, la versión usada para validar
+estos paquetes; actualiza esa versión de forma explícita al comprobar
+compatibilidad con una nueva versión del cliente.
 
 ## Instalar la variante con token en Cowork
 
@@ -148,8 +159,12 @@ token está vacío, caducado o revocado — las tres se arreglan igual:
    caducado) y emite uno nuevo con las mismas capacidades.
 2. Pega el nuevo en la configuración del plugin: en Cowork, desde la ficha del
    plugin en **Customize → Plugins**; en Claude Code, desde el gestor `/plugin`.
-   El valor se guarda en el almacén seguro del sistema, nunca en un archivo del
-   proyecto.
+   El almacenamiento depende del cliente y del sistema. Claude Code usa el
+   llavero de macOS cuando está disponible; si falla o no hay un llavero
+   compatible, usa `~/.claude/.credentials.json`. `sensitive: true` oculta el
+   valor y evita guardarlo en `settings.json`, pero no garantiza un llavero en
+   todas las plataformas. Consulta la
+   [referencia de configuración de Claude](https://code.claude.com/docs/en/plugins-reference#user-configuration).
 
 La herramienta `alcance_del_token` devuelve `caduca`; la skill le pide al
 modelo que avise cuando falte menos de una semana.
@@ -188,9 +203,10 @@ plugins/booked-chatgpt/          # ChatGPT, OAuth
 ```
 
 En `booked`, el token viaja como `Authorization: Bearer` hacia
-`https://booked.fincasdelavilla.com/mcp` y se guarda en el almacén seguro del
-sistema (`sensitive: true`), nunca en este repositorio. Los paquetes OAuth no
-llevan credenciales: el cliente las obtiene al vincularse con
+`https://booked.fincasdelavilla.com/mcp`. El cliente gestiona su almacenamiento
+con `sensitive: true`, según lo explicado arriba; el paquete no lo guarda en
+este repositorio. Los paquetes OAuth no llevan credenciales: el cliente las
+obtiene al vincularse con
 `https://booked.fincasdelavilla.com/mcp/oauth`. El servidor vive en el repo de
 la aplicación, en `app/Mcp/`, y la puerta remota se monta en `routes/ai.php`.
 
@@ -209,6 +225,11 @@ Seis escriben, y cada una lleva su permiso en Booked:
 | `eliminar_reserva` | Eliminar reservas | Archiva una reserva ya cancelada y sin retención. |
 | `convertir_bloqueo_en_reserva` | Convertir bloqueos en reservas | Convierte en reserva un bloqueo importado de Airbnb, Booking.com o VRBO. |
 
+Los bloqueos manuales se crean o eliminan con una petición explícita del
+anfitrión y todos los datos completos. Estas dos herramientas no tienen una
+preparación con firma ni una segunda confirmación; ante datos incompletos o
+ambigüedad, el agente pregunta antes de actuar.
+
 Las reservas se preparan antes con una herramienta que no escribe
 (`preparar_reserva_manual`, `preparar_gestion_de_reserva`,
 `preparar_conversion_de_bloqueo`): devuelve un resumen y una firma de un solo
@@ -221,6 +242,10 @@ cuando la instalación tiene `INTEGRATION_WRITES_ENABLED=true`. Cada permiso
 exige además sus lecturas acompañantes: «Propiedades» para todos, «Bloqueos»
 para eliminar bloqueos y convertirlos, «Reservas» para cancelar y eliminar
 reservas, y «Cotizar estancias» para crear reservas y convertir bloqueos.
+
+Si Booked responde que la escritura por integraciones está apagada en la
+instalación, el administrador debe revisar esa habilitación. Emitir otro token
+o reconectar OAuth no resuelve ese caso; conserva el acceso de lectura.
 
 - **Token manual (`booked`).** Con uno de solo lectura, el plugin no puede
   escribir. Para escribir desde aquí, emite **un token aparte** —no amplíes

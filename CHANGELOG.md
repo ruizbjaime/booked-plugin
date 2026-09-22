@@ -3,12 +3,28 @@
 Cada versión publicada actualiza los manifiestos de los tres paquetes y las
 entradas del marketplace de Claude, y lleva un tag `vX.Y.Z`.
 
+## Sin publicar
+
+- La validación exige el catálogo completo, versiones coordinadas,
+  autenticación manual obligatoria y sensible, y rutas válidas en los paquetes
+  fuente y generado. Las pruebas cubren las configuraciones rotas que antes
+  pasaban CI.
+- El empaquetador rechaza salidas dentro de su fuente, incluidos enlaces
+  simbólicos, y evita dejar un paquete incompleto si falla la construcción.
+- La skill distingue escritura deshabilitada de permiso faltante y aclara
+  cómo presentar cálculos en centavos sin convertir dos veces un importe.
+- Los manifiestos y la documentación distinguen la petición de un bloqueo de
+  la preparación y confirmación de una reserva, y explican el almacenamiento
+  real de credenciales según el cliente.
+- CI ejecuta primero las comprobaciones Python y las pruebas de regresión,
+  fija Claude Code en `2.1.278` y limita los permisos a lectura del repositorio.
+
 ## 0.4.0 — 2026-09-21
 
 - El servidor pasa a veintinueve herramientas y seis escriben: además de
   convertir bloqueos, ahora crear y eliminar bloqueos manuales, y crear,
   cancelar y archivar reservas directas o del sitio público.
-- La skill enseña el contrato común de las escrituras —preparar, leer el
+- La skill enseña el contrato de las escrituras de reservas —preparar, leer el
   resumen, esperar el sí explícito, ejecutar con la firma— y que cancelar y
   archivar son dos confirmaciones separadas.
 - Los avisos de permiso faltante nombran la acción y el permiso exacto de

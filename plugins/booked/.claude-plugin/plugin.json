@@ -2,7 +2,7 @@
   "name": "booked",
   "displayName": "Booked — fincas, reservas y dinero",
   "version": "0.4.0",
-  "description": "Veintinueve herramientas sobre las propiedades, reservas, calendario y dinero de un anfitrión de Booked; seis escriben —crear y eliminar bloqueos, crear, cancelar y archivar reservas directas, y convertir en reserva un bloqueo de plataforma—, siempre tras preparar y confirmar. Más las reglas que no caben en la descripción de una herramienta.",
+  "description": "Veintinueve herramientas sobre propiedades, reservas, calendario y dinero de un anfitrión de Booked. Seis escriben con permiso: crear y eliminar bloqueos a petición explícita; crear, cancelar y archivar reservas directas, y convertir bloqueos de plataforma, tras preparar y confirmar. Incluye las reglas de negocio compartidas.",
   "author": {
     "name": "Jaime Ruiz"
   },

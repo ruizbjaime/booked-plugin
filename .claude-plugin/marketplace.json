@@ -4,13 +4,13 @@
     "name": "Jaime Ruiz",
     "url": "https://github.com/ruizbjaime"
   },
-  "description": "Booked para Claude: OAuth o token manual. Consultas, bloqueos, reservas directas y conversión de bloqueos, con confirmación.",
+  "description": "Booked para Claude: OAuth o token manual. Consultas y bloqueos a petición explícita; reservas directas y conversión de bloqueos con preparación y confirmación.",
   "plugins": [
     {
       "name": "booked",
       "source": "./plugins/booked",
       "displayName": "Booked — fincas, reservas y dinero",
-      "description": "Consulta las fincas de Jaime en Booked: disponibilidad, reservas, calendario, cotizaciones, ingresos, deudas y comisiones. Escribe —bloqueos, reservas directas, conversión de bloqueos— solo si el token lo permite y tras confirmar.",
+      "description": "Consulta las fincas de Jaime en Booked: disponibilidad, reservas, calendario, cotizaciones, ingresos, deudas y comisiones. Con permiso del token: bloqueos a petición explícita; reservas directas y conversión de bloqueos con preparación y confirmación.",
       "version": "0.4.0",
       "author": {
         "name": "Jaime Ruiz"
@@ -29,7 +29,7 @@
       "name": "booked-oauth",
       "source": "./plugins/booked-oauth",
       "displayName": "Booked — conexión con OAuth",
-      "description": "Consulta Booked iniciando sesión con tu cuenta; escribe —bloqueos, reservas directas, conversión de bloqueos— solo lo que marques al autorizar y tras confirmar. Autorización OAuth revocable sin caducidad fija.",
+      "description": "Consulta Booked iniciando sesión con tu cuenta; escribe solo lo que marques al autorizar: bloqueos a petición explícita; reservas directas y conversión de bloqueos con preparación y confirmación. Autorización OAuth revocable sin caducidad fija.",
       "version": "0.4.0",
       "author": {
         "name": "Jaime Ruiz"
