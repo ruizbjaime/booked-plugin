@@ -1,8 +1,8 @@
 {
   "name": "booked",
   "displayName": "Booked — fincas, reservas y dinero",
-  "version": "0.4.1",
-  "description": "Veintinueve herramientas sobre propiedades, reservas, calendario y dinero de un anfitrión de Booked. Seis escriben con permiso: crear y eliminar bloqueos a petición explícita; crear, cancelar y archivar reservas directas, y convertir bloqueos de plataforma, tras preparar y confirmar. Incluye las reglas de negocio compartidas.",
+  "version": "0.5.0",
+  "description": "Treinta y dos herramientas sobre propiedades, reservas, contactos, calendario y dinero de un anfitrión de Booked: veinticuatro de lectura y ocho de escritura con permiso. Consulta datos de contactos y responsables de estancias; crea contactos, bloqueos y reservas, gestiona reservas y convierte bloqueos. Toda eliminación exige explicar las consecuencias y recibir confirmación explícita. Incluye las reglas de negocio compartidas.",
   "author": {
     "name": "Jaime Ruiz"
   },
@@ -15,13 +15,14 @@
     "fincas",
     "pms",
     "disponibilidad",
-    "precios"
+    "precios",
+    "contactos"
   ],
   "userConfig": {
     "api_token": {
       "type": "string",
       "title": "Token de la integración de Booked",
-      "description": "Se emite en Booked → Ajustes → Integraciones API y se muestra una sola vez. Caduca a los 30 días: cuando el plugin conteste «credenciales», emite uno nuevo y pégalo aquí. El token decide lo que el plugin puede hacer: con uno de solo lectura no escribe nada; para crear, cancelar o archivar reservas, administrar bloqueos o convertirlos, emite uno aparte con esos permisos de escritura.",
+      "description": "Se emite en Booked → Ajustes → Integraciones API y se muestra una sola vez. Caduca a los 30 días: cuando el plugin conteste «credenciales», emite uno nuevo y pégalo aquí. El token decide lo que el plugin puede hacer: con uno de solo lectura no escribe nada; para crear o eliminar contactos, administrar bloqueos o gestionar reservas, emite uno aparte con esos permisos de escritura y las lecturas que requieren. Actualizar el plugin no amplía los permisos del token.",
       "sensitive": true,
       "required": true
     }

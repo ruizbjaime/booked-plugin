@@ -3,6 +3,26 @@
 Cada versión publicada actualiza los manifiestos de los tres paquetes y las
 entradas del marketplace de Claude, y lleva un tag `vX.Y.Z`.
 
+## 0.5.0 — 2026-09-22
+
+- El catálogo pasa a treinta y dos herramientas: veinticuatro de lectura y
+  ocho de escritura. Se incorporan `ver_contactos`, `crear_contacto` y
+  `eliminar_contacto` a las reglas compartidas de los tres paquetes.
+- La skill permite consultar datos personales autorizados: teléfono por
+  contacto y responsable de una estancia por propiedad y fecha, con hoy como
+  valor predeterminado. Explica la diferencia entre titular y huésped alojado.
+- Toda eliminación exige explicar las consecuencias y recibir un sí explícito
+  posterior. Los contactos se preparan y confirman con la misma herramienta y
+  una firma de treinta minutos vinculada a la credencial; los bloqueos manuales
+  requieren `confirmado: true`, sin firma.
+- Se documentan el alcance de toda la libreta de `contacts:read`, las lecturas
+  y la lista de propiedades exigidas para buscar por estancia, y los permisos
+  independientes de creación y eliminación. Las credenciales existentes no
+  ganan permisos: hay que emitir un token o volver a autorizar OAuth.
+- Requiere desplegar primero el soporte MCP del PR #574 de Booked. Se conservan
+  las URLs de los conectores y las variantes de autenticación; actualizar el
+  plugin no despliega el backend ni publica las aplicaciones.
+
 ## 0.4.1 — 2026-09-22
 
 - La validación exige el catálogo completo, versiones coordinadas,

@@ -1,8 +1,8 @@
 {
   "name": "booked-oauth",
   "displayName": "Booked — conexión con OAuth",
-  "version": "0.4.1",
-  "description": "Veintinueve herramientas sobre propiedades, reservas, calendario y dinero de un anfitrión de Booked. Seis escriben con permiso: crear y eliminar bloqueos a petición explícita; crear, cancelar y archivar reservas directas, y convertir bloqueos de plataforma, tras preparar y confirmar. Incluye las reglas de negocio compartidas.",
+  "version": "0.5.0",
+  "description": "Treinta y dos herramientas sobre propiedades, reservas, contactos, calendario y dinero de un anfitrión de Booked: veinticuatro de lectura y ocho de escritura con permiso. Consulta datos de contactos y responsables de estancias; crea contactos, bloqueos y reservas, gestiona reservas y convierte bloqueos. Toda eliminación exige explicar las consecuencias y recibir confirmación explícita. Incluye las reglas de negocio compartidas.",
   "author": {
     "name": "Jaime Ruiz"
   },
@@ -15,6 +15,7 @@
     "fincas",
     "pms",
     "disponibilidad",
-    "precios"
+    "precios",
+    "contactos"
   ]
 }
