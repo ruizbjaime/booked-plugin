@@ -4,14 +4,14 @@
     "name": "Jaime Ruiz",
     "url": "https://github.com/ruizbjaime"
   },
-  "description": "Booked para Claude: OAuth o token manual. Treinta y cuatro herramientas para consultas y escrituras autorizadas sobre propiedades, reservas, contactos y dinero. Toda eliminación exige confirmación explícita posterior a sus consecuencias.",
+  "description": "Booked para Claude: OAuth o token manual. Treinta y seis herramientas para consultas y escrituras autorizadas sobre propiedades, reservas, contactos y dinero. Toda eliminación exige confirmación explícita posterior a sus consecuencias.",
   "plugins": [
     {
       "name": "booked",
       "source": "./plugins/booked",
       "displayName": "Booked — fincas, reservas y dinero",
-      "description": "Consulta Booked: propiedades, reservas, contactos, calendario y dinero. Con los permisos del token, guarda cotizaciones confirmadas, crea contactos y bloqueos, gestiona reservas y convierte bloqueos. Toda eliminación exige explicar las consecuencias y recibir confirmación explícita; las escrituras de reservas y la eliminación de contactos usan preparación con firma.",
-      "version": "0.6.0",
+      "description": "Consulta Booked: propiedades, reservas, contactos, calendario y dinero. Con los permisos del token, guarda cotizaciones confirmadas, crea contactos y bloqueos, crea reservas directas o comisionadas, gestiona reservas directas y convierte bloqueos. Toda eliminación exige explicar las consecuencias y recibir confirmación explícita; las escrituras de reservas y la eliminación de contactos usan preparación con firma.",
+      "version": "0.7.0",
       "author": {
         "name": "Jaime Ruiz"
       },
@@ -30,8 +30,8 @@
       "name": "booked-oauth",
       "source": "./plugins/booked-oauth",
       "displayName": "Booked — conexión con OAuth",
-      "description": "Consulta Booked: propiedades, reservas, contactos, calendario y dinero. Con los permisos seleccionados al autorizar OAuth, guarda cotizaciones confirmadas, crea contactos y bloqueos, gestiona reservas y convierte bloqueos. Toda eliminación exige explicar las consecuencias y recibir confirmación explícita; las escrituras de reservas y la eliminación de contactos usan preparación con firma.",
-      "version": "0.6.0",
+      "description": "Consulta Booked: propiedades, reservas, contactos, calendario y dinero. Con los permisos seleccionados al autorizar OAuth, guarda cotizaciones confirmadas, crea contactos y bloqueos, crea reservas directas o comisionadas, gestiona reservas directas y convierte bloqueos. Toda eliminación exige explicar las consecuencias y recibir confirmación explícita; las escrituras de reservas y la eliminación de contactos usan preparación con firma.",
+      "version": "0.7.0",
       "author": {
         "name": "Jaime Ruiz"
       },

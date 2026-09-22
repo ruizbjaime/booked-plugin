@@ -3,6 +3,20 @@
 Cada versión publicada actualiza los manifiestos de los tres paquetes y las
 entradas del marketplace de Claude, y lleva un tag `vX.Y.Z`.
 
+## 0.7.0 — 2026-09-22
+
+- Añade el flujo `preparar_reserva_comisionada` → confirmar resumen →
+  `crear_reserva_comisionada` en los tres paquetes, con contacto existente,
+  estado elegido, cargos y comisión declarados por el anfitrión.
+- El catálogo pasa a 36 herramientas: 26 de lectura y 10 de escritura. La
+  disponibilidad comisionada solo refleja lo registrado en Booked; no se
+  registran pagos ni cobros de comisión.
+- Documenta `brokered:create` y sus lecturas acompañantes `brokered:read`,
+  `finance:read` y `contacts:read`, el alcance comisionado y la renovación de
+  credenciales. Las conexiones existentes no ganan permisos al actualizar.
+- Requiere desplegar primero el [PR #576 de Booked](https://github.com/ruizbjaime/booked/pull/576).
+  Las tres skills se regeneran desde la fuente compartida.
+
 ## 0.6.0 — 2026-09-22
 
 - Preparación guiada y guardado confirmado de cotizaciones para propiedades
