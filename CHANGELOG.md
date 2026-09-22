@@ -3,6 +3,20 @@
 Cada versión publicada actualiza los manifiestos de los tres paquetes y las
 entradas del marketplace de Claude, y lleva un tag `vX.Y.Z`.
 
+## 0.4.0 — 2026-09-21
+
+- El servidor pasa a veintinueve herramientas y seis escriben: además de
+  convertir bloqueos, ahora crear y eliminar bloqueos manuales, y crear,
+  cancelar y archivar reservas directas o del sitio público.
+- La skill enseña el contrato común de las escrituras —preparar, leer el
+  resumen, esperar el sí explícito, ejecutar con la firma— y que cancelar y
+  archivar son dos confirmaciones separadas.
+- Los avisos de permiso faltante nombran la acción y el permiso exacto de
+  Booked, en la variante manual y en las OAuth.
+- Requiere desplegar primero Booked con las reservas manuales y la gestión de
+  reservas por MCP, y `INTEGRATION_WRITES_ENABLED=true`; sin eso, los paquetes
+  siguen leyendo igual.
+
 ## 0.3.0 — 2026-09-21
 
 - El servidor pasa a veintidós herramientas y una escribe:

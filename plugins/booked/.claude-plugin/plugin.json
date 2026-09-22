@@ -1,8 +1,8 @@
 {
   "name": "booked",
   "displayName": "Booked — fincas, reservas y dinero",
-  "version": "0.3.0",
-  "description": "Veintidós herramientas sobre las propiedades, reservas, calendario y dinero de un anfitrión de Booked —todas de lectura salvo una, que convierte en reserva un bloqueo de plataforma—, más las reglas que no caben en la descripción de una herramienta.",
+  "version": "0.4.0",
+  "description": "Veintinueve herramientas sobre las propiedades, reservas, calendario y dinero de un anfitrión de Booked; seis escriben —crear y eliminar bloqueos, crear, cancelar y archivar reservas directas, y convertir en reserva un bloqueo de plataforma—, siempre tras preparar y confirmar. Más las reglas que no caben en la descripción de una herramienta.",
   "author": {
     "name": "Jaime Ruiz"
   },
@@ -21,7 +21,7 @@
     "api_token": {
       "type": "string",
       "title": "Token de la integración de Booked",
-      "description": "Se emite en Booked → Ajustes → Integraciones API y se muestra una sola vez. Caduca a los 30 días: cuando el plugin conteste «credenciales», emite uno nuevo y pégalo aquí. Con un token de solo lectura el plugin no puede escribir nada; para convertir bloqueos en reservas desde aquí, emite uno aparte que además lleve «Convertir bloqueos en reservas».",
+      "description": "Se emite en Booked → Ajustes → Integraciones API y se muestra una sola vez. Caduca a los 30 días: cuando el plugin conteste «credenciales», emite uno nuevo y pégalo aquí. El token decide lo que el plugin puede hacer: con uno de solo lectura no escribe nada; para crear, cancelar o archivar reservas, administrar bloqueos o convertirlos, emite uno aparte con esos permisos de escritura.",
       "sensitive": true,
       "required": true
     }

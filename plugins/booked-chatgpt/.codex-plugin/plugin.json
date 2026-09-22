@@ -1,7 +1,7 @@
 {
   "name": "booked-chatgpt",
-  "version": "0.3.0",
-  "description": "Veintidós herramientas sobre las propiedades, reservas, calendario y dinero de un anfitrión de Booked —todas de lectura salvo una, que convierte en reserva un bloqueo de plataforma—, más las reglas que no caben en la descripción de una herramienta.",
+  "version": "0.4.0",
+  "description": "Veintinueve herramientas sobre las propiedades, reservas, calendario y dinero de un anfitrión de Booked; seis escriben —crear y eliminar bloqueos, crear, cancelar y archivar reservas directas, y convertir en reserva un bloqueo de plataforma—, siempre tras preparar y confirmar. Más las reglas que no caben en la descripción de una herramienta.",
   "author": {
     "name": "Jaime Ruiz"
   },
@@ -9,7 +9,7 @@
   "interface": {
     "displayName": "Booked",
     "shortDescription": "Consulta tus fincas, reservas e ingresos.",
-    "longDescription": "Consulta Booked mediante OAuth, con reglas compartidas con Claude. Lo único que escribe es convertir en reserva un bloqueo de plataforma, y solo si lo autorizas al conectar.",
+    "longDescription": "Consulta Booked mediante OAuth, con reglas compartidas con Claude. Escribe solo lo que autorices al conectar —bloqueos, reservas directas y conversión de bloqueos— y siempre tras leerte un resumen y recibir tu sí.",
     "developerName": "Jaime Ruiz",
     "category": "Productivity",
     "capabilities": [],

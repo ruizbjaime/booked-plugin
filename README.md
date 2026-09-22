@@ -1,9 +1,10 @@
 # Booked para Claude y ChatGPT
 
 Los paquetes conectan al servidor MCP de
-[Booked](https://booked.fincasdelavilla.com) —veintidós herramientas sobre
-propiedades, reservas, calendario y dinero, todas de lectura salvo una— e incluyen una skill con las
-reglas de negocio que no caben en la descripción de una herramienta.
+[Booked](https://booked.fincasdelavilla.com) —veintinueve herramientas sobre
+propiedades, reservas, calendario y dinero, seis de ellas de escritura— e
+incluyen una skill con las reglas de negocio que no caben en la descripción de
+una herramienta.
 
 Este repositorio incluye el *marketplace* de Claude y los paquetes para ambas
 plataformas. Claude se instala por URL; ChatGPT requiere registrar su conexión
@@ -33,7 +34,7 @@ El administrador debe completar primero [la configuración del backend](#prepara
 En Booked, crea una integración en **Ajustes → Integraciones API** y selecciona
 las propiedades administradas y comisionadas que quieres compartir. No necesitas
 emitir un token manual. Durante la vinculación, escoge esa integración y marca
-los permisos de lectura. La pantalla muestra el alcance antes de autorizar.
+los permisos de lectura y, si quieres escribir desde el cliente, los de escritura. La pantalla muestra el alcance antes de autorizar.
 
 ### Claude
 
@@ -195,25 +196,41 @@ la aplicación, en `app/Mcp/`, y la puerta remota se monta en `routes/ai.php`.
 
 ## Lectura y escritura
 
-Veintiuna herramientas solo leen. `cotizar` calcula un precio; no aparta fechas.
+Veintitrés herramientas solo leen. `cotizar` calcula un precio; no aparta fechas.
 
-Una sola escribe: `convertir_bloqueo_en_reserva`, que convierte en reserva un
-bloqueo importado del calendario de Airbnb, Booking.com o VRBO. Antes pasa
-siempre por `preparar_conversion_de_bloqueo`, que no escribe y dice qué datos
-faltan; el agente se los pregunta al anfitrión, no los inventa.
+Seis escriben, y cada una lleva su permiso en Booked:
 
-La credencial es el interruptor, y el permiso solo se ofrece cuando la
-instalación tiene `INTEGRATION_WRITES_ENABLED=true`. «Convertir bloqueos en
-reservas» exige además «Bloqueos» y «Cotizar estancias».
+| Herramienta | Permiso | Qué hace |
+| --- | --- | --- |
+| `crear_bloqueo` | Crear bloqueos | Bloquea noches de una propiedad administrada. |
+| `eliminar_bloqueo` | Eliminar bloqueos | Borra un bloqueo manual; nunca uno importado. |
+| `crear_reserva_manual` | Crear reservas manuales | Crea una reserva pendiente por Directo o el canal del sitio público, sin registrar pagos. |
+| `cancelar_reserva` | Cancelar reservas | Cancela una reserva directa o del sitio público, conservando su historial. |
+| `eliminar_reserva` | Eliminar reservas | Archiva una reserva ya cancelada y sin retención. |
+| `convertir_bloqueo_en_reserva` | Convertir bloqueos en reservas | Convierte en reserva un bloqueo importado de Airbnb, Booking.com o VRBO. |
+
+Las reservas se preparan antes con una herramienta que no escribe
+(`preparar_reserva_manual`, `preparar_gestion_de_reserva`,
+`preparar_conversion_de_bloqueo`): devuelve un resumen y una firma de un solo
+intento, válida treinta minutos, y el agente solo ejecuta tras leer el resumen
+y recibir el sí explícito del anfitrión. Ninguna escritura mueve dinero:
+crear no registra pagos y cancelar o archivar no reembolsa.
+
+La credencial es el interruptor, y los permisos de escritura solo se ofrecen
+cuando la instalación tiene `INTEGRATION_WRITES_ENABLED=true`. Cada permiso
+exige además sus lecturas acompañantes: «Propiedades» para todos, «Bloqueos»
+para eliminar bloqueos y convertirlos, «Reservas» para cancelar y eliminar
+reservas, y «Cotizar estancias» para crear reservas y convertir bloqueos.
 
 - **Token manual (`booked`).** Con uno de solo lectura, el plugin no puede
-  escribir. Para convertir desde aquí, emite **un token aparte** —no amplíes
-  uno que ya use otro agente— con las lecturas y ese permiso.
+  escribir. Para escribir desde aquí, emite **un token aparte** —no amplíes
+  uno que ya use otro agente— con las lecturas y los permisos de escritura
+  que quieras dar.
 - **OAuth (`booked-oauth`, `booked-chatgpt`).** Los permisos quedan fijados al
-  autorizar. Una conexión anterior sigue siendo de solo lectura: desconecta y
-  vuelve a conectar, y marca el permiso en el bloque de escritura de la
-  pantalla de consentimiento, que nunca viene premarcado. La autorización
-  anterior de ese cliente se revoca sola.
+  autorizar. Una conexión anterior sigue con los permisos que tenía:
+  desconecta y vuelve a conectar, y marca los permisos en el bloque de
+  escritura de la pantalla de consentimiento, que nunca viene premarcado. La
+  autorización anterior de ese cliente se revoca sola.
 
 ## Licencia
 
