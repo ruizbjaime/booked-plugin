@@ -179,8 +179,12 @@ actualizar Booked; no simules un guardado con otra herramienta.
    comisionada es distinta de un comisionista destinatario. En comisionadas la
    disponibilidad solo cubre lo registrado en Booked, no inventario externo.
 2. Pregunta `faltan` con sus opciones y corrige `errores`; presenta
-   `impedimentos` antes de seguir. No vuelvas a preguntar datos ya entregados.
-   Adultos, niños y mascotas deben quedar explícitos; cero no se presume.
+   `avisos` e `impedimentos` antes de seguir. Si un aviso indica que falta un
+   permiso de escritura, explica que solo quedó preparada; no solicites la
+   confirmación de guardado hasta contar con una credencial habilitada.
+   No vuelvas a preguntar datos ya entregados. Adultos, niños y mascotas deben
+   quedar explícitos; cero no se presume. En comisionadas las edades son
+   opcionales, pero una lista no vacía debe incluir una edad por cada niño.
    Puede elegir un contacto existente o crear uno al guardar: nombre y tipo
    de contacto se preguntan cuando faltan; teléfono, email y documento son
    opcionales. No uses `crear_contacto` por adelantado para este flujo.
@@ -188,10 +192,12 @@ actualizar Booked; no simules un guardado con otra herramienta.
    destinatario, descuentos elegibles y cualquier excepción a estadía mínima.
    En comisionadas pregunta alojamiento total, cargos con su selección de
    comisión y comisión configurada, porcentaje o monto fijo. Los importes de
-   entrada son centavos; `comision_porcentaje: 15` significa 15 %. No elijas
-   descuentos, cargos ni comisión por Jaime. Una lista vacía significa que
+   entrada son centavos; `comision_porcentaje`, `comision_configurada_porcentaje`
+   y `resumen.comision.porcentaje` usan la escala de 0 a 100: 15 significa 15 %.
+   No elijas descuentos, cargos ni comisión por Jaime. Una lista vacía significa que
    respondió ninguno. La vigencia sugerida también necesita aceptación.
-4. Solo cuando `lista_para_crear` sea verdadero, lee el resumen completo,
+4. Solo cuando `lista_para_crear` sea verdadero, haya una firma vigente y
+   estén habilitados los permisos de escritura, lee el resumen completo,
    incluido destinatario, fechas, ocupación, desglose, comisión interna cuando
    corresponda, vigencia y notas. Espera un sí explícito posterior en el chat.
    Entonces llama `crear_cotizacion` únicamente con `firma` y `confirmado: true`.
@@ -199,9 +205,13 @@ actualizar Booked; no simules un guardado con otra herramienta.
 5. Devuelve el número y enlace reales. Queda en borrador: no ocupa noches,
    envía mensajes ni registra pagos. La firma está ligada a la credencial,
    dura como máximo treinta minutos sin cruzar medianoche y no se reutiliza
-   tras guardar. Si se pierde la respuesta, verifica las cotizaciones en el
-   panel antes de crear otra; no hay consulta MCP de cotizaciones para resolver
-   ese caso ni idempotencia entre firmas distintas.
+   tras guardar. Si faltan menos de dos minutos para medianoche, el servidor
+   no emite firma: sigue su mensaje para preparar después del cambio de día.
+   Si la firma caduca, sigue la indicación de preparar y confirmar de nuevo.
+   Ante un resultado incierto o una respuesta perdida al guardar, verifica
+   las cotizaciones en el panel antes de intentar otra creación; no hay
+   consulta MCP de cotizaciones para resolver ese caso ni idempotencia entre
+   firmas distintas.
 
 Preparar requiere `quotations:read`; guardar añade `quotations:create`.
 Propias/administradas necesitan `properties:read` y `pricing:read`; comisionadas,
