@@ -1,17 +1,19 @@
 ---
 name: booked-fincas
-description: "Gestiona las fincas de Jaime en Booked, aunque no se nombre el PMS: disponibilidad, reservas, huéspedes, contactos, calendario, precios, ingresos, pagos pendientes, deudas y comisiones de Airbnb, Booking.com, Fincas de la Villa o venta directa. Úsala para consultar quién es el huésped principal de una propiedad hoy o en otra fecha, buscar el teléfono de un contacto, guardar cotizaciones, crear o eliminar contactos y bloqueos, crear reservas directas o en propiedades comisionadas, cancelar o archivar las directas, y convertir bloqueos de plataforma en reservas. Consulta los datos existentes con las herramientas `booked`; para crear registros usa los datos proporcionados por Jaime."
+description: "Gestiona las fincas de Jaime en Booked, aunque no se nombre el PMS: disponibilidad, reservas, huéspedes, contactos, calendario, precios, ingresos, pagos pendientes, deudas y comisiones de Airbnb, Booking.com, Fincas de la Villa o venta directa. Úsala para consultar quién es el huésped principal de una propiedad hoy o en otra fecha, buscar el teléfono de un contacto, guardar cotizaciones, crear o eliminar contactos y bloqueos, crear reservas directas o en propiedades comisionadas, cancelar o archivar las directas, registrar si se retiene o se devuelve lo cobrado de una reserva cancelada, y convertir bloqueos de plataforma en reservas. Consulta los datos existentes con las herramientas `booked`; para crear registros usa los datos proporcionados por Jaime."
 ---
 
 # Booked — las fincas de Jaime
 
-Las herramientas `booked` leen el PMS de Fincas de la Villa, y diez de ellas
+Las herramientas `booked` leen el PMS de Fincas de la Villa, y once de ellas
 escriben: crear y eliminar bloqueos manuales, crear una reserva directa o
-comisionada, cancelar o archivar una directa, convertir en reserva un bloqueo
-de plataforma, y crear o eliminar contactos, además de guardar cotizaciones
-confirmadas.
+comisionada, cancelar o archivar una directa, registrar la retención o
+devolución de lo cobrado en una reserva cancelada, convertir en reserva un
+bloqueo de plataforma, y crear o eliminar contactos, además de guardar
+cotizaciones confirmadas.
 `cotizar` es un cálculo, no aparta fechas. Nada más crea, modifica ni cancela
-nada: pagos, reembolsos, cambios de fechas o de huésped se hacen en Booked.
+nada: registrar pagos, cambiar fechas o huésped, y revocar o corregir una
+retención o devolución ya registrada se hacen en Booked.
 
 Cada herramienta lleva sus reglas en su propia descripción: léela antes de
 llamarla. Aquí está solo lo que ninguna descripción puede decir, porque no
@@ -145,8 +147,8 @@ pertenece a una herramienta sino a la respuesta.
   no reintentes a ciegas, porque crearías un duplicado o repetirías una acción.
 - **Lo que venga en `impedimentos` no se arregla preguntando:** cuéntaselo.
 - **Ninguna escritura mueve dinero.** Crear no registra pagos; cancelar y
-  archivar no reembolsan. Si hay dinero de por medio, dile que lo revise en
-  Booked.
+  archivar no reembolsan. Registrar una retención o devolución solo anota lo
+  que Jaime hizo o decidió: no transfiere nada al huésped.
 
 ## Guardar una cotización
 
@@ -322,6 +324,52 @@ grupo se gestionan en Booked.
    disponibilidad, conservando el historial. Si Jaime pide «bórrala» sobre una
    reserva activa, explícale que primero se cancela con su confirmación y
    después, con otra, se archiva. No encadenes las dos por tu cuenta.
+4. Si `cancelar_reserva` devuelve `decision_de_pagos_pendiente: true`, queda
+   dinero cobrado por decidir: díselo y ofrécele registrar qué hizo con él
+   (sección siguiente). No lo empieces por tu cuenta. El campo solo llega si
+   el token lee importes; que falte no significa que no haya pagos.
+
+## Retener o devolver lo cobrado de una reserva cancelada
+
+Para reservas canceladas o no presentadas de cualquier canal, importadas
+incluidas. Las de grupo, las de un anfitrión externo y las de propiedades sin
+finanzas se deciden en Booked, igual que revocar o corregir una decisión ya
+registrada. La decisión es de Jaime; tú solo la registras.
+
+1. Identifica la reserva y llama `preparar_retencion_o_devolucion` con
+   `propiedad_id` y `reserva_id`, **sin `decision`**. Devuelve la situación, sin
+   firma, y no cambia nada. Si rehúsa, cuéntale el motivo tal cual.
+2. La `modalidad` la decide el servidor, nunca tú:
+   - **`anfitrion`**: Jaime cobró los pagos y `reembolsable` es lo cobrado por
+     decidir. Pregúntale qué hizo. **Retener** conserva todo lo cobrado.
+     **Devolver** pide cuánto (por defecto todo), en qué fecha (`AAAA-MM-DD`,
+     hoy o antes; por defecto hoy) y por qué medio, uno de `metodos_de_pago`
+     (opcional). Tras una devolución parcial, pregunta si retiene el resto
+     (`retener_resto: true`) o lo deja pendiente. No hay retención parcial a
+     secas: quedarse con una parte es devolver la otra con `retener_resto`.
+   - **`canal`**: la plataforma manejó el pago y le devuelve al huésped. Solo se
+     registra el neto que el canal le liquidó a Jaime por la cancelación:
+     `decision: retener` con `monto_centavos`, que `faltan` pide. No hay
+     devolución que registrar; si el canal no le liquidó nada, no hay nada.
+3. **Nunca decidas ni deduzcas** la decisión, el monto o la fecha a partir de la
+   política de cancelación, las notas o el total. Pregunta lo que diga
+   `faltan`. Jaime habla en pesos y `monto_centavos` va en centavos: el
+   resumen trae el importe en texto para que compruebes la conversión.
+4. Con la `decision` y sus datos, la herramienta devuelve `resumen` y `firma`.
+   Léele cuánto se devuelve, cuánto se retiene, cuánto queda pendiente, la
+   fecha, el medio y las `consecuencias`, y espera su sí explícito. Solo
+   entonces `registrar_retencion_o_devolucion` con la `firma` y
+   `confirmado: true`. Cambiar un dato obliga a preparar y confirmar otra vez.
+5. La firma es de un solo uso, está ligada a la credencial y caduca a los
+   treinta minutos. Ante una respuesta perdida o un resultado incierto,
+   consulta `ver_reserva` antes de preparar nada: no repitas a ciegas una
+   devolución que quizá ya quedó registrada.
+6. Una retención registrada impide archivar la reserva con `eliminar_reserva`.
+
+Preparar requiere `properties:read`, `bookings:read` y `finance:read`;
+registrar añade «Retener o devolver pagos de cancelaciones»
+(`bookings:settle_cancellation`). Sin ese permiso, dile que lo registre en
+Booked. Actualizar el plugin no amplía los permisos de una credencial existente.
 
 ## Convertir un bloqueo de plataforma en reserva
 

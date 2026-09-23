@@ -3,6 +3,23 @@
 Cada versión publicada actualiza los manifiestos de los tres paquetes y las
 entradas del marketplace de Claude, y lleva un tag `vX.Y.Z`.
 
+## 0.8.0 — 2026-09-22
+
+- Añade el flujo `preparar_retencion_o_devolucion` → confirmar resumen →
+  `registrar_retencion_o_devolucion` en los tres paquetes: tras cancelar, el
+  anfitrión decide si retiene o devuelve lo cobrado, o registra el neto que
+  liquidó el canal. La modalidad la decide el servidor y nada transfiere
+  dinero.
+- La skill ya no dice que los reembolsos se hacen solo en Booked, lee
+  `decision_de_pagos_pendiente` al cancelar y manda a la aplicación los casos
+  que el MCP rehúsa (grupos, anfitrión externo, pagos mezclados, revocaciones).
+- El catálogo pasa a 38 herramientas: 27 de lectura y 11 de escritura.
+  Documenta `bookings:settle_cancellation` y sus lecturas acompañantes
+  `properties:read`, `bookings:read` y `finance:read`. Las credenciales
+  existentes no ganan permisos al actualizar.
+- Requiere desplegar primero el [PR #579 de Booked](https://github.com/ruizbjaime/booked/pull/579).
+  Las tres skills se regeneran desde la fuente compartida.
+
 ## 0.7.0 — 2026-09-22
 
 - Añade el flujo `preparar_reserva_comisionada` → confirmar resumen →

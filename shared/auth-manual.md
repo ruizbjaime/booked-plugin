@@ -15,9 +15,11 @@
   *Booked → Ajustes → Integraciones API*, que lleve el permiso de esa acción:
   «Guardar cotizaciones», «Crear bloqueos», «Eliminar bloqueos»,
   «Crear reservas manuales», «Crear reservas comisionadas», «Cancelar reservas»,
-  «Eliminar reservas», «Convertir bloqueos en reservas», «Crear contactos» o
-  «Eliminar contactos».
+  «Eliminar reservas», «Retener o devolver pagos de cancelaciones»,
+  «Convertir bloqueos en reservas», «Crear contactos» o «Eliminar contactos».
   «Eliminar contactos» requiere además «Consultar contactos».
+  «Retener o devolver pagos de cancelaciones» (`bookings:settle_cancellation`)
+  requiere «Propiedades», «Reservas» e «Importes y pagos».
   «Crear reservas comisionadas» (`brokered:create`) requiere «Reservas
   comisionadas», «Importes y pagos» y «Consultar contactos». Actualizar el
   plugin no amplía los permisos del token existente.

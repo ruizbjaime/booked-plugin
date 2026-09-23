@@ -15,9 +15,12 @@
   conectarlo y marcar en la pantalla de consentimiento el permiso de esa
   acción: «Guardar cotizaciones», «Crear bloqueos», «Eliminar bloqueos»,
   «Crear reservas manuales», «Crear reservas comisionadas», «Cancelar reservas»,
-  «Eliminar reservas», «Convertir bloqueos en reservas», «Crear contactos» o
-  «Eliminar contactos». Este último requiere también
-  «Consultar contactos» en los permisos de lectura. Para «Crear reservas
+  «Eliminar reservas», «Retener o devolver pagos de cancelaciones»,
+  «Convertir bloqueos en reservas», «Crear contactos» o «Eliminar contactos».
+  Este último requiere también «Consultar contactos» en los permisos de
+  lectura. Para «Retener o devolver pagos de cancelaciones»
+  (`bookings:settle_cancellation`), selecciona además «Propiedades»,
+  «Reservas» e «Importes y pagos». Para «Crear reservas
   comisionadas» (`brokered:create`), selecciona además «Reservas comisionadas»,
   «Importes y pagos» y «Consultar contactos» al volver a autorizar.
 - **La autorización OAuth no caduca por tiempo.** El cliente renueva sus
