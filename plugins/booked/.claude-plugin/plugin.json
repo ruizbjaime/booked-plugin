@@ -1,8 +1,8 @@
 {
   "name": "booked",
   "displayName": "Booked — fincas, reservas y dinero",
-  "version": "0.7.0",
-  "description": "Treinta y seis herramientas sobre propiedades, reservas, contactos, calendario y dinero de un anfitrión de Booked: veintiséis de lectura y diez de escritura con permiso. Consulta datos de contactos y responsables de estancias; guarda cotizaciones confirmadas, crea contactos, bloqueos y reservas directas o comisionadas, gestiona reservas y convierte bloqueos. Toda eliminación exige explicar las consecuencias y recibir confirmación explícita. Incluye las reglas de negocio compartidas.",
+  "version": "0.8.0",
+  "description": "Treinta y ocho herramientas sobre propiedades, reservas, contactos, calendario y dinero de un anfitrión de Booked: veintisiete de lectura y once de escritura con permiso. Consulta datos de contactos y responsables de estancias; guarda cotizaciones confirmadas, crea contactos, bloqueos y reservas directas o comisionadas, gestiona reservas, registra la retención o devolución de lo cobrado en cancelaciones y convierte bloqueos. Toda eliminación exige explicar las consecuencias y recibir confirmación explícita. Incluye las reglas de negocio compartidas.",
   "author": {
     "name": "Jaime Ruiz"
   },
@@ -22,7 +22,7 @@
     "api_token": {
       "type": "string",
       "title": "Token de la integración de Booked",
-      "description": "Se emite en Booked → Ajustes → Integraciones API y se muestra una sola vez. Caduca a los 30 días: cuando el plugin conteste «credenciales», emite uno nuevo y pégalo aquí. El token decide lo que el plugin puede hacer: con uno de solo lectura no escribe nada; para guardar cotizaciones, crear o eliminar contactos, administrar bloqueos o gestionar reservas, emite uno aparte con esos permisos de escritura y las lecturas que requieren. Actualizar el plugin no amplía los permisos del token.",
+      "description": "Se emite en Booked → Ajustes → Integraciones API y se muestra una sola vez. Caduca a los 30 días: cuando el plugin conteste «credenciales», emite uno nuevo y pégalo aquí. El token decide lo que el plugin puede hacer: con uno de solo lectura no escribe nada; para guardar cotizaciones, crear o eliminar contactos, administrar bloqueos, gestionar reservas o registrar la retención o devolución de una cancelación, emite uno aparte con esos permisos de escritura y las lecturas que requieren. Actualizar el plugin no amplía los permisos del token.",
       "sensitive": true,
       "required": true
     }

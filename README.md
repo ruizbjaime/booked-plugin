@@ -1,8 +1,8 @@
 # Booked para Claude y ChatGPT
 
 Los paquetes conectan al servidor MCP de
-[Booked](https://booked.fincasdelavilla.com) —treinta y seis herramientas sobre
-propiedades, reservas, contactos, calendario y dinero, diez de ellas de escritura— e
+[Booked](https://booked.fincasdelavilla.com) —treinta y ocho herramientas sobre
+propiedades, reservas, contactos, calendario y dinero, once de ellas de escritura— e
 incluyen una skill con las reglas de negocio que no caben en la descripción de
 una herramienta.
 
@@ -24,10 +24,12 @@ Instala una sola variante de Booked en cada cliente para evitar herramientas
 repetidas. Las reglas de negocio se mantienen en `shared/booked-fincas.md` y
 se generan con `python3 scripts/sync-skills.py`. No edites las copias generadas.
 
-**Versión 0.7.0:** para crear reservas comisionadas, despliega primero el
-[PR #576 de Booked](https://github.com/ruizbjaime/booked/pull/576). El backend también
-debe incluir cotizaciones ([PR #575](https://github.com/ruizbjaime/booked/pull/575))
-y contactos ([PR #574](https://github.com/ruizbjaime/booked/pull/574)). Actualizar el
+**Versión 0.8.0:** para registrar la retención o devolución de una cancelación,
+despliega primero el [PR #579 de Booked](https://github.com/ruizbjaime/booked/pull/579).
+El backend también debe incluir reservas comisionadas
+([PR #576](https://github.com/ruizbjaime/booked/pull/576)), cotizaciones
+([PR #575](https://github.com/ruizbjaime/booked/pull/575)) y contactos
+([PR #574](https://github.com/ruizbjaime/booked/pull/574)). Actualizar el
 plugin no despliega el servidor ni amplía permisos existentes.
 OAuth requiere además el soporte de la rama `feat/mcp-oauth` del backend.
 Estos archivos preparan los paquetes; no registran ni publican una app en ChatGPT.
@@ -263,9 +265,38 @@ y `brokered:read`, `finance:read` y `contacts:read`. La integración debe inclui
 la propiedad en su alcance comisionado; autorizar propiedades administradas no
 concede acceso a las comisionadas. Actualizar el plugin no concede estos permisos.
 
+## Retener o devolver tras cancelar
+
+Después de cancelar, `cancelar_reserva` indica con `decision_de_pagos_pendiente`
+si queda dinero cobrado por decidir (solo cuando el token lee importes).
+`preparar_retencion_o_devolucion` sin `decision` describe la situación, y la
+modalidad la decide el servidor:
+
+- **`anfitrion`**: el anfitrión cobró los pagos. Puede retener todo lo cobrado
+  o devolver una parte o todo, con fecha, medio de pago y, en una devolución
+  parcial, la opción de retener el resto.
+- **`canal`**: la plataforma manejó el pago. Solo se registra el neto que le
+  liquidó al anfitrión (`monto_centavos` obligatorio).
+
+Admite reservas canceladas o no presentadas de cualquier canal, importadas
+incluidas. Las de grupo, las de un anfitrión externo, las de propiedades sin
+finanzas y las que mezclan pagos del canal y del anfitrión se deciden en
+Booked, igual que revocar o corregir una decisión ya registrada. Con la
+decisión, la herramienta devuelve un resumen y una firma de un solo uso, válida
+treinta minutos; `registrar_retencion_o_devolucion` recibe solo `firma` y
+`confirmado: true` tras el sí explícito del anfitrión. No transfiere dinero:
+anota lo que el anfitrión hizo. Si se pierde la respuesta, consulta
+`ver_reserva` antes de preparar otra vez.
+
+Primero debe desplegarse el [PR #579 del servidor](https://github.com/ruizbjaime/booked/pull/579)
+y estar habilitado `INTEGRATION_WRITES_ENABLED=true`. Emite un token aparte o
+vuelve a autorizar OAuth con «Retener o devolver pagos de cancelaciones»
+(`bookings:settle_cancellation`) y `properties:read`, `bookings:read` y
+`finance:read`. Actualizar el plugin no concede estos permisos.
+
 ## Lectura y escritura
 
-Veintiséis herramientas solo leen. `cotizar` calcula un precio; no aparta fechas.
+Veintisiete herramientas solo leen. `cotizar` calcula un precio; no aparta fechas.
 
 `ver_contactos` consulta la libreta del anfitrión con `contacts:read`: devuelve
 nombre, teléfono, email, documento y notas disponibles. Ese permiso permite
@@ -285,7 +316,7 @@ requiere `properties:read` y `bookings:read`, y sí respeta esa lista.
   no la lista de acompañantes. Una reserva pendiente o confirmada no prueba
   presencia física.
 
-Diez herramientas escriben, y cada una lleva su permiso en Booked:
+Once herramientas escriben, y cada una lleva su permiso en Booked:
 
 | Herramienta | Permiso | Qué hace |
 | --- | --- | --- |
@@ -296,6 +327,7 @@ Diez herramientas escriben, y cada una lleva su permiso en Booked:
 | `crear_reserva_comisionada` | Crear reservas comisionadas (`brokered:create`) | Crea una reserva pendiente o confirmada en una propiedad comisionada tras preparar y confirmar huésped, estancia, importes y comisión; no registra pagos ni cobros de comisión. |
 | `cancelar_reserva` | Cancelar reservas | Cancela una reserva directa o del sitio público, conservando su historial. |
 | `eliminar_reserva` | Eliminar reservas | Archiva una reserva ya cancelada y sin retención. |
+| `registrar_retencion_o_devolucion` | Retener o devolver pagos de cancelaciones (`bookings:settle_cancellation`) | Registra, tras preparar y confirmar, si el anfitrión retiene o devuelve lo cobrado de una reserva cancelada o no presentada, o el neto que liquidó el canal; no transfiere dinero. |
 | `convertir_bloqueo_en_reserva` | Convertir bloqueos en reservas | Convierte en reserva un bloqueo importado de Airbnb, Booking.com o VRBO. |
 | `crear_contacto` | Crear contactos (`contacts:create`) | Crea un contacto con nombre y teléfono internacional proporcionados por el anfitrión; no crea una reserva. |
 | `eliminar_contacto` | Eliminar contactos (`contacts:delete`) y Consultar contactos (`contacts:read`) | Prepara y, tras confirmación explícita, elimina un contacto que puede borrarse. |
@@ -329,12 +361,13 @@ confirmación.
 
 Las reservas se preparan antes con una herramienta que no escribe
 (`preparar_reserva_manual`, `preparar_reserva_comisionada`, `preparar_gestion_de_reserva`,
-`preparar_conversion_de_bloqueo`): devuelve un resumen y una firma de un solo
+`preparar_retencion_o_devolucion`, `preparar_conversion_de_bloqueo`): devuelve un resumen y una firma de un solo
 uso, válida hasta treinta minutos, y el agente solo ejecuta tras leer el resumen
 y recibir el sí explícito del anfitrión. Cancelar y archivar una reserva son
 acciones separadas, cada una con su propia preparación y confirmación.
-Ninguna escritura mueve dinero: crear no registra pagos y cancelar o archivar
-no reembolsa.
+Ninguna escritura mueve dinero: crear no registra pagos, cancelar o archivar
+no reembolsa, y registrar una retención o devolución solo anota lo que hizo el
+anfitrión.
 
 La credencial es el interruptor, y los permisos de escritura solo se ofrecen
 cuando la instalación tiene `INTEGRATION_WRITES_ENABLED=true`. Además del
@@ -348,6 +381,7 @@ permiso de escritura de cada herramienta, se exigen estas lecturas acompañantes
 | `crear_reserva_manual` | «Propiedades» (`properties:read`) y «Cotizar estancias» (`pricing:read`). |
 | `crear_reserva_comisionada` | «Reservas comisionadas» (`brokered:read`), «Importes y pagos» (`finance:read`) y «Consultar contactos» (`contacts:read`). |
 | `cancelar_reserva`, `eliminar_reserva` | «Propiedades» (`properties:read`) y «Reservas» (`bookings:read`). |
+| `registrar_retencion_o_devolucion` | «Propiedades» (`properties:read`), «Reservas» (`bookings:read`) e «Importes y pagos» (`finance:read`). |
 | `convertir_bloqueo_en_reserva` | «Bloqueos» (`blocks:read`) y «Cotizar estancias» (`pricing:read`). |
 | `crear_contacto` | Ninguna. |
 | `eliminar_contacto` | «Consultar contactos» (`contacts:read`). |

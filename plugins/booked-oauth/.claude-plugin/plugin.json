@@ -1,8 +1,8 @@
 {
   "name": "booked-oauth",
   "displayName": "Booked — conexión con OAuth",
-  "version": "0.7.0",
-  "description": "Treinta y seis herramientas sobre propiedades, reservas, contactos, calendario y dinero de un anfitrión de Booked: veintiséis de lectura y diez de escritura con permiso. Consulta datos de contactos y responsables de estancias; guarda cotizaciones confirmadas, crea contactos, bloqueos y reservas directas o comisionadas, gestiona reservas y convierte bloqueos. Toda eliminación exige explicar las consecuencias y recibir confirmación explícita. Incluye las reglas de negocio compartidas.",
+  "version": "0.8.0",
+  "description": "Treinta y ocho herramientas sobre propiedades, reservas, contactos, calendario y dinero de un anfitrión de Booked: veintisiete de lectura y once de escritura con permiso. Consulta datos de contactos y responsables de estancias; guarda cotizaciones confirmadas, crea contactos, bloqueos y reservas directas o comisionadas, gestiona reservas, registra la retención o devolución de lo cobrado en cancelaciones y convierte bloqueos. Toda eliminación exige explicar las consecuencias y recibir confirmación explícita. Incluye las reglas de negocio compartidas.",
   "author": {
     "name": "Jaime Ruiz"
   },
