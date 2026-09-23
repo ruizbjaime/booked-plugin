@@ -13,15 +13,19 @@
 - **Al token le falta un permiso de escritura:** dilo así, nombrando la acción
   que faltó, y no insistas. Hace falta un token aparte, emitido en
   *Booked → Ajustes → Integraciones API*, que lleve el permiso de esa acción:
-  «Guardar cotizaciones», «Crear bloqueos», «Eliminar bloqueos»,
-  «Crear reservas manuales», «Crear reservas comisionadas», «Cancelar reservas»,
+  «Guardar cotizaciones», «Cambiar el estado de cotizaciones», «Editar
+  cotizaciones», «Convertir cotizaciones en reservas», «Crear bloqueos»,
+  «Eliminar bloqueos», «Crear reservas manuales», «Crear reservas
+  comisionadas», «Cancelar reservas»,
   «Eliminar reservas», «Retener o devolver pagos de cancelaciones»,
   «Convertir bloqueos en reservas», «Crear contactos» o «Eliminar contactos».
   «Eliminar contactos» requiere además «Consultar contactos».
   «Retener o devolver pagos de cancelaciones» (`bookings:settle_cancellation`)
   requiere «Propiedades», «Reservas» e «Importes y pagos».
   «Crear reservas comisionadas» (`brokered:create`) requiere «Reservas
-  comisionadas», «Importes y pagos» y «Consultar contactos». Actualizar el
+  comisionadas», «Importes y pagos» y «Consultar contactos». Los permisos de
+  cotizaciones requieren «Cotizaciones»; editar una administrada o convertir
+  una antigua sin precio guardado, también «Cotizar estancias». Actualizar el
   plugin no amplía los permisos del token existente.
 - **`caduca` a menos de siete días** (lo devuelve `alcance_del_token`): avísalo
   al final de la respuesta, una sola vez por conversación, con la fecha.
