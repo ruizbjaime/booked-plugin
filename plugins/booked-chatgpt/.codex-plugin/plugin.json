@@ -1,7 +1,7 @@
 {
   "name": "booked-chatgpt",
-  "version": "0.10.1",
-  "description": "Cincuenta y siete herramientas sobre propiedades, reservas, contactos, calendario y dinero de un anfitrión de Booked: cuarenta y tres de lectura y catorce de escritura con permiso. Consulta datos de contactos y responsables de estancias; analiza huéspedes recurrentes, patrones de reserva, rendimiento de propiedades, resultados, caja y cuentas por pagar; guarda, consulta, edita, cambia de estado y convierte cotizaciones confirmadas, crea contactos, bloqueos y reservas directas o comisionadas, gestiona reservas, registra la retención o devolución de lo cobrado en cancelaciones y convierte bloqueos. Toda eliminación exige explicar las consecuencias y recibir confirmación explícita. Incluye las reglas de negocio compartidas.",
+  "version": "0.11.0",
+  "description": "Cincuenta y ocho herramientas sobre propiedades, reservas, contactos, calendario y dinero de un anfitrión de Booked: cuarenta y tres de lectura y quince de escritura con permiso. Consulta datos de contactos y responsables de estancias; analiza huéspedes recurrentes, patrones de reserva, rendimiento de propiedades, resultados, caja y cuentas por pagar; guarda, consulta, edita, cambia de estado y convierte cotizaciones confirmadas, crea contactos, crea y edita bloqueos, crea reservas directas o comisionadas, gestiona reservas, registra la retención o devolución de lo cobrado en cancelaciones y convierte bloqueos. Toda eliminación exige explicar las consecuencias y recibir confirmación explícita. Incluye las reglas de negocio compartidas.",
   "author": {
     "name": "Jaime Ruiz"
   },
@@ -9,7 +9,7 @@
   "interface": {
     "displayName": "Booked",
     "shortDescription": "Consulta fincas, reservas, contactos e ingresos.",
-    "longDescription": "Consulta Booked mediante OAuth, con reglas compartidas con Claude: propiedades, reservas, contactos y dinero, y análisis de huéspedes, reservas, propiedades, resultados y caja. Escribe solo lo que autorices al conectar: crea contactos y bloqueos a petición explícita; guarda cotizaciones, cambia su estado, edita borradores y convierte las aceptadas en reservas tras preparar y confirmar; crea reservas directas o comisionadas, cancela o archiva reservas directas, registra la retención o devolución de lo cobrado en una cancelación y convierte bloqueos tras preparar y confirmar. Toda eliminación exige explicar las consecuencias y recibir tu sí explícito posterior; la eliminación de contactos requiere además una firma de preparación.",
+    "longDescription": "Consulta Booked mediante OAuth, con reglas compartidas con Claude: propiedades, reservas, contactos y dinero, y análisis de huéspedes, reservas, propiedades, resultados y caja. Escribe solo lo que autorices al conectar: crea contactos y bloqueos a petición explícita, edita bloqueos tras confirmar; guarda cotizaciones, cambia su estado, edita borradores y convierte las aceptadas en reservas tras preparar y confirmar; crea reservas directas o comisionadas, cancela o archiva reservas directas, registra la retención o devolución de lo cobrado en una cancelación y convierte bloqueos tras preparar y confirmar. Toda eliminación exige explicar las consecuencias y recibir tu sí explícito posterior; la eliminación de contactos requiere además una firma de preparación.",
     "developerName": "Jaime Ruiz",
     "category": "Productivity",
     "capabilities": [],

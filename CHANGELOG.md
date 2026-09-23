@@ -3,6 +3,24 @@
 Cada versión publicada actualiza los manifiestos de los tres paquetes y las
 entradas del marketplace de Claude, y lleva un tag `vX.Y.Z`.
 
+## 0.11.0 — 2026-09-23
+
+- Añade `editar_bloqueo` en los tres paquetes: cambia las fechas o las notas
+  de un bloqueo manual con la misma identificación y confirmación explícita
+  que `eliminar_bloqueo`, enviando solo lo que cambia. Es todo o nada: si las
+  fechas nuevas se cruzan con otra ocupación, tampoco se guardan las notas.
+  Devuelve el bloqueo antes y después; la skill pide confirmar con esa
+  respuesta y avisar si otra persona lo cambió entretanto.
+- `ver_bloqueos`, `bloqueos_por_convertir` y `preparar_conversion_de_bloqueo`
+  traen las notas del bloqueo; la skill las usa para explicar la razón.
+- El catálogo pasa a 58 herramientas: 43 de lectura y 15 de escritura.
+  Documenta `blocks:update` («Editar bloqueos») y sus lecturas acompañantes
+  `properties:read` y `blocks:read`. Las credenciales existentes no ganan
+  permisos al actualizar.
+- Requiere desplegar primero los PR [#585](https://github.com/ruizbjaime/booked/pull/585)
+  y [#586](https://github.com/ruizbjaime/booked/pull/586) de Booked. Las tres
+  skills se regeneran desde la fuente compartida.
+
 ## 0.10.1 — 2026-09-23
 
 - En las herramientas de huéspedes, las reservas de la misma persona con

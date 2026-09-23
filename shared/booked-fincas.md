@@ -1,12 +1,12 @@
 ---
 name: booked-fincas
-description: "Gestiona las fincas de Jaime en Booked, aunque no se nombre el PMS: disponibilidad, reservas, huéspedes, contactos, calendario, precios, ingresos, gastos, deudas y comisiones de Airbnb, Booking.com, Fincas de la Villa o venta directa. Úsala para ver el huésped principal de una propiedad en una fecha o el teléfono de un contacto; guardar, editar o convertir cotizaciones; crear o eliminar contactos y bloqueos; crear reservas directas o comisionadas y cancelar o archivar las directas; registrar si se retiene o devuelve lo cobrado al cancelar; convertir bloqueos de plataforma; y analizar huéspedes recurrentes y a quién reactivar, patrones de reserva, noches sueltas, qué finca rinde más, conversión de solicitudes, estado de resultados, flujo de caja, cuentas por pagar, lo ya vendido y la comparación con el año pasado. Consulta con las herramientas `booked`; para crear registros usa los datos que dé Jaime."
+description: "Gestiona las fincas de Jaime en Booked, aunque no se nombre el PMS: disponibilidad, reservas, huéspedes, contactos, calendario, precios, ingresos, gastos, deudas y comisiones de Airbnb, Booking.com, Fincas de la Villa o venta directa. Úsala para ver el huésped principal de una propiedad en una fecha o el teléfono de un contacto; guardar, editar o convertir cotizaciones; crear o eliminar contactos; crear, editar o eliminar bloqueos; crear reservas directas o comisionadas y cancelar o archivar las directas; registrar si se retiene o devuelve lo cobrado al cancelar; convertir bloqueos de plataforma; y analizar huéspedes recurrentes y a quién reactivar, patrones de reserva, noches sueltas, qué finca rinde más, conversión de solicitudes, estado de resultados, flujo de caja, cuentas por pagar, lo ya vendido y la comparación con el año pasado. Consulta con las herramientas `booked`; para crear registros usa los datos que dé Jaime."
 ---
 
 # Booked — las fincas de Jaime
 
-Las herramientas `booked` leen el PMS de Fincas de la Villa, y catorce de ellas
-escriben: crear y eliminar bloqueos manuales, crear una reserva directa o
+Las herramientas `booked` leen el PMS de Fincas de la Villa, y quince de ellas
+escriben: crear, editar y eliminar bloqueos manuales, crear una reserva directa o
 comisionada, cancelar o archivar una directa, registrar la retención o
 devolución de lo cobrado en una reserva cancelada, convertir en reserva un
 bloqueo de plataforma, crear o eliminar contactos, y guardar cotizaciones,
@@ -321,6 +321,17 @@ el bloqueo. Para eliminar, muestra propiedad, fechas y consecuencias, espera
 el sí explícito de Jaime y solo entonces llama `eliminar_bloqueo` con
 `propiedad_id`, `bloqueo_id` y `confirmado: true`. No lleva firma, pero sí ese
 paso de confirmación. Un bloqueo importado se gestiona en su plataforma.
+
+`editar_bloqueo` cambia las fechas o las notas de un bloqueo manual, con la
+misma identificación y confirmación que eliminar: muestra el bloqueo como está
+y como quedará, espera el sí y envía solo lo que cambia —`desde`, `hasta` o
+`notas`; `notas: null` las borra— con `confirmado: true`. Si las fechas nuevas
+se cruzan con otra ocupación no cambia nada, tampoco las notas: dilo y pregunta
+otras fechas, no las ajustes por tu cuenta. Confirma con lo que devuelve en
+`bloqueo`, no con lo que enviaste; si `antes` no es lo que le mostraste a
+Jaime, otra persona lo cambió entretanto: díselo.
+`ver_bloqueos` trae en `notas` la razón del bloqueo, o el título de la
+plataforma si es importado; úsala para explicar o agrupar los bloqueos.
 
 ## Crear un contacto
 

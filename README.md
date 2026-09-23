@@ -1,8 +1,8 @@
 # Booked para Claude y ChatGPT
 
 Los paquetes conectan al servidor MCP de
-[Booked](https://booked.fincasdelavilla.com) —cincuenta y siete herramientas sobre
-propiedades, reservas, contactos, calendario y dinero, catorce de ellas de escritura— e
+[Booked](https://booked.fincasdelavilla.com) —cincuenta y ocho herramientas sobre
+propiedades, reservas, contactos, calendario y dinero, quince de ellas de escritura— e
 incluyen una skill con las reglas de negocio que no caben en la descripción de
 una herramienta.
 
@@ -24,9 +24,11 @@ Instala una sola variante de Booked en cada cliente para evitar herramientas
 repetidas. Las reglas de negocio se mantienen en `shared/booked-fincas.md` y
 se generan con `python3 scripts/sync-skills.py`. No edites las copias generadas.
 
-**Versión 0.10.1:** para las preguntas de análisis —huéspedes, reservas,
-propiedades y finanzas—, despliega primero los PR [#583](https://github.com/ruizbjaime/booked/pull/583)
-y [#584](https://github.com/ruizbjaime/booked/pull/584) de Booked.
+**Versión 0.11.0:** para editar bloqueos manuales, despliega primero el
+[PR #586](https://github.com/ruizbjaime/booked/pull/586) de Booked, que trae
+también las notas de los bloqueos ([PR #585](https://github.com/ruizbjaime/booked/pull/585)).
+Las preguntas de análisis requieren los PR [#583](https://github.com/ruizbjaime/booked/pull/583)
+y [#584](https://github.com/ruizbjaime/booked/pull/584).
 El backend también debe incluir la gestión de cotizaciones
 ([PR #581](https://github.com/ruizbjaime/booked/pull/581)), la retención o
 devolución de cancelaciones ([PR #579](https://github.com/ruizbjaime/booked/pull/579)), reservas comisionadas
@@ -113,7 +115,7 @@ En el repositorio de la aplicación, con el soporte OAuth y los cambios del
 5. Verifica descubrimiento, consentimiento y consulta con una cuenta de prueba
    en Claude y otra en ChatGPT antes de distribuir la versión. Confirma que el
    servidor ofrece `ver_contactos`, `crear_contacto` y `eliminar_contacto`, y que
-   `eliminar_bloqueo` exige `confirmado: true`. Comprueba también que ofrece
+   `editar_bloqueo` y `eliminar_bloqueo` exigen `confirmado: true`. Comprueba también que ofrece
    `preparar_cotizacion`, `crear_cotizacion` y `ver_cotizaciones`, con sus
    tres flujos de gestión, y las doce de análisis (de `huespedes_recurrentes`
    a `comparativo_interanual`). Actualizar solo el plugin no
@@ -382,7 +384,7 @@ requiere `properties:read` y `bookings:read`, y sí respeta esa lista.
   no la lista de acompañantes. Una reserva pendiente o confirmada no prueba
   presencia física.
 
-Catorce herramientas escriben, y cada una lleva su permiso en Booked:
+Quince herramientas escriben, y cada una lleva su permiso en Booked:
 
 | Herramienta | Permiso | Qué hace |
 | --- | --- | --- |
@@ -391,6 +393,7 @@ Catorce herramientas escriben, y cada una lleva su permiso en Booked:
 | `editar_cotizacion` | Editar cotizaciones (`quotations:update`) | Corrige un borrador tras preparar y confirmar, recalculando el precio como la ficha; no reserva noches. |
 | `convertir_cotizacion_en_reserva` | Convertir cotizaciones en reservas (`quotations:convert`) | Convierte una cotización aceptada en una reserva pendiente con su precio tras preparar y confirmar; retiene las noches y no registra pagos. |
 | `crear_bloqueo` | Crear bloqueos | Bloquea noches de una propiedad administrada. |
+| `editar_bloqueo` | Editar bloqueos (`blocks:update`) | Cambia las fechas o las notas de un bloqueo manual tras mostrar cómo quedará y recibir confirmación explícita; si las fechas se cruzan con otra ocupación no cambia nada; nunca uno importado. |
 | `eliminar_bloqueo` | Eliminar bloqueos | Borra un bloqueo manual tras explicar las consecuencias y recibir confirmación explícita; nunca uno importado. |
 | `crear_reserva_manual` | Crear reservas manuales | Crea una reserva pendiente por Directo o el canal del sitio público, sin registrar pagos. |
 | `crear_reserva_comisionada` | Crear reservas comisionadas (`brokered:create`) | Crea una reserva pendiente o confirmada en una propiedad comisionada tras preparar y confirmar huésped, estancia, importes y comisión; no registra pagos ni cobros de comisión. |
@@ -414,7 +417,8 @@ confirmación.** Para `eliminar_bloqueo`, el agente identifica el bloqueo manual
 muestra la propiedad, las fechas y las consecuencias, espera el sí y llama con
 `confirmado: true`. Borrar el bloqueo no garantiza disponibilidad: pueden
 existir otras reservas o bloqueos. Esta herramienta no tiene preparación con
-firma.
+firma, y `editar_bloqueo` sigue el mismo patrón: muestra el bloqueo como está y
+como quedará, espera el sí y envía solo lo que cambia con `confirmado: true`.
 
 `eliminar_contacto` usa la misma herramienta en dos etapas: primero solo
 `contacto_id`, obtenido de `ver_contactos`, para recibir el resumen y la firma
@@ -450,7 +454,7 @@ permiso de escritura de cada herramienta, se exigen estas lecturas acompañantes
 | `editar_cotizacion` | «Cotizaciones» (`quotations:read`); administradas requieren `pricing:read`; comisionadas, `brokered:read` y `finance:read`. |
 | `convertir_cotizacion_en_reserva` | «Cotizaciones» (`quotations:read`); una cotización antigua sin precio guardado requiere `pricing:read`; comisionadas, `brokered:read` y `finance:read`. |
 | `crear_bloqueo` | «Propiedades» (`properties:read`). |
-| `eliminar_bloqueo` | «Propiedades» (`properties:read`) y «Bloqueos» (`blocks:read`). |
+| `editar_bloqueo`, `eliminar_bloqueo` | «Propiedades» (`properties:read`) y «Bloqueos» (`blocks:read`). |
 | `crear_reserva_manual` | «Propiedades» (`properties:read`) y «Cotizar estancias» (`pricing:read`). |
 | `crear_reserva_comisionada` | «Reservas comisionadas» (`brokered:read`), «Importes y pagos» (`finance:read`) y «Consultar contactos» (`contacts:read`). |
 | `cancelar_reserva`, `eliminar_reserva` | «Propiedades» (`properties:read`) y «Reservas» (`bookings:read`). |
