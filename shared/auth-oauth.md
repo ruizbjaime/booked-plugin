@@ -13,8 +13,10 @@
   la acción que faltó, y no insistas.
   Los permisos se fijan al autorizar: hay que desconectar Booked, volver a
   conectarlo y marcar en la pantalla de consentimiento el permiso de esa
-  acción: «Guardar cotizaciones», «Crear bloqueos», «Eliminar bloqueos»,
-  «Crear reservas manuales», «Crear reservas comisionadas», «Cancelar reservas»,
+  acción: «Guardar cotizaciones», «Cambiar el estado de cotizaciones»,
+  «Editar cotizaciones», «Convertir cotizaciones en reservas», «Crear
+  bloqueos», «Eliminar bloqueos», «Crear reservas manuales», «Crear reservas
+  comisionadas», «Cancelar reservas»,
   «Eliminar reservas», «Retener o devolver pagos de cancelaciones»,
   «Convertir bloqueos en reservas», «Crear contactos» o «Eliminar contactos».
   Este último requiere también «Consultar contactos» en los permisos de
@@ -22,7 +24,9 @@
   (`bookings:settle_cancellation`), selecciona además «Propiedades»,
   «Reservas» e «Importes y pagos». Para «Crear reservas
   comisionadas» (`brokered:create`), selecciona además «Reservas comisionadas»,
-  «Importes y pagos» y «Consultar contactos» al volver a autorizar.
+  «Importes y pagos» y «Consultar contactos» al volver a autorizar. Los
+  permisos de cotizaciones requieren «Cotizaciones»; editar una administrada o
+  convertir una antigua sin precio guardado, también «Cotizar estancias».
 - **La autorización OAuth no caduca por tiempo.** El cliente renueva sus
   accesos automáticamente. Se revoca desde *Booked → Ajustes → Integraciones
   API*. Si `caduca` es `null`, no anuncies una caducidad de 30 días ni pidas

@@ -3,6 +3,25 @@
 Cada versión publicada actualiza los manifiestos de los tres paquetes y las
 entradas del marketplace de Claude, y lleva un tag `vX.Y.Z`.
 
+## 0.9.0 — 2026-09-23
+
+- Añade la gestión de cotizaciones en los tres paquetes: `ver_cotizaciones`
+  para listar o ver el detalle, y tres flujos preparar → confirmar resumen →
+  escribir: cambiar el estado (`cambiar_estado_de_cotizacion`), editar un
+  borrador (`editar_cotizacion`) y convertir una aceptada en reserva
+  (`convertir_cotizacion_en_reserva`).
+- La skill explica que «enviar» solo registra el envío, que rechazar es
+  definitivo, que editar re-precia a la fecha de hoy salvo las notas, qué
+  pregunta la conversión y que ante una respuesta perdida se consulta
+  `ver_cotizaciones`, que también sustituye la verificación en el panel al
+  guardar una cotización.
+- El catálogo pasa a 45 herramientas: 31 de lectura y 14 de escritura.
+  Documenta `quotations:transition`, `quotations:update` y
+  `quotations:convert` y sus lecturas acompañantes. Las credenciales
+  existentes no ganan permisos al actualizar.
+- Requiere desplegar primero el [PR #581 de Booked](https://github.com/ruizbjaime/booked/pull/581).
+  Las tres skills se regeneran desde la fuente compartida.
+
 ## 0.8.0 — 2026-09-22
 
 - Añade el flujo `preparar_retencion_o_devolucion` → confirmar resumen →

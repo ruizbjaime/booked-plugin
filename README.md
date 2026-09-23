@@ -1,8 +1,8 @@
 # Booked para Claude y ChatGPT
 
 Los paquetes conectan al servidor MCP de
-[Booked](https://booked.fincasdelavilla.com) —treinta y ocho herramientas sobre
-propiedades, reservas, contactos, calendario y dinero, once de ellas de escritura— e
+[Booked](https://booked.fincasdelavilla.com) —cuarenta y cinco herramientas sobre
+propiedades, reservas, contactos, calendario y dinero, catorce de ellas de escritura— e
 incluyen una skill con las reglas de negocio que no caben en la descripción de
 una herramienta.
 
@@ -24,9 +24,10 @@ Instala una sola variante de Booked en cada cliente para evitar herramientas
 repetidas. Las reglas de negocio se mantienen en `shared/booked-fincas.md` y
 se generan con `python3 scripts/sync-skills.py`. No edites las copias generadas.
 
-**Versión 0.8.0:** para registrar la retención o devolución de una cancelación,
-despliega primero el [PR #579 de Booked](https://github.com/ruizbjaime/booked/pull/579).
-El backend también debe incluir reservas comisionadas
+**Versión 0.9.0:** para consultar, cambiar de estado, editar y convertir
+cotizaciones, despliega primero el [PR #581 de Booked](https://github.com/ruizbjaime/booked/pull/581).
+El backend también debe incluir la retención o devolución de cancelaciones
+([PR #579](https://github.com/ruizbjaime/booked/pull/579)), reservas comisionadas
 ([PR #576](https://github.com/ruizbjaime/booked/pull/576)), cotizaciones
 ([PR #575](https://github.com/ruizbjaime/booked/pull/575)) y contactos
 ([PR #574](https://github.com/ruizbjaime/booked/pull/574)). Actualizar el
@@ -111,7 +112,8 @@ En el repositorio de la aplicación, con el soporte OAuth y los cambios del
    en Claude y otra en ChatGPT antes de distribuir la versión. Confirma que el
    servidor ofrece `ver_contactos`, `crear_contacto` y `eliminar_contacto`, y que
    `eliminar_bloqueo` exige `confirmado: true`. Comprueba también que ofrece
-   `preparar_cotizacion` y `crear_cotizacion`. Actualizar solo el plugin no
+   `preparar_cotizacion`, `crear_cotizacion` y `ver_cotizaciones`, con sus
+   tres flujos de gestión. Actualizar solo el plugin no
    incorpora estas herramientas ni sus permisos al backend.
 
 El registro dinámico permite HTTPS en `chatgpt.com`, `chat.openai.com`,
@@ -235,7 +237,40 @@ Booked y comprueba ambas herramientas en `tools/list`. Habilita escrituras
 con `INTEGRATION_WRITES_ENABLED=true` y concede «Guardar cotizaciones» más
 las lecturas de la rama y los permisos de contactos necesarios. Los tokens y
 consentimientos existentes no ganan permisos automáticamente. Ante una
-respuesta perdida, verifica la ficha/listado de cotizaciones antes de repetir.
+respuesta perdida, consulta `ver_cotizaciones` antes de repetir.
+
+## Gestionar cotizaciones
+
+`ver_cotizaciones` lista las cotizaciones de una propiedad (administrada o
+comisionada) con filtros por propiedad, estado y número, o da el detalle de una:
+desglose, destinatario, notas, `acciones_posibles` y si ya es una reserva. Las
+de un conjunto se gestionan en Booked. Tres flujos escriben, cada uno con
+preparación, resumen, firma de un solo uso (treinta minutos, sin cruzar la
+medianoche) y el sí explícito del anfitrión:
+
+- **Cambiar el estado** (`preparar_cambio_de_estado_de_cotizacion` →
+  `cambiar_estado_de_cotizacion`): enviar, aceptar, rechazar o volver a
+  borrador. «Enviar» solo registra que el anfitrión la envió; Booked no manda
+  nada al huésped. Rechazar es definitivo.
+- **Editar un borrador** (`preparar_edicion_de_cotizacion` →
+  `editar_cotizacion`): fechas, vigencia, ocupación, descuentos y notas, y en
+  comisionadas alojamiento, cargos y comisión. Solo se envían los campos que
+  cambian; el precio se recalcula a la fecha de hoy como en la ficha.
+- **Convertir en reserva** (`preparar_conversion_de_cotizacion` →
+  `convertir_cotizacion_en_reserva`): una cotización aceptada pasa a reserva
+  pendiente con su precio y retiene las noches. La preparación pregunta método
+  y compromiso de pago, el huésped real si el destinatario es un comisionista,
+  un teléfono si falta y, en cotizaciones antiguas sin precio guardado, si se
+  acepta el precio vigente.
+
+La escritura se niega si la cotización, su precio o las condiciones de pago
+cambiaron desde la preparación. Primero debe desplegarse el
+[PR #581 del servidor](https://github.com/ruizbjaime/booked/pull/581) y estar
+habilitado `INTEGRATION_WRITES_ENABLED=true`. Emite un token aparte o vuelve a
+autorizar OAuth con «Cambiar el estado de cotizaciones» (`quotations:transition`),
+«Editar cotizaciones» (`quotations:update`) o «Convertir cotizaciones en
+reservas» (`quotations:convert`), además de «Cotizaciones» (`quotations:read`).
+Actualizar el plugin no concede estos permisos.
 
 ## Crear reservas comisionadas
 
@@ -296,7 +331,7 @@ vuelve a autorizar OAuth con «Retener o devolver pagos de cancelaciones»
 
 ## Lectura y escritura
 
-Veintisiete herramientas solo leen. `cotizar` calcula un precio; no aparta fechas.
+Treinta y una herramientas solo leen. `cotizar` calcula un precio; no aparta fechas.
 
 `ver_contactos` consulta la libreta del anfitrión con `contacts:read`: devuelve
 nombre, teléfono, email, documento y notas disponibles. Ese permiso permite
@@ -316,11 +351,14 @@ requiere `properties:read` y `bookings:read`, y sí respeta esa lista.
   no la lista de acompañantes. Una reserva pendiente o confirmada no prueba
   presencia física.
 
-Once herramientas escriben, y cada una lleva su permiso en Booked:
+Catorce herramientas escriben, y cada una lleva su permiso en Booked:
 
 | Herramienta | Permiso | Qué hace |
 | --- | --- | --- |
 | `crear_cotizacion` | Guardar cotizaciones (`quotations:create`) | Guarda un borrador tras preparar, presentar el resumen y recibir confirmación explícita; no reserva noches ni envía mensajes. |
+| `cambiar_estado_de_cotizacion` | Cambiar el estado de cotizaciones (`quotations:transition`) | Marca una cotización como enviada, aceptada o rechazada, o la devuelve a borrador, tras preparar y confirmar; no envía nada al huésped. |
+| `editar_cotizacion` | Editar cotizaciones (`quotations:update`) | Corrige un borrador tras preparar y confirmar, recalculando el precio como la ficha; no reserva noches. |
+| `convertir_cotizacion_en_reserva` | Convertir cotizaciones en reservas (`quotations:convert`) | Convierte una cotización aceptada en una reserva pendiente con su precio tras preparar y confirmar; retiene las noches y no registra pagos. |
 | `crear_bloqueo` | Crear bloqueos | Bloquea noches de una propiedad administrada. |
 | `eliminar_bloqueo` | Eliminar bloqueos | Borra un bloqueo manual tras explicar las consecuencias y recibir confirmación explícita; nunca uno importado. |
 | `crear_reserva_manual` | Crear reservas manuales | Crea una reserva pendiente por Directo o el canal del sitio público, sin registrar pagos. |
@@ -361,7 +399,8 @@ confirmación.
 
 Las reservas se preparan antes con una herramienta que no escribe
 (`preparar_reserva_manual`, `preparar_reserva_comisionada`, `preparar_gestion_de_reserva`,
-`preparar_retencion_o_devolucion`, `preparar_conversion_de_bloqueo`): devuelve un resumen y una firma de un solo
+`preparar_retencion_o_devolucion`, `preparar_conversion_de_bloqueo`,
+`preparar_conversion_de_cotizacion`): devuelve un resumen y una firma de un solo
 uso, válida hasta treinta minutos, y el agente solo ejecuta tras leer el resumen
 y recibir el sí explícito del anfitrión. Cancelar y archivar una reserva son
 acciones separadas, cada una con su propia preparación y confirmación.
@@ -376,6 +415,9 @@ permiso de escritura de cada herramienta, se exigen estas lecturas acompañantes
 | Herramienta | Lecturas acompañantes |
 | --- | --- |
 | `crear_cotizacion` | «Cotizaciones» (`quotations:read`); propias/administradas requieren `properties:read` y `pricing:read`; comisionadas requieren `brokered:read` y `finance:read`. Elegir un contacto o comisionista requiere `contacts:read`; crear un contacto nuevo requiere además la escritura `contacts:create`. |
+| `cambiar_estado_de_cotizacion` | «Cotizaciones» (`quotations:read`); comisionadas requieren `brokered:read` y `finance:read`. |
+| `editar_cotizacion` | «Cotizaciones» (`quotations:read`); administradas requieren `pricing:read`; comisionadas, `brokered:read` y `finance:read`. |
+| `convertir_cotizacion_en_reserva` | «Cotizaciones» (`quotations:read`); una cotización antigua sin precio guardado requiere `pricing:read`; comisionadas, `brokered:read` y `finance:read`. |
 | `crear_bloqueo` | «Propiedades» (`properties:read`). |
 | `eliminar_bloqueo` | «Propiedades» (`properties:read`) y «Bloqueos» (`blocks:read`). |
 | `crear_reserva_manual` | «Propiedades» (`properties:read`) y «Cotizar estancias» (`pricing:read`). |

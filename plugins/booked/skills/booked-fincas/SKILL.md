@@ -1,19 +1,19 @@
 ---
 name: booked-fincas
-description: "Gestiona las fincas de Jaime en Booked, aunque no se nombre el PMS: disponibilidad, reservas, huéspedes, contactos, calendario, precios, ingresos, pagos pendientes, deudas y comisiones de Airbnb, Booking.com, Fincas de la Villa o venta directa. Úsala para consultar quién es el huésped principal de una propiedad hoy o en otra fecha, buscar el teléfono de un contacto, guardar cotizaciones, crear o eliminar contactos y bloqueos, crear reservas directas o en propiedades comisionadas, cancelar o archivar las directas, registrar si se retiene o se devuelve lo cobrado de una reserva cancelada, y convertir bloqueos de plataforma en reservas. Consulta los datos existentes con las herramientas `booked`; para crear registros usa los datos proporcionados por Jaime."
+description: "Gestiona las fincas de Jaime en Booked, aunque no se nombre el PMS: disponibilidad, reservas, huéspedes, contactos, calendario, precios, ingresos, pagos pendientes, deudas y comisiones de Airbnb, Booking.com, Fincas de la Villa o venta directa. Úsala para consultar quién es el huésped principal de una propiedad hoy o en otra fecha, buscar el teléfono de un contacto, guardar, consultar, editar o convertir cotizaciones, crear o eliminar contactos y bloqueos, crear reservas directas o en propiedades comisionadas, cancelar o archivar las directas, registrar si se retiene o se devuelve lo cobrado de una reserva cancelada, y convertir bloqueos de plataforma en reservas. Consulta los datos existentes con las herramientas `booked`; para crear registros usa los datos proporcionados por Jaime."
 ---
 
 # Booked — las fincas de Jaime
 
-Las herramientas `booked` leen el PMS de Fincas de la Villa, y once de ellas
+Las herramientas `booked` leen el PMS de Fincas de la Villa, y catorce de ellas
 escriben: crear y eliminar bloqueos manuales, crear una reserva directa o
 comisionada, cancelar o archivar una directa, registrar la retención o
 devolución de lo cobrado en una reserva cancelada, convertir en reserva un
-bloqueo de plataforma, y crear o eliminar contactos, además de guardar
-cotizaciones confirmadas.
+bloqueo de plataforma, crear o eliminar contactos, y guardar cotizaciones,
+cambiar su estado, editar un borrador o convertir una aceptada en reserva.
 `cotizar` es un cálculo, no aparta fechas. Nada más crea, modifica ni cancela
-nada: registrar pagos, cambiar fechas o huésped, y revocar o corregir una
-retención o devolución ya registrada se hacen en Booked.
+nada: registrar pagos, cambiar fechas o huésped de una reserva, y revocar o
+corregir una retención o devolución ya registrada se hacen en Booked.
 
 Cada herramienta lleva sus reglas en su propia descripción: léela antes de
 llamarla. Aquí está solo lo que ninguna descripción puede decir, porque no
@@ -50,15 +50,19 @@ pertenece a una herramienta sino a la respuesta.
 - **Al token le falta un permiso de escritura:** dilo así, nombrando la acción
   que faltó, y no insistas. Hace falta un token aparte, emitido en
   *Booked → Ajustes → Integraciones API*, que lleve el permiso de esa acción:
-  «Guardar cotizaciones», «Crear bloqueos», «Eliminar bloqueos»,
-  «Crear reservas manuales», «Crear reservas comisionadas», «Cancelar reservas»,
+  «Guardar cotizaciones», «Cambiar el estado de cotizaciones», «Editar
+  cotizaciones», «Convertir cotizaciones en reservas», «Crear bloqueos»,
+  «Eliminar bloqueos», «Crear reservas manuales», «Crear reservas
+  comisionadas», «Cancelar reservas»,
   «Eliminar reservas», «Retener o devolver pagos de cancelaciones»,
   «Convertir bloqueos en reservas», «Crear contactos» o «Eliminar contactos».
   «Eliminar contactos» requiere además «Consultar contactos».
   «Retener o devolver pagos de cancelaciones» (`bookings:settle_cancellation`)
   requiere «Propiedades», «Reservas» e «Importes y pagos».
   «Crear reservas comisionadas» (`brokered:create`) requiere «Reservas
-  comisionadas», «Importes y pagos» y «Consultar contactos». Actualizar el
+  comisionadas», «Importes y pagos» y «Consultar contactos». Los permisos de
+  cotizaciones requieren «Cotizaciones»; editar una administrada o convertir
+  una antigua sin precio guardado, también «Cotizar estancias». Actualizar el
   plugin no amplía los permisos del token existente.
 - **`caduca` a menos de siete días** (lo devuelve `alcance_del_token`): avísalo
   al final de la respuesta, una sola vez por conversación, con la fecha.
@@ -218,10 +222,9 @@ actualizar Booked; no simules un guardado con otra herramienta.
    tras guardar. Si faltan menos de dos minutos para medianoche, el servidor
    no emite firma: sigue su mensaje para preparar después del cambio de día.
    Si la firma caduca, sigue la indicación de preparar y confirmar de nuevo.
-   Ante un resultado incierto o una respuesta perdida al guardar, verifica
-   las cotizaciones en el panel antes de intentar otra creación; no hay
-   consulta MCP de cotizaciones para resolver ese caso ni idempotencia entre
-   firmas distintas.
+   Ante un resultado incierto o una respuesta perdida al guardar, consulta
+   `ver_cotizaciones` antes de intentar otra creación: no hay idempotencia
+   entre firmas distintas.
 
 Preparar requiere `quotations:read`; guardar añade `quotations:create`.
 Propias/administradas necesitan `properties:read` y `pricing:read`; comisionadas,
@@ -229,6 +232,64 @@ Propias/administradas necesitan `properties:read` y `pricing:read`; comisionadas
 `finance:read` y `contacts:read`. Elegir contactos requiere `contacts:read`,
 y crearlos inline, `contacts:create`. Los permisos existentes no se amplían
 al actualizar el plugin: solicita solo los necesarios para la operación.
+
+## Consultar, cambiar de estado, editar y convertir cotizaciones
+
+Si el servidor aún no ofrece estas herramientas, explica que falta actualizar
+Booked; no las simules con otras. Solo cotizaciones de una propiedad
+(administrada o comisionada): las de un conjunto se gestionan en Booked.
+
+- **Consultar.** `ver_cotizaciones` lista con filtros (propiedad, estado,
+  número) o da el detalle con `cotizacion_id`. Usa `coinciden` para contar y
+  comprueba `truncado`; `incluye_comisionadas: false` significa que el token no
+  las ve, no que no existan. Una cotización en borrador o enviada con la
+  vigencia pasada figura como `expired`. `acciones_posibles` dice qué admite
+  ahora; `convertida` y `reserva_id` dicen si ya es una reserva.
+- **Todas las escrituras se preparan, se leen y se confirman.** Cada flujo
+  tiene una herramienta que no escribe y devuelve `resumen` (o `reserva`),
+  `consecuencias`, `avisos` e `impedimentos`, y una `firma` solo si todo está
+  completo y la credencial puede escribir. Léele lo que cambia y espera un sí
+  explícito posterior en el chat; entonces llama la herramienta que escribe
+  únicamente con `firma` y `confirmado: true`. La firma es de un solo uso, está
+  ligada a la credencial, caduca en hasta treinta minutos y no cruza la
+  medianoche. Si la escritura responde que la cotización cambió, prepara y
+  confirma de nuevo; ante una respuesta perdida, consulta `ver_cotizaciones`
+  antes de repetir nada.
+- **Cambiar el estado** (`preparar_cambio_de_estado_de_cotizacion` →
+  `cambiar_estado_de_cotizacion`): `enviar`, `aceptar`, `rechazar` o
+  `volver_a_borrador`, la que pidió Jaime. «Enviar» solo registra que Jaime ya
+  la envió: Booked no le manda nada al huésped. Aceptar no reserva noches.
+  Rechazar es definitivo: no se reabre, edita ni convierte.
+- **Editar** (`preparar_edicion_de_cotizacion` → `editar_cotizacion`): solo
+  borradores; una enviada se vuelve antes a borrador. Envía **solo los campos
+  que Jaime pidió cambiar**: lo omitido se conserva. No cambia canal,
+  destinatario ni tipo de cliente. En propias y administradas el precio se
+  recalcula a la fecha de hoy aunque las fechas no cambien, así que compara
+  `antes` y `despues` con él; cambiar solo las notas no re-precia. En
+  comisionadas se editan también alojamiento, cargos (la lista entera) y
+  comisión: sin porcentaje ni monto, la comisión se recalcula con la tasa
+  guardada y el resumen lo avisa. Pregunta lo que devuelva `faltan` (edades,
+  excepción de estadía mínima, vigencia).
+- **Convertir en reserva** (`preparar_conversion_de_cotizacion` →
+  `convertir_cotizacion_en_reserva`): solo una cotización aceptada que aún no
+  es reserva. La reserva nace pendiente con el precio de la cotización y
+  retiene sus noches. Pregunta lo que devuelva `faltan` y nunca lo supongas:
+  método y compromiso de pago, el huésped real (nombre y teléfono) si la
+  cotización es para un comisionista, un teléfono si el contacto no tiene uno
+  válido, o si Jaime acepta el precio vigente en una cotización antigua que no
+  guardó el suyo. Lee `reserva` y `consecuencias` —crea el contacto del
+  huésped o guarda el teléfono cuando corresponde— antes de pedir el sí. No
+  registra pagos ni envía mensajes.
+
+Consultar y preparar requieren «Cotizaciones» (`quotations:read`). Escribir
+añade «Cambiar el estado de cotizaciones» (`quotations:transition`), «Editar
+cotizaciones» (`quotations:update`) o «Convertir cotizaciones en reservas»
+(`quotations:convert`). Editar una administrada, o convertir una antigua sin
+precio guardado, requiere además «Cotizar estancias» (`pricing:read`); las
+comisionadas requieren «Reservas comisionadas» (`brokered:read`) e «Importes y
+pagos» (`finance:read`). El nombre del destinatario solo llega con
+`contacts:read`. Actualizar el plugin no amplía los permisos de una
+credencial existente.
 
 ## Bloqueos manuales
 
