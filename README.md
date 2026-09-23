@@ -1,7 +1,7 @@
 # Booked para Claude y ChatGPT
 
 Los paquetes conectan al servidor MCP de
-[Booked](https://booked.fincasdelavilla.com) —cuarenta y cinco herramientas sobre
+[Booked](https://booked.fincasdelavilla.com) —cincuenta y siete herramientas sobre
 propiedades, reservas, contactos, calendario y dinero, catorce de ellas de escritura— e
 incluyen una skill con las reglas de negocio que no caben en la descripción de
 una herramienta.
@@ -24,10 +24,11 @@ Instala una sola variante de Booked en cada cliente para evitar herramientas
 repetidas. Las reglas de negocio se mantienen en `shared/booked-fincas.md` y
 se generan con `python3 scripts/sync-skills.py`. No edites las copias generadas.
 
-**Versión 0.9.0:** para consultar, cambiar de estado, editar y convertir
-cotizaciones, despliega primero el [PR #581 de Booked](https://github.com/ruizbjaime/booked/pull/581).
-El backend también debe incluir la retención o devolución de cancelaciones
-([PR #579](https://github.com/ruizbjaime/booked/pull/579)), reservas comisionadas
+**Versión 0.10.0:** para las preguntas de análisis —huéspedes, reservas,
+propiedades y finanzas—, despliega primero el [PR #583 de Booked](https://github.com/ruizbjaime/booked/pull/583).
+El backend también debe incluir la gestión de cotizaciones
+([PR #581](https://github.com/ruizbjaime/booked/pull/581)), la retención o
+devolución de cancelaciones ([PR #579](https://github.com/ruizbjaime/booked/pull/579)), reservas comisionadas
 ([PR #576](https://github.com/ruizbjaime/booked/pull/576)), cotizaciones
 ([PR #575](https://github.com/ruizbjaime/booked/pull/575)) y contactos
 ([PR #574](https://github.com/ruizbjaime/booked/pull/574)). Actualizar el
@@ -113,7 +114,8 @@ En el repositorio de la aplicación, con el soporte OAuth y los cambios del
    servidor ofrece `ver_contactos`, `crear_contacto` y `eliminar_contacto`, y que
    `eliminar_bloqueo` exige `confirmado: true`. Comprueba también que ofrece
    `preparar_cotizacion`, `crear_cotizacion` y `ver_cotizaciones`, con sus
-   tres flujos de gestión. Actualizar solo el plugin no
+   tres flujos de gestión, y las doce de análisis (de `huespedes_recurrentes`
+   a `comparativo_interanual`). Actualizar solo el plugin no
    incorpora estas herramientas ni sus permisos al backend.
 
 El registro dinámico permite HTTPS en `chatgpt.com`, `chat.openai.com`,
@@ -329,9 +331,37 @@ vuelve a autorizar OAuth con «Retener o devolver pagos de cancelaciones»
 (`bookings:settle_cancellation`) y `properties:read`, `bookings:read` y
 `finance:read`. Actualizar el plugin no concede estos permisos.
 
+## Preguntas de análisis
+
+Doce herramientas de solo lectura contestan preguntas sobre personas, patrones
+y resultados sin paginar reservas ni sumar a mano:
+
+| Herramienta | Contesta | Permisos |
+| --- | --- | --- |
+| `huespedes_recurrentes` | Quiénes repiten y, con `sin_volver_desde`, a quién reactivar | «Nombre del huésped» (`guests:read`) y «Reservas» (`bookings:read`) |
+| `ver_huesped` | El historial de una persona | Igual |
+| `analisis_de_huespedes` | Cuántos repiten, cuánto facturan y de dónde vienen | Igual |
+| `patrones_de_reserva` | Anticipación, duración, grupo y cancelaciones por mes, canal o propiedad | «Reservas» |
+| `huecos_de_ocupacion` | Noches sueltas entre ocupaciones, con festivos y puentes | «Disponibilidad» (`availability:read`) |
+| `comparar_propiedades` | Ocupación, ADR y RevPAR por propiedad | «Propiedades y canales» (`properties:read`) y «Reservas» |
+| `embudo_de_ventas` | Solicitudes → cotizaciones → reservas | «Cotizaciones» (`quotations:read`) |
+| `estado_de_resultados` | Lo que dejó una propiedad o el conjunto, en devengo | «Importes y pagos» (`finance:read`) |
+| `flujo_de_caja` | Lo que entró y salió, por fecha de pago | Igual |
+| `obligaciones_por_pagar` | Lo que debe el anfitrión: gastos, nómina y comisiones | Igual |
+| `ingresos_comprometidos` | Lo ya vendido por mes y el ritmo frente al año pasado | Igual |
+| `comparativo_interanual` | Ingresos, ocupación y ADR por año | Igual |
+
+`deudas` añade la antigüedad de lo que le deben y las comisiones ya cobradas.
+Teléfono, cumpleaños y origen de los huéspedes llegan solo con «Consultar
+contactos» (`contacts:read`), y los importes de las herramientas de reservas y
+huéspedes, con «Importes y pagos». La nómina viaja en totales, nunca por
+trabajador, y los datos de TRA/SIRE no se usan. Primero debe desplegarse el
+[PR #583 del servidor](https://github.com/ruizbjaime/booked/pull/583);
+actualizar el plugin no concede permisos.
+
 ## Lectura y escritura
 
-Treinta y una herramientas solo leen. `cotizar` calcula un precio; no aparta fechas.
+Cuarenta y tres herramientas solo leen. `cotizar` calcula un precio; no aparta fechas.
 
 `ver_contactos` consulta la libreta del anfitrión con `contacts:read`: devuelve
 nombre, teléfono, email, documento y notas disponibles. Ese permiso permite

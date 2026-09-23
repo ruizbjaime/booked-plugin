@@ -10,6 +10,9 @@
   Para consultar teléfonos y otros datos, hace falta un token con «Consultar
   contactos», que abarca la libreta completa del anfitrión. Para buscar al
   responsable por propiedad y fecha necesita también «Propiedades» y «Reservas».
+- **Al token le falta otro permiso de lectura** —«Importes y pagos», «Nombre
+  del huésped», «Disponibilidad»—: hace falta un token que lo lleve, emitido en
+  *Booked → Ajustes → Integraciones API*.
 - **Al token le falta un permiso de escritura:** dilo así, nombrando la acción
   que faltó, y no insistas. Hace falta un token aparte, emitido en
   *Booked → Ajustes → Integraciones API*, que lleve el permiso de esa acción:
