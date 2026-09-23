@@ -9,6 +9,9 @@
   los permisos de lectura; permite consultar toda la libreta del anfitrión.
   Para buscar al responsable por propiedad y fecha selecciona además
   «Propiedades» y «Reservas». Actualizar el plugin no amplía permisos existentes.
+- **A la autorización le falta otro permiso de lectura** —«Importes y pagos»,
+  «Nombre del huésped», «Disponibilidad»—: vuelve a autorizar Booked marcando
+  ese permiso en la pantalla de consentimiento.
 - **A la autorización le falta un permiso de escritura:** dilo así, nombrando
   la acción que faltó, y no insistas.
   Los permisos se fijan al autorizar: hay que desconectar Booked, volver a

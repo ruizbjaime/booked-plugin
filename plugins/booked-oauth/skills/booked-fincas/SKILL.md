@@ -1,6 +1,6 @@
 ---
 name: booked-fincas
-description: "Gestiona las fincas de Jaime en Booked, aunque no se nombre el PMS: disponibilidad, reservas, huéspedes, contactos, calendario, precios, ingresos, pagos pendientes, deudas y comisiones de Airbnb, Booking.com, Fincas de la Villa o venta directa. Úsala para consultar quién es el huésped principal de una propiedad hoy o en otra fecha, buscar el teléfono de un contacto, guardar, consultar, editar o convertir cotizaciones, crear o eliminar contactos y bloqueos, crear reservas directas o en propiedades comisionadas, cancelar o archivar las directas, registrar si se retiene o se devuelve lo cobrado de una reserva cancelada, y convertir bloqueos de plataforma en reservas. Consulta los datos existentes con las herramientas `booked`; para crear registros usa los datos proporcionados por Jaime."
+description: "Gestiona las fincas de Jaime en Booked, aunque no se nombre el PMS: disponibilidad, reservas, huéspedes, contactos, calendario, precios, ingresos, gastos, deudas y comisiones de Airbnb, Booking.com, Fincas de la Villa o venta directa. Úsala para ver el huésped principal de una propiedad en una fecha o el teléfono de un contacto; guardar, editar o convertir cotizaciones; crear o eliminar contactos y bloqueos; crear reservas directas o comisionadas y cancelar o archivar las directas; registrar si se retiene o devuelve lo cobrado al cancelar; convertir bloqueos de plataforma; y analizar huéspedes recurrentes y a quién reactivar, patrones de reserva, noches sueltas, qué finca rinde más, conversión de solicitudes, estado de resultados, flujo de caja, cuentas por pagar, lo ya vendido y la comparación con el año pasado. Consulta con las herramientas `booked`; para crear registros usa los datos que dé Jaime."
 ---
 
 # Booked — las fincas de Jaime
@@ -46,6 +46,9 @@ pertenece a una herramienta sino a la respuesta.
   los permisos de lectura; permite consultar toda la libreta del anfitrión.
   Para buscar al responsable por propiedad y fecha selecciona además
   «Propiedades» y «Reservas». Actualizar el plugin no amplía permisos existentes.
+- **A la autorización le falta otro permiso de lectura** —«Importes y pagos»,
+  «Nombre del huésped», «Disponibilidad»—: vuelve a autorizar Booked marcando
+  ese permiso en la pantalla de consentimiento.
 - **A la autorización le falta un permiso de escritura:** dilo así, nombrando
   la acción que faltó, y no insistas.
   Los permisos se fijan al autorizar: hay que desconectar Booked, volver a
@@ -154,6 +157,53 @@ pertenece a una herramienta sino a la respuesta.
   `properties:read` y `bookings:read`, y respeta la lista de propiedades de la
   integración. Este filtro usa ids de propiedades administradas; no le pases
   el id de una comisionada.
+
+## Preguntas de análisis
+
+Si el servidor aún no ofrece estas herramientas, explica que falta actualizar
+Booked. Cada una ya cuenta, suma y separa lo que hay que separar: no rehagas
+sus cifras paginando `buscar_reservas`, que sale recortado y cuenta dos veces
+los conjuntos.
+
+- «¿Quiénes repiten?» → `huespedes_recurrentes`; «¿quién no vuelve desde…?»,
+  la misma con `sin_volver_desde`. «¿Qué sé de Carlos?» → `ver_huesped`.
+- «¿Cuántos clientes repiten?», «¿de dónde vienen?» → `analisis_de_huespedes`.
+- Anticipación, duración o cancelaciones por canal → `patrones_de_reserva`.
+  Noches sueltas entre reservas → `huecos_de_ocupacion`. «¿Qué finca rinde
+  más?» → `comparar_propiedades`. Solicitudes que terminan en reserva →
+  `embudo_de_ventas`.
+- «¿Cuánto me dejó?» → `estado_de_resultados`; «¿cuánta plata entró o
+  salió?» → `flujo_de_caja`; «¿qué tengo que pagar?» →
+  `obligaciones_por_pagar`; «¿qué me deben?» → `deudas`.
+- «¿Cuánto tengo vendido?», «¿voy mejor que el año pasado a esta fecha?» →
+  `ingresos_comprometidos`; años enteros → `comparativo_interanual`.
+
+Al contestar:
+
+- **Devengo y caja no cuadran, y no es un error.** `estado_de_resultados` e
+  `ingresos_del_ano` cuentan cada reserva en el mes de su llegada;
+  `flujo_de_caja`, el día en que se movió el dinero. Di de cuál hablas y no
+  concilies una con otra.
+- **«Estancia» no es siempre lo mismo.** En las de huéspedes es una visita de
+  la persona (responsable o acompañante, un conjunto una vez); en
+  `patrones_de_reserva` y `comparar_propiedades`, la reserva de cada cabaña. No
+  cruces sus conteos. Un contacto duplicado cuenta como otra persona.
+- **Un campo que falta es un permiso, no un dato vacío.** Sin teléfono ni
+  cumpleaños de un huésped, o sin nacionalidad y ciudad en
+  `analisis_de_huespedes`, a la credencial le falta «Consultar contactos»
+  (`contacts:read`); sin importes —gasto, ingresos, ADR, RevPAR,
+  valor cotizado—, «Importes y pagos» (`finance:read`). Dilo nombrando el
+  permiso. En cambio, `incluye_gastos` o `incluye_nomina` en falso es un
+  permiso del anfitrión en Booked: volver a autorizar no lo arregla.
+- **La nómina por trabajador y los datos de TRA/SIRE no llegan por ninguna
+  herramienta.** Dilo; no los estimes.
+
+Las de huéspedes requieren «Nombre del huésped» (`guests:read`) y «Reservas»
+(`bookings:read`); `patrones_de_reserva`, «Reservas»; `huecos_de_ocupacion`,
+«Disponibilidad» (`availability:read`); `comparar_propiedades`, «Propiedades y
+canales» (`properties:read`) y «Reservas»; `embudo_de_ventas`, «Cotizaciones»
+(`quotations:read`); las de dinero, «Importes y pagos». Actualizar el plugin no
+amplía los permisos de una credencial existente.
 
 ## Escribir: reglas comunes
 

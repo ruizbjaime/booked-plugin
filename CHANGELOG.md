@@ -3,6 +3,25 @@
 Cada versión publicada actualiza los manifiestos de los tres paquetes y las
 entradas del marketplace de Claude, y lleva un tag `vX.Y.Z`.
 
+## 0.10.0 — 2026-09-23
+
+- Añade las preguntas de análisis en los tres paquetes: huéspedes
+  (`huespedes_recurrentes`, `ver_huesped`, `analisis_de_huespedes`),
+  reservas y propiedades (`patrones_de_reserva`, `huecos_de_ocupacion`,
+  `comparar_propiedades`, `embudo_de_ventas`) y finanzas
+  (`estado_de_resultados`, `flujo_de_caja`, `obligaciones_por_pagar`,
+  `ingresos_comprometidos`, `comparativo_interanual`); `deudas` añade la
+  antigüedad y las comisiones cobradas.
+- La skill lleva cada pregunta típica a su herramienta y fija lo que ninguna
+  descripción dice sola: devengo y caja no cuadran por diseño, «estancia» no
+  cuenta lo mismo en huéspedes que en reservas, un contacto duplicado es otra
+  persona, y qué permiso falta cuando no llegan datos de contacto o importes.
+- El catálogo pasa a 57 herramientas: 43 de lectura y 14 de escritura. No hay
+  permisos nuevos; las credenciales existentes no ganan permisos al
+  actualizar.
+- Requiere desplegar primero el [PR #583 de Booked](https://github.com/ruizbjaime/booked/pull/583).
+  Las tres skills se regeneran desde la fuente compartida.
+
 ## 0.9.0 — 2026-09-23
 
 - Añade la gestión de cotizaciones en los tres paquetes: `ver_cotizaciones`
