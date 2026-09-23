@@ -18,7 +18,7 @@
   conectarlo y marcar en la pantalla de consentimiento el permiso de esa
   acción: «Guardar cotizaciones», «Cambiar el estado de cotizaciones»,
   «Editar cotizaciones», «Convertir cotizaciones en reservas», «Crear
-  bloqueos», «Eliminar bloqueos», «Crear reservas manuales», «Crear reservas
+  bloqueos», «Editar bloqueos», «Eliminar bloqueos», «Crear reservas manuales», «Crear reservas
   comisionadas», «Cancelar reservas»,
   «Eliminar reservas», «Retener o devolver pagos de cancelaciones»,
   «Convertir bloqueos en reservas», «Crear contactos» o «Eliminar contactos».

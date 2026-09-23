@@ -18,7 +18,7 @@
   *Booked → Ajustes → Integraciones API*, que lleve el permiso de esa acción:
   «Guardar cotizaciones», «Cambiar el estado de cotizaciones», «Editar
   cotizaciones», «Convertir cotizaciones en reservas», «Crear bloqueos»,
-  «Eliminar bloqueos», «Crear reservas manuales», «Crear reservas
+  «Editar bloqueos», «Eliminar bloqueos», «Crear reservas manuales», «Crear reservas
   comisionadas», «Cancelar reservas»,
   «Eliminar reservas», «Retener o devolver pagos de cancelaciones»,
   «Convertir bloqueos en reservas», «Crear contactos» o «Eliminar contactos».
