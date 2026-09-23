@@ -1,7 +1,7 @@
 {
   "name": "booked",
   "displayName": "Booked — fincas, reservas y dinero",
-  "version": "0.10.0",
+  "version": "0.10.1",
   "description": "Cincuenta y siete herramientas sobre propiedades, reservas, contactos, calendario y dinero de un anfitrión de Booked: cuarenta y tres de lectura y catorce de escritura con permiso. Consulta datos de contactos y responsables de estancias; analiza huéspedes recurrentes, patrones de reserva, rendimiento de propiedades, resultados, caja y cuentas por pagar; guarda, consulta, edita, cambia de estado y convierte cotizaciones confirmadas, crea contactos, bloqueos y reservas directas o comisionadas, gestiona reservas, registra la retención o devolución de lo cobrado en cancelaciones y convierte bloqueos. Toda eliminación exige explicar las consecuencias y recibir confirmación explícita. Incluye las reglas de negocio compartidas.",
   "author": {
     "name": "Jaime Ruiz"

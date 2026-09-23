@@ -3,6 +3,15 @@
 Cada versión publicada actualiza los manifiestos de los tres paquetes y las
 entradas del marketplace de Claude, y lleva un tag `vX.Y.Z`.
 
+## 0.10.1 — 2026-09-23
+
+- En las herramientas de huéspedes, las reservas de la misma persona con
+  fechas pegadas o superpuestas cuentan como una sola visita; la skill lo dice
+  en la regla de qué es una «estancia». Una noche libre en medio sigue
+  separando dos visitas.
+- Requiere desplegar el [PR #584 de Booked](https://github.com/ruizbjaime/booked/pull/584).
+  Las tres skills se regeneran desde la fuente compartida.
+
 ## 0.10.0 — 2026-09-23
 
 - Añade las preguntas de análisis en los tres paquetes: huéspedes
