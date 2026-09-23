@@ -150,7 +150,8 @@ Al contestar:
   `flujo_de_caja`, el día en que se movió el dinero. Di de cuál hablas y no
   concilies una con otra.
 - **«Estancia» no es siempre lo mismo.** En las de huéspedes es una visita de
-  la persona (responsable o acompañante, un conjunto una vez); en
+  la persona (responsable o acompañante, un conjunto una vez, y sus reservas
+  con fechas pegadas o superpuestas también una vez); en
   `patrones_de_reserva` y `comparar_propiedades`, la reserva de cada cabaña. No
   cruces sus conteos. Un contacto duplicado cuenta como otra persona.
 - **Un campo que falta es un permiso, no un dato vacío.** Sin teléfono ni

@@ -24,8 +24,9 @@ Instala una sola variante de Booked en cada cliente para evitar herramientas
 repetidas. Las reglas de negocio se mantienen en `shared/booked-fincas.md` y
 se generan con `python3 scripts/sync-skills.py`. No edites las copias generadas.
 
-**Versión 0.10.0:** para las preguntas de análisis —huéspedes, reservas,
-propiedades y finanzas—, despliega primero el [PR #583 de Booked](https://github.com/ruizbjaime/booked/pull/583).
+**Versión 0.10.1:** para las preguntas de análisis —huéspedes, reservas,
+propiedades y finanzas—, despliega primero los PR [#583](https://github.com/ruizbjaime/booked/pull/583)
+y [#584](https://github.com/ruizbjaime/booked/pull/584) de Booked.
 El backend también debe incluir la gestión de cotizaciones
 ([PR #581](https://github.com/ruizbjaime/booked/pull/581)), la retención o
 devolución de cancelaciones ([PR #579](https://github.com/ruizbjaime/booked/pull/579)), reservas comisionadas
