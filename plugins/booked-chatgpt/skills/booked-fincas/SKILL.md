@@ -1,13 +1,14 @@
 ---
 name: booked-fincas
-description: "Gestiona las fincas de Jaime en Booked, aunque no se nombre el PMS: disponibilidad, reservas, huéspedes, contactos, calendario, precios, ingresos, gastos, deudas y comisiones de Airbnb, Booking.com, Fincas de la Villa o venta directa. Úsala para ver el huésped principal de una propiedad en una fecha o el teléfono de un contacto; guardar, editar o convertir cotizaciones; crear o eliminar contactos; crear, editar o eliminar bloqueos; crear reservas directas o comisionadas y cancelar o archivar las directas; registrar si se retiene o devuelve lo cobrado al cancelar; convertir bloqueos de plataforma; y analizar huéspedes recurrentes y a quién reactivar, patrones de reserva, noches sueltas, qué finca rinde más, conversión de solicitudes, estado de resultados, flujo de caja, cuentas por pagar, lo ya vendido y la comparación con el año pasado. Consulta con las herramientas `booked`; para crear registros usa los datos que dé Jaime."
+description: "Gestiona las fincas de Jaime en Booked, aunque no se nombre el PMS: disponibilidad, reservas, huéspedes, contactos, calendario, precios, ingresos, gastos, nómina, deudas y comisiones de Airbnb, Booking.com, Fincas de la Villa o venta directa. Úsala para ver el huésped de una propiedad en una fecha o un teléfono; editar los datos de una propiedad; sincronizar calendarios; guardar, editar o convertir cotizaciones; crear o eliminar contactos; crear, editar o eliminar bloqueos; crear, cancelar o archivar reservas; registrar la retención o devolución de una cancelación; convertir bloqueos de plataforma; ver qué gastos hubo y quién los asume, la nómina por concepto o trabajador, y preparar el informe financiero o la liquidación de un propietario; y analizar huéspedes, patrones de reserva, qué finca rinde más, estado de resultados, flujo de caja, cuentas por pagar y lo ya vendido. Consulta con las herramientas `booked`; para crear registros usa los datos que dé Jaime."
 ---
 
 # Booked — las fincas de Jaime
 
-Las herramientas `booked` leen el PMS de Fincas de la Villa, y quince de ellas
-escriben: crear, editar y eliminar bloqueos manuales, crear una reserva directa o
-comisionada, cancelar o archivar una directa, registrar la retención o
+Las herramientas `booked` leen el PMS de Fincas de la Villa, y diecisiete de
+ellas escriben: editar los datos de una propiedad administrada, sincronizar ya
+sus calendarios con las plataformas, crear, editar y eliminar bloqueos
+manuales, crear una reserva directa o comisionada, cancelar o archivar una directa, registrar la retención o
 devolución de lo cobrado en una reserva cancelada, convertir en reserva un
 bloqueo de plataforma, crear o eliminar contactos, y guardar cotizaciones,
 cambiar su estado, editar un borrador o convertir una aceptada en reserva.
@@ -175,6 +176,10 @@ los conjuntos.
 - «¿Cuánto me dejó?» → `estado_de_resultados`; «¿cuánta plata entró o
   salió?» → `flujo_de_caja`; «¿qué tengo que pagar?» →
   `obligaciones_por_pagar`; «¿qué me deben?» → `deudas`.
+- «¿Qué gastos tuvo la Cabaña en agosto?», «¿cuánto gasto le toca al
+  propietario?» → `gastos`; «¿cuánto me costó la nómina?», «¿y por
+  trabajador?» → `gastos_de_nomina`; «hazme el informe del semestre», «la
+  liquidación de agosto para el propietario» → `informe_financiero`.
 - «¿Cuánto tengo vendido?», «¿voy mejor que el año pasado a esta fecha?» →
   `ingresos_comprometidos`; años enteros → `comparativo_interanual`.
 
@@ -196,15 +201,32 @@ Al contestar:
   valor cotizado—, «Importes y pagos» (`finance:read`). Dilo nombrando el
   permiso. En cambio, `incluye_gastos` o `incluye_nomina` en falso es un
   permiso del anfitrión en Booked: volver a autorizar no lo arregla.
-- **La nómina por trabajador y los datos de TRA/SIRE no llegan por ninguna
-  herramienta.** Dilo; no los estimes.
+- **Quién asume un costo no es quién es el dueño.** `gastos` y
+  `gastos_de_nomina` reparten cada costo entre `anfitrion` —Jaime, también
+  como dueño de sus propias—, `propietario` (el dueño de una administrada) y
+  `tercero`. El filtro por quién asume suma solo su parte, pero `pagado` y
+  `pendiente` de `gastos` son siempre del gasto entero: Booked no registra
+  quién pagó. No los mezcles al contestar.
+- **La nómina por trabajador solo llega con «Nómina por trabajador»
+  (`payroll:read`).** Sin ese permiso viaja en totales y por concepto, y pedir
+  el detalle se rechaza: di que falta el permiso, no que no hay datos. Los
+  salarios son datos sensibles: dalos solo si Jaime los pidió.
+- **El informe se entrega, no se rehace.** `informe_financiero` trae la
+  cascada con su detalle; con `documento: true`, el informe listo en Markdown:
+  entrégalo tal cual, sin recalcular ni redondear. Para un propietario, sin
+  `propietario_id` devuelve `propietarios`: pregunta cuál. `detalle_oculto` es
+  un permiso del anfitrión en Booked (el monto de la línea sí cuenta);
+  `completo: false`, una propiedad quedó en `excluidas`: dilo.
+- **Los datos de TRA/SIRE no llegan por ninguna herramienta.** Dilo; no los
+  estimes.
 
 Las de huéspedes requieren «Nombre del huésped» (`guests:read`) y «Reservas»
 (`bookings:read`); `patrones_de_reserva`, «Reservas»; `huecos_de_ocupacion`,
 «Disponibilidad» (`availability:read`); `comparar_propiedades`, «Propiedades y
 canales» (`properties:read`) y «Reservas»; `embudo_de_ventas`, «Cotizaciones»
-(`quotations:read`); las de dinero, «Importes y pagos». Actualizar el plugin no
-amplía los permisos de una credencial existente.
+(`quotations:read`); las de dinero, «Importes y pagos», y la nómina por
+trabajador, además «Nómina por trabajador» (`payroll:read`). Actualizar el
+plugin no amplía los permisos de una credencial existente.
 
 ## Escribir: reglas comunes
 
@@ -367,6 +389,44 @@ otras fechas, no las ajustes por tu cuenta. Confirma con lo que devuelve en
 Jaime, otra persona lo cambió entretanto: díselo.
 `ver_bloqueos` trae en `notas` la razón del bloqueo, o el título de la
 plataforma si es importado; úsala para explicar o agrupar los bloqueos.
+
+## Editar una propiedad
+
+Solo propiedades administradas de `listar_propiedades`, nunca una comisionada,
+y solo nombre, ciudad, dirección, horas de entrada y salida (`HH:MM`) y
+capacidad base y máxima. Precios, canales, fotos y lo demás se cambian en
+Booked.
+
+1. `preparar_edicion_de_propiedad` con `propiedad_id` y **solo los campos que
+   Jaime pidió cambiar**: lo omitido se conserva, y `null` en una capacidad la
+   borra. No cambia nada.
+2. Léele `resumen.antes` y `resumen.despues` de lo que cambia, los `avisos`
+   —cambiar la capacidad puede cambiar los precios de las cotizaciones nuevas—
+   y cuéntale los `impedimentos`. Espera su sí explícito.
+3. Solo entonces `editar_propiedad` con la `firma` y `confirmado: true`.
+   Confirma con la `propiedad` que devuelve. Si responde que la propiedad
+   cambió desde la preparación, no se guardó nada: prepara y confirma de
+   nuevo. Ante una respuesta perdida, consulta `ver_propiedad` antes de
+   reintentar.
+
+La dirección solo se lee y se cambia con «Editar propiedades»
+(`properties:update`), que requiere además «Propiedades y canales»
+(`properties:read`).
+
+## Sincronizar calendarios
+
+`sincronizar_calendarios` importa ya los calendarios iCal de las plataformas,
+como la sincronización automática de cada hora. Úsala solo si Jaime lo pide:
+puede crear o quitar bloqueos importados y cambiar o cancelar reservas
+sincronizadas. Sin `propiedad_id` sincroniza todas las de la credencial con
+calendario externo. Corre en segundo plano y solo dice qué quedó en cola: el
+resultado se consulta con `estado_de_sincronizacion` (`en_curso`,
+`terminada`, `vencida` —se puede repetir— o `ninguna`). No anuncies cambios
+antes de verlos ahí, y no la repitas mientras siga `en_curso`.
+
+Sincronizar requiere «Sincronizar calendarios» (`blocks:sync`) y
+«Propiedades» (`properties:read`); consultar el estado, «Bloqueos»
+(`blocks:read`), y sus cifras de reservas, «Reservas» (`bookings:read`).
 
 ## Crear un contacto
 

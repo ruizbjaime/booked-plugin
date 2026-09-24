@@ -1,8 +1,8 @@
 {
   "name": "booked",
   "displayName": "Booked — fincas, reservas y dinero",
-  "version": "0.11.0",
-  "description": "Cincuenta y ocho herramientas sobre propiedades, reservas, contactos, calendario y dinero de un anfitrión de Booked: cuarenta y tres de lectura y quince de escritura con permiso. Consulta datos de contactos y responsables de estancias; analiza huéspedes recurrentes, patrones de reserva, rendimiento de propiedades, resultados, caja y cuentas por pagar; guarda, consulta, edita, cambia de estado y convierte cotizaciones confirmadas, crea contactos, crea y edita bloqueos, crea reservas directas o comisionadas, gestiona reservas, registra la retención o devolución de lo cobrado en cancelaciones y convierte bloqueos. Toda eliminación exige explicar las consecuencias y recibir confirmación explícita. Incluye las reglas de negocio compartidas.",
+  "version": "0.12.0",
+  "description": "Sesenta y cinco herramientas sobre propiedades, reservas, contactos, calendario y dinero de un anfitrión de Booked: cuarenta y ocho de lectura y diecisiete de escritura con permiso. Consulta datos de contactos y responsables de estancias; analiza huéspedes recurrentes, patrones de reserva, rendimiento de propiedades, resultados, caja, cuentas por pagar, gastos y nómina por quién los asume, y prepara informes financieros y liquidaciones de propietarios; edita los datos de una propiedad, sincroniza calendarios, guarda, consulta, edita, cambia de estado y convierte cotizaciones confirmadas, crea contactos, crea y edita bloqueos, crea reservas directas o comisionadas, gestiona reservas, registra la retención o devolución de lo cobrado en cancelaciones y convierte bloqueos. Toda eliminación exige explicar las consecuencias y recibir confirmación explícita. Incluye las reglas de negocio compartidas.",
   "author": {
     "name": "Jaime Ruiz"
   },
@@ -22,7 +22,7 @@
     "api_token": {
       "type": "string",
       "title": "Token de la integración de Booked",
-      "description": "Se emite en Booked → Ajustes → Integraciones API y se muestra una sola vez. Caduca a los 30 días: cuando el plugin conteste «credenciales», emite uno nuevo y pégalo aquí. El token decide lo que el plugin puede hacer: con uno de solo lectura no escribe nada; para guardar cotizaciones, crear o eliminar contactos, administrar bloqueos, gestionar reservas o registrar la retención o devolución de una cancelación, emite uno aparte con esos permisos de escritura y las lecturas que requieren. Actualizar el plugin no amplía los permisos del token.",
+      "description": "Se emite en Booked → Ajustes → Integraciones API y se muestra una sola vez. Caduca a los 30 días: cuando el plugin conteste «credenciales», emite uno nuevo y pégalo aquí. El token decide lo que el plugin puede hacer: con uno de solo lectura no escribe nada; para editar propiedades, sincronizar calendarios, guardar cotizaciones, crear o eliminar contactos, administrar bloqueos, gestionar reservas o registrar la retención o devolución de una cancelación, emite uno aparte con esos permisos de escritura y las lecturas que requieren. Actualizar el plugin no amplía los permisos del token.",
       "sensitive": true,
       "required": true
     }

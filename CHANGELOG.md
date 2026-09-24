@@ -3,6 +3,34 @@
 Cada versión publicada actualiza los manifiestos de los tres paquetes y las
 entradas del marketplace de Claude, y lleva un tag `vX.Y.Z`.
 
+## 0.12.0 — 2026-09-23
+
+- Añade `gastos`, `gastos_de_nomina` e `informe_financiero` en los tres
+  paquetes: los gastos causados con quién asume cada parte (anfitrión,
+  propietario o tercero), el costo de nómina por concepto, propiedad y mes, y
+  el informe del anfitrión o la liquidación de un propietario con el detalle
+  de cada línea y, si se pide, en Markdown. La skill dice que el filtro por
+  quién asume suma solo su parte mientras lo pagado es del gasto entero, que
+  el documento se entrega sin recalcular y qué significan `detalle_oculto` y
+  `completo`.
+- Documenta el permiso «Nómina por trabajador» (`payroll:read`), que exige
+  «Importes y pagos»: sin él la nómina sigue en totales y por concepto. La
+  skill ya no dice que la nómina por trabajador no llega por ninguna
+  herramienta.
+- Añade `preparar_edicion_de_propiedad` → `editar_propiedad`: nombre, ciudad,
+  dirección, horarios y capacidad de una propiedad administrada, con resumen
+  antes y después, firma y confirmación explícita. Permiso «Editar
+  propiedades» (`properties:update`) con «Propiedades y canales».
+- Añade `sincronizar_calendarios` y `estado_de_sincronizacion`: importar ya
+  los iCal de las plataformas, solo a petición, y ver cómo terminó. Permiso
+  «Sincronizar calendarios» (`blocks:sync`) con «Propiedades».
+- El catálogo pasa a 65 herramientas: 48 de lectura y 17 de escritura. Las
+  credenciales existentes no ganan permisos al actualizar.
+- Requiere desplegar primero los PR [#587](https://github.com/ruizbjaime/booked/pull/587),
+  [#588](https://github.com/ruizbjaime/booked/pull/588) y
+  [#589](https://github.com/ruizbjaime/booked/pull/589) de Booked. Las tres
+  skills se regeneran desde la fuente compartida.
+
 ## 0.11.0 — 2026-09-23
 
 - Añade `editar_bloqueo` en los tres paquetes: cambia las fechas o las notas

@@ -1,8 +1,8 @@
 # Booked para Claude y ChatGPT
 
 Los paquetes conectan al servidor MCP de
-[Booked](https://booked.fincasdelavilla.com) —cincuenta y ocho herramientas sobre
-propiedades, reservas, contactos, calendario y dinero, quince de ellas de escritura— e
+[Booked](https://booked.fincasdelavilla.com) —sesenta y cinco herramientas sobre
+propiedades, reservas, contactos, calendario y dinero, diecisiete de ellas de escritura— e
 incluyen una skill con las reglas de negocio que no caben en la descripción de
 una herramienta.
 
@@ -24,9 +24,12 @@ Instala una sola variante de Booked en cada cliente para evitar herramientas
 repetidas. Las reglas de negocio se mantienen en `shared/booked-fincas.md` y
 se generan con `python3 scripts/sync-skills.py`. No edites las copias generadas.
 
-**Versión 0.11.0:** para editar bloqueos manuales, despliega primero el
-[PR #586](https://github.com/ruizbjaime/booked/pull/586) de Booked, que trae
-también las notas de los bloqueos ([PR #585](https://github.com/ruizbjaime/booked/pull/585)).
+**Versión 0.12.0:** despliega primero los PR de Booked que traen
+sincronizar calendarios ([PR #587](https://github.com/ruizbjaime/booked/pull/587)),
+editar propiedades ([PR #588](https://github.com/ruizbjaime/booked/pull/588)) y
+gastos, nómina e informes financieros ([PR #589](https://github.com/ruizbjaime/booked/pull/589)).
+Editar bloqueos requiere el [PR #586](https://github.com/ruizbjaime/booked/pull/586),
+con las notas de los bloqueos ([PR #585](https://github.com/ruizbjaime/booked/pull/585)).
 Las preguntas de análisis requieren los PR [#583](https://github.com/ruizbjaime/booked/pull/583)
 y [#584](https://github.com/ruizbjaime/booked/pull/584).
 El backend también debe incluir la gestión de cotizaciones
@@ -117,8 +120,11 @@ En el repositorio de la aplicación, con el soporte OAuth y los cambios del
    servidor ofrece `ver_contactos`, `crear_contacto` y `eliminar_contacto`, y que
    `editar_bloqueo` y `eliminar_bloqueo` exigen `confirmado: true`. Comprueba también que ofrece
    `preparar_cotizacion`, `crear_cotizacion` y `ver_cotizaciones`, con sus
-   tres flujos de gestión, y las doce de análisis (de `huespedes_recurrentes`
-   a `comparativo_interanual`). Actualizar solo el plugin no
+   tres flujos de gestión, las doce de análisis (de `huespedes_recurrentes`
+   a `comparativo_interanual`), `gastos`, `gastos_de_nomina` e
+   `informe_financiero`, `preparar_edicion_de_propiedad` con
+   `editar_propiedad`, y `sincronizar_calendarios` con
+   `estado_de_sincronizacion`. Actualizar solo el plugin no
    incorpora estas herramientas ni sus permisos al backend.
 
 El registro dinámico permite HTTPS en `chatgpt.com`, `chat.openai.com`,
@@ -353,18 +359,26 @@ y resultados sin paginar reservas ni sumar a mano:
 | `obligaciones_por_pagar` | Lo que debe el anfitrión: gastos, nómina y comisiones | Igual |
 | `ingresos_comprometidos` | Lo ya vendido por mes y el ritmo frente al año pasado | Igual |
 | `comparativo_interanual` | Ingresos, ocupación y ADR por año | Igual |
+| `gastos` | Los gastos causados, uno por uno, y quién asume cada parte: anfitrión, propietario o tercero | Igual |
+| `gastos_de_nomina` | El costo de nómina por concepto, quién lo asume, propiedad y mes | Igual; por trabajador, además «Nómina por trabajador» (`payroll:read`) |
+| `informe_financiero` | El informe del anfitrión o la liquidación de un propietario, con el detalle de cada línea y, si se pide, en Markdown | Igual; la nómina por trabajador, además `payroll:read` |
 
 `deudas` añade la antigüedad de lo que le deben y las comisiones ya cobradas.
 Teléfono, cumpleaños y origen de los huéspedes llegan solo con «Consultar
 contactos» (`contacts:read`), y los importes de las herramientas de reservas y
-huéspedes, con «Importes y pagos». La nómina viaja en totales, nunca por
-trabajador, y los datos de TRA/SIRE no se usan. Primero debe desplegarse el
-[PR #583 del servidor](https://github.com/ruizbjaime/booked/pull/583);
+huéspedes, con «Importes y pagos». La nómina viaja en totales y por concepto;
+por trabajador, con su nombre, solo con «Nómina por trabajador»
+(`payroll:read`), que exige «Importes y pagos» y se concede aparte. Los datos
+de TRA/SIRE no se usan. `gastos` y `gastos_de_nomina` dicen quién asume cada
+costo; `informe_financiero` entrega la cascada con su detalle y, con
+`documento`, el informe en Markdown para entregar sin recalcular. Primero debe
+desplegarse el [PR #583 del servidor](https://github.com/ruizbjaime/booked/pull/583),
+y para las tres de costos e informes el [PR #589](https://github.com/ruizbjaime/booked/pull/589);
 actualizar el plugin no concede permisos.
 
 ## Lectura y escritura
 
-Cuarenta y tres herramientas solo leen. `cotizar` calcula un precio; no aparta fechas.
+Cuarenta y ocho herramientas solo leen. `cotizar` calcula un precio; no aparta fechas.
 
 `ver_contactos` consulta la libreta del anfitrión con `contacts:read`: devuelve
 nombre, teléfono, email, documento y notas disponibles. Ese permiso permite
@@ -384,7 +398,7 @@ requiere `properties:read` y `bookings:read`, y sí respeta esa lista.
   no la lista de acompañantes. Una reserva pendiente o confirmada no prueba
   presencia física.
 
-Quince herramientas escriben, y cada una lleva su permiso en Booked:
+Diecisiete herramientas escriben, y cada una lleva su permiso en Booked:
 
 | Herramienta | Permiso | Qué hace |
 | --- | --- | --- |
@@ -392,6 +406,8 @@ Quince herramientas escriben, y cada una lleva su permiso en Booked:
 | `cambiar_estado_de_cotizacion` | Cambiar el estado de cotizaciones (`quotations:transition`) | Marca una cotización como enviada, aceptada o rechazada, o la devuelve a borrador, tras preparar y confirmar; no envía nada al huésped. |
 | `editar_cotizacion` | Editar cotizaciones (`quotations:update`) | Corrige un borrador tras preparar y confirmar, recalculando el precio como la ficha; no reserva noches. |
 | `convertir_cotizacion_en_reserva` | Convertir cotizaciones en reservas (`quotations:convert`) | Convierte una cotización aceptada en una reserva pendiente con su precio tras preparar y confirmar; retiene las noches y no registra pagos. |
+| `editar_propiedad` | Editar propiedades (`properties:update`) | Cambia nombre, ciudad, dirección, horarios o capacidad de una propiedad administrada tras preparar, mostrar antes y después y recibir confirmación explícita; no toca precios ni canales. |
+| `sincronizar_calendarios` | Sincronizar calendarios (`blocks:sync`) | Importa ya los calendarios iCal de las plataformas, solo a petición; puede crear o quitar bloqueos importados y cambiar o cancelar reservas sincronizadas. El resultado se consulta con `estado_de_sincronizacion`. |
 | `crear_bloqueo` | Crear bloqueos | Bloquea noches de una propiedad administrada. |
 | `editar_bloqueo` | Editar bloqueos (`blocks:update`) | Cambia las fechas o las notas de un bloqueo manual tras mostrar cómo quedará y recibir confirmación explícita; si las fechas se cruzan con otra ocupación no cambia nada; nunca uno importado. |
 | `eliminar_bloqueo` | Eliminar bloqueos | Borra un bloqueo manual tras explicar las consecuencias y recibir confirmación explícita; nunca uno importado. |
@@ -453,6 +469,8 @@ permiso de escritura de cada herramienta, se exigen estas lecturas acompañantes
 | `cambiar_estado_de_cotizacion` | «Cotizaciones» (`quotations:read`); comisionadas requieren `brokered:read` y `finance:read`. |
 | `editar_cotizacion` | «Cotizaciones» (`quotations:read`); administradas requieren `pricing:read`; comisionadas, `brokered:read` y `finance:read`. |
 | `convertir_cotizacion_en_reserva` | «Cotizaciones» (`quotations:read`); una cotización antigua sin precio guardado requiere `pricing:read`; comisionadas, `brokered:read` y `finance:read`. |
+| `editar_propiedad` | «Propiedades y canales» (`properties:read`). |
+| `sincronizar_calendarios` | «Propiedades» (`properties:read`). |
 | `crear_bloqueo` | «Propiedades» (`properties:read`). |
 | `editar_bloqueo`, `eliminar_bloqueo` | «Propiedades» (`properties:read`) y «Bloqueos» (`blocks:read`). |
 | `crear_reserva_manual` | «Propiedades» (`properties:read`) y «Cotizar estancias» (`pricing:read`). |
