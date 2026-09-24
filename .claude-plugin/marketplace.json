@@ -4,14 +4,14 @@
     "name": "Jaime Ruiz",
     "url": "https://github.com/ruizbjaime"
   },
-  "description": "Booked para Claude: OAuth o token manual. Sesenta y cinco herramientas para consultas y escrituras autorizadas sobre propiedades, reservas, contactos y dinero. Toda eliminación exige confirmación explícita posterior a sus consecuencias.",
+  "description": "Booked para Claude: OAuth o token manual. Noventa y cuatro herramientas para consultas y escrituras autorizadas sobre propiedades, reservas, contactos y dinero. Toda eliminación exige confirmación explícita posterior a sus consecuencias.",
   "plugins": [
     {
       "name": "booked",
       "source": "./plugins/booked",
       "displayName": "Booked — fincas, reservas y dinero",
-      "description": "Consulta y analiza Booked: propiedades, reservas, huéspedes, contactos, calendario y dinero, con resultados, caja, cuentas por pagar, gastos, nómina e informes financieros. Con los permisos del token, edita propiedades, sincroniza calendarios, guarda, consulta, edita, cambia de estado y convierte cotizaciones confirmadas, crea contactos, crea y edita bloqueos, crea reservas directas o comisionadas, gestiona reservas directas, registra la retención o devolución de cancelaciones y convierte bloqueos. Toda eliminación exige explicar las consecuencias y recibir confirmación explícita; las escrituras de reservas y la eliminación de contactos usan preparación con firma.",
-      "version": "0.12.0",
+      "description": "Consulta y analiza Booked: propiedades, reservas, huéspedes, contactos, calendario y dinero, con resultados, caja, cuentas por pagar, gastos, nómina, informes financieros, solicitudes del sitio y cumplimiento TRA/SIRE. Con los permisos del token, edita propiedades, sincroniza calendarios, guarda, consulta, edita, cambia de estado y convierte cotizaciones confirmadas, también de conjunto, convierte o descarta solicitudes, crea contactos, crea y edita bloqueos, crea reservas directas, comisionadas o de conjunto, las edita, cambia su estado y registra o anula sus pagos, gestiona reservas directas, registra la retención o devolución de cancelaciones y convierte bloqueos. Toda eliminación exige explicar las consecuencias y recibir confirmación explícita; las escrituras de reservas y la eliminación de contactos usan preparación con firma.",
+      "version": "0.13.0",
       "author": {
         "name": "Jaime Ruiz"
       },
@@ -30,8 +30,8 @@
       "name": "booked-oauth",
       "source": "./plugins/booked-oauth",
       "displayName": "Booked — conexión con OAuth",
-      "description": "Consulta y analiza Booked: propiedades, reservas, huéspedes, contactos, calendario y dinero, con resultados, caja, cuentas por pagar, gastos, nómina e informes financieros. Con los permisos seleccionados al autorizar OAuth, edita propiedades, sincroniza calendarios, guarda, consulta, edita, cambia de estado y convierte cotizaciones confirmadas, crea contactos, crea y edita bloqueos, crea reservas directas o comisionadas, gestiona reservas directas, registra la retención o devolución de cancelaciones y convierte bloqueos. Toda eliminación exige explicar las consecuencias y recibir confirmación explícita; las escrituras de reservas y la eliminación de contactos usan preparación con firma.",
-      "version": "0.12.0",
+      "description": "Consulta y analiza Booked: propiedades, reservas, huéspedes, contactos, calendario y dinero, con resultados, caja, cuentas por pagar, gastos, nómina, informes financieros, solicitudes del sitio y cumplimiento TRA/SIRE. Con los permisos seleccionados al autorizar OAuth, edita propiedades, sincroniza calendarios, guarda, consulta, edita, cambia de estado y convierte cotizaciones confirmadas, también de conjunto, convierte o descarta solicitudes, crea contactos, crea y edita bloqueos, crea reservas directas, comisionadas o de conjunto, las edita, cambia su estado y registra o anula sus pagos, gestiona reservas directas, registra la retención o devolución de cancelaciones y convierte bloqueos. Toda eliminación exige explicar las consecuencias y recibir confirmación explícita; las escrituras de reservas y la eliminación de contactos usan preparación con firma.",
+      "version": "0.13.0",
       "author": {
         "name": "Jaime Ruiz"
       },

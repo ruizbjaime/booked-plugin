@@ -3,6 +3,50 @@
 Cada versión publicada actualiza los manifiestos de los tres paquetes y las
 entradas del marketplace de Claude, y lleva un tag `vX.Y.Z`.
 
+## 0.13.0 — 2026-09-24
+
+- Añade las reservas de conjunto en los tres paquetes: `ver_conjuntos`,
+  `ver_reserva_de_conjunto` y `cotizar_conjunto`, y reservar un conjunto
+  directo con `preparar_reserva_de_conjunto` → `crear_reserva_de_conjunto`
+  (una reserva pendiente por cabaña, todas o ninguna). Moverlo, cambiar su
+  estado —cancelar incluido— o cobrarlo se prepara y confirma para todas sus
+  cabañas a la vez (`editar_conjunto`, `cambiar_estado_de_conjunto`,
+  `registrar_pago_de_conjunto`). Permiso «Reservas de conjunto»
+  (`groups:manage`) con «Propiedades», «Reservas» y «Cotizar estancias». La
+  skill enseña que un conjunto solo existe para el token si alcanza todas sus
+  cabañas.
+- Las cotizaciones de conjunto funcionan con las herramientas de siempre:
+  `preparar_cotizacion` con `tipo_inventario: conjunto` y el
+  `reparto_para_cotizar` de `cotizar_conjunto`, `crear_cotizacion`,
+  `ver_cotizaciones`, `editar_cotizacion` (solo notas) y
+  `convertir_cotizacion_en_reserva`. La skill ya no dice que se gestionan en
+  Booked.
+- Añade cuatro flujos sobre una reserva existente, cada uno con preparación,
+  firma y confirmación explícita: editarla (`editar_reserva`,
+  `bookings:update`), cambiar su estado (`cambiar_estado_de_reserva`,
+  `bookings:transition`), registrar un pago ya recibido
+  (`registrar_pago_de_reserva`, `bookings:register_payment`) y anular un pago
+  o una devolución registrados por error (`anular_pago`,
+  `bookings:void_payment`). Ninguno mueve dinero; los de pagos exigen
+  «Importes y pagos».
+- Añade `cambios_por_revisar` y `marcar_cambio_revisado` para los avisos que
+  deja la sincronización de calendarios; cerrar un aviso no aplica ni deshace
+  nada.
+- Añade `solicitudes`, `preparar_conversion_de_solicitud` →
+  `convertir_solicitud_en_cotizacion` y `descartar_solicitud`, con los
+  permisos «Solicitudes del sitio» (`inquiries:read`) y «Gestionar
+  solicitudes» (`inquiries:manage`).
+- Añade `cumplimiento_tra_sire` («Cumplimiento TRA/SIRE», `compliance:read`):
+  qué falta reportar, en estados y conteos, nunca identidades. La skill ya no
+  dice que TRA/SIRE no llega por ninguna herramienta.
+- Añade `trabajadores` (con `payroll:read`), `gastos_recurrentes` y
+  `eventos_locales`. `ver_reserva` trae `detalle` y `ver_propiedad`,
+  `descripcion`.
+- El catálogo pasa a 94 herramientas: 66 de lectura y 28 de escritura. Las
+  credenciales existentes no ganan permisos al actualizar.
+- Requiere desplegar primero el PR [#590](https://github.com/ruizbjaime/booked/pull/590)
+  de Booked. Las tres skills se regeneran desde la fuente compartida.
+
 ## 0.12.0 — 2026-09-23
 
 - Añade `gastos`, `gastos_de_nomina` e `informe_financiero` en los tres
