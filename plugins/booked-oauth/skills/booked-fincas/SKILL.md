@@ -671,12 +671,16 @@ antes de reintentar.
   ocupación o mascotas, el precio se recalcula con la configuración de hoy y
   así se guarda: compara `antes` y `despues` y lee los avisos (un segmento ya
   pagado que se mueve, cargos a mano). Una cabaña de un conjunto se edita sola
-  aquí; mover el conjunto entero es `preparar_edicion_de_conjunto`.
+  aquí si el token alcanza el conjunto entero; mover el conjunto entero es
+  `preparar_edicion_de_conjunto`, y su responsable se cambia en Booked. Si
+  la preparación dice que las condiciones de pago ya no encajan, se ajustan en
+  Booked y se prepara de nuevo.
 - **Cambiar el estado** (`preparar_cambio_de_estado_de_reserva` →
   `cambiar_estado_de_reserva`): sin `accion` devuelve `acciones_posibles`
   —confirmar, volver a pendiente, no-show, reconfirmar, reactivar (re-precia
   con la configuración de hoy) o reabrir—; usa la que pidió Jaime. Vale en
-  cualquier canal, importadas incluidas, y en un conjunto, cabaña por cabaña.
+  cualquier canal, importadas incluidas, y en un conjunto, cabaña por cabaña
+  si el token alcanza el conjunto entero.
   No cancela (`cancelar_reserva`) ni hace check-in o salida, que son
   automáticos. No avisa al huésped ni a la plataforma.
 - **Registrar un pago** (`preparar_pago_de_reserva` →
@@ -743,12 +747,14 @@ perdida, `ver_reserva_de_conjunto`:
   `editar_conjunto`): nuevas fechas para todas las cabañas, o la ocupación de
   varias. Cada cabaña se re-precia con la configuración de hoy: lee antes y
   después por cabaña y en total. Solo si todas son no importadas de Directo o
-  del sitio público.
+  del sitio público. Una cabaña cancelada o no-show queda fuera: no se mueve
+  ni se re-precia, y la preparación lo avisa.
 - **Cambiar el estado** (`preparar_cambio_de_estado_de_conjunto` →
   `cambiar_estado_de_conjunto`): las mismas acciones que una reserva, más
-  cancelar (solo cabañas no importadas de Directo o del sitio público). Exige
-  que todas las cabañas estén en el mismo estado; si no, dice cuáles y cada una
-  se cambia con `cambiar_estado_de_reserva`. Retener o devolver lo cobrado de
+  cancelar (solo cabañas no importadas de Directo o del sitio público). Las
+  cabañas ya canceladas o no-show quedan fuera y la preparación lo avisa; las
+  demás deben estar en el mismo estado y, si no, dice cuáles y cada una se
+  cambia con `cambiar_estado_de_reserva`. Retener o devolver lo cobrado de
   un conjunto cancelado, y archivarlo, se hacen en Booked.
 - **Registrar un pago** (`preparar_pago_de_conjunto` →
   `registrar_pago_de_conjunto`): un pago que Jaime ya recibió por todo el

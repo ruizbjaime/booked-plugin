@@ -15,6 +15,9 @@ entradas del marketplace de Claude, y lleva un tag `vX.Y.Z`.
   (`groups:manage`) con «Propiedades», «Reservas» y «Cotizar estancias». La
   skill enseña que un conjunto solo existe para el token si alcanza todas sus
   cabañas.
+- Una cabaña de conjunto se edita o cambia de estado sola solo si el token
+  alcanza el conjunto entero, y las cabañas canceladas o no-show quedan fuera
+  de mover el conjunto y de cambiar su estado en vez de bloquearlo.
 - Las cotizaciones de conjunto funcionan con las herramientas de siempre:
   `preparar_cotizacion` con `tipo_inventario: conjunto` y el
   `reparto_para_cotizar` de `cotizar_conjunto`, `crear_cotizacion`,
