@@ -1,8 +1,8 @@
 # Booked para Claude y ChatGPT
 
 Los paquetes conectan al servidor MCP de
-[Booked](https://booked.fincasdelavilla.com) —sesenta y cinco herramientas sobre
-propiedades, reservas, contactos, calendario y dinero, diecisiete de ellas de escritura— e
+[Booked](https://booked.fincasdelavilla.com) —noventa y cuatro herramientas sobre
+propiedades, reservas, contactos, calendario y dinero, veintiocho de ellas de escritura— e
 incluyen una skill con las reglas de negocio que no caben en la descripción de
 una herramienta.
 
@@ -24,8 +24,11 @@ Instala una sola variante de Booked en cada cliente para evitar herramientas
 repetidas. Las reglas de negocio se mantienen en `shared/booked-fincas.md` y
 se generan con `python3 scripts/sync-skills.py`. No edites las copias generadas.
 
-**Versión 0.12.0:** despliega primero los PR de Booked que traen
-sincronizar calendarios ([PR #587](https://github.com/ruizbjaime/booked/pull/587)),
+**Versión 0.13.0:** despliega primero el
+[PR #590](https://github.com/ruizbjaime/booked/pull/590) de Booked, que trae
+las reservas de conjunto, editar, cambiar de estado y cobrar reservas, las
+solicitudes del sitio, el cumplimiento TRA/SIRE y las nuevas lecturas. El
+backend debe incluir también los PR que traen sincronizar calendarios ([PR #587](https://github.com/ruizbjaime/booked/pull/587)),
 editar propiedades ([PR #588](https://github.com/ruizbjaime/booked/pull/588)) y
 gastos, nómina e informes financieros ([PR #589](https://github.com/ruizbjaime/booked/pull/589)).
 Editar bloqueos requiere el [PR #586](https://github.com/ruizbjaime/booked/pull/586),
@@ -123,8 +126,12 @@ En el repositorio de la aplicación, con el soporte OAuth y los cambios del
    tres flujos de gestión, las doce de análisis (de `huespedes_recurrentes`
    a `comparativo_interanual`), `gastos`, `gastos_de_nomina` e
    `informe_financiero`, `preparar_edicion_de_propiedad` con
-   `editar_propiedad`, y `sincronizar_calendarios` con
-   `estado_de_sincronizacion`. Actualizar solo el plugin no
+   `editar_propiedad`, `sincronizar_calendarios` con
+   `estado_de_sincronizacion`, y las veintinueve del
+   [PR #590](https://github.com/ruizbjaime/booked/pull/590), entre ellas
+   `ver_conjuntos`, `cotizar_conjunto`, `preparar_reserva_de_conjunto`,
+   `solicitudes`, `cumplimiento_tra_sire` y `preparar_pago_de_reserva`;
+   `tools/list` debe devolver las noventa y cuatro en una sola página. Actualizar solo el plugin no
    incorpora estas herramientas ni sus permisos al backend.
 
 El registro dinámico permite HTTPS en `chatgpt.com`, `chat.openai.com`,
@@ -255,7 +262,9 @@ respuesta perdida, consulta `ver_cotizaciones` antes de repetir.
 `ver_cotizaciones` lista las cotizaciones de una propiedad (administrada o
 comisionada) con filtros por propiedad, estado y número, o da el detalle de una:
 desglose, destinatario, notas, `acciones_posibles` y si ya es una reserva. Las
-de un conjunto se gestionan en Booked. Tres flujos escriben, cada uno con
+de un conjunto llevan `tipo_inventario: conjunto` y sus cabañas; de ellas
+solo se editan las notas, y convertirlas crea una reserva por cabaña, todas o
+ninguna. Tres flujos escriben, cada uno con
 preparación, resumen, firma de un solo uso (treinta minutos, sin cruzar la
 medianoche) y el sí explícito del anfitrión:
 
@@ -340,9 +349,87 @@ vuelve a autorizar OAuth con «Retener o devolver pagos de cancelaciones»
 (`bookings:settle_cancellation`) y `properties:read`, `bookings:read` y
 `finance:read`. Actualizar el plugin no concede estos permisos.
 
+## Editar, cambiar de estado y cobrar reservas
+
+Cuatro flujos escriben sobre una reserva existente, cada uno con preparación,
+resumen, firma de un solo uso (treinta minutos) y el sí explícito del
+anfitrión; si la reserva cambió desde la preparación, no guardan nada:
+
+- **Editar** (`preparar_edicion_de_reserva` → `editar_reserva`): fechas,
+  ocupación, mascotas, notas, método de pago o responsable de una reserva no
+  importada de Directo o del sitio público. Si cambia la estancia, el precio
+  se recalcula con la configuración de hoy y se guarda el total mostrado.
+- **Cambiar el estado** (`preparar_cambio_de_estado_de_reserva` →
+  `cambiar_estado_de_reserva`): confirmar, volver a pendiente, no-show,
+  reconfirmar, reactivar o reabrir, en cualquier canal. Cancelar sigue siendo
+  `cancelar_reserva`; check-in y salida son automáticos.
+- **Registrar un pago** (`preparar_pago_de_reserva` →
+  `registrar_pago_de_reserva`): un pago que el anfitrión ya recibió, por
+  segmento (depósito, saldo o total), con su recibo cuando el segmento queda
+  pagado. Repetir la misma preparación no lo duplica.
+- **Anular un pago o una devolución** (`preparar_anulacion_de_pago` →
+  `anular_pago`): deshace, con motivo, un registro hecho por error y anula o
+  reemite su recibo.
+
+`cambios_por_revisar` lista los avisos que dejó la sincronización de
+calendarios —fechas aplicadas o diferidas, cancelaciones, pagos por
+conciliar— y `marcar_cambio_revisado` cierra uno tras confirmación explícita,
+sin aplicar ni deshacer nada. Ninguno de estos flujos mueve dinero.
+
+Emite un token aparte o vuelve a autorizar OAuth con «Editar reservas»
+(`bookings:update`), «Cambiar el estado de reservas» (`bookings:transition`),
+«Registrar pagos» (`bookings:register_payment`) o «Anular pagos»
+(`bookings:void_payment`), con «Propiedades» y «Reservas»; los de pagos
+exigen además «Importes y pagos».
+
+## Conjuntos
+
+Un conjunto son varias cabañas cercanas que se venden juntas. Solo existe
+para una credencial que alcanza **todas** sus cabañas: con una fuera del
+alcance de la integración, `ver_conjuntos` no lo muestra y ninguna herramienta
+lo lee ni lo escribe.
+
+- **Consultar:** `ver_conjuntos` y `ver_reserva_de_conjunto`.
+- **Reservar sin cotización:** `cotizar_conjunto` propone el reparto más
+  barato entre las cabañas libres, o cotiza el que dicte el anfitrión;
+  `preparar_reserva_de_conjunto` recibe ese `reparto_para_cotizar` y pregunta
+  huésped, método y compromiso de pago una sola vez; `crear_reserva_de_conjunto`,
+  tras el sí, crea una reserva pendiente por cabaña, todas o ninguna.
+- **Cotizar y convertir:** el mismo reparto va a `preparar_cotizacion` con
+  `tipo_inventario: conjunto`; la cotización se gestiona con las herramientas
+  de siempre.
+- **Mover, cambiar de estado o cobrar:** `preparar_edicion_de_conjunto` →
+  `editar_conjunto`, `preparar_cambio_de_estado_de_conjunto` →
+  `cambiar_estado_de_conjunto` (cancelar incluido) y
+  `preparar_pago_de_conjunto` → `registrar_pago_de_conjunto`, siempre para
+  todas las cabañas a la vez, todo o nada.
+
+Escribir requiere «Reservas de conjunto» (`groups:manage`) con «Propiedades»,
+«Reservas» y «Cotizar estancias»; cobrar, además «Importes y pagos».
+Retener o devolver lo cobrado de un conjunto cancelado, archivarlo y anular
+sus pagos se hacen en Booked.
+
+## Solicitudes del sitio y TRA/SIRE
+
+`solicitudes` lista las solicitudes de reserva del sitio público con los datos
+de quien las envió. `preparar_conversion_de_solicitud` →
+`convertir_solicitud_en_cotizacion` crea, tras el sí, una cotización borrador
+con los precios vigentes; `descartar_solicitud` la cierra para siempre tras
+confirmación explícita. Leer requiere «Solicitudes del sitio»
+(`inquiries:read`); escribir, «Gestionar solicitudes» (`inquiries:manage`) con
+«Cotizaciones» (`quotations:read`).
+
+`cumplimiento_tra_sire` dice qué falta reportar a la TRA o al SIRE por
+propiedad y reserva, como estados y conteos: nunca nombres, documentos ni
+nacionalidades. Requiere «Cumplimiento TRA/SIRE» (`compliance:read`).
+
+Primero debe desplegarse el [PR #590 del servidor](https://github.com/ruizbjaime/booked/pull/590)
+y, para escribir, estar habilitado `INTEGRATION_WRITES_ENABLED=true`.
+Actualizar el plugin no concede estos permisos.
+
 ## Preguntas de análisis
 
-Doce herramientas de solo lectura contestan preguntas sobre personas, patrones
+Estas herramientas de solo lectura contestan preguntas sobre personas, patrones
 y resultados sin paginar reservas ni sumar a mano:
 
 | Herramienta | Contesta | Permisos |
@@ -362,6 +449,10 @@ y resultados sin paginar reservas ni sumar a mano:
 | `gastos` | Los gastos causados, uno por uno, y quién asume cada parte: anfitrión, propietario o tercero | Igual |
 | `gastos_de_nomina` | El costo de nómina por concepto, quién lo asume, propiedad y mes | Igual; por trabajador, además «Nómina por trabajador» (`payroll:read`) |
 | `informe_financiero` | El informe del anfitrión o la liquidación de un propietario, con el detalle de cada línea y, si se pide, en Markdown | Igual; la nómina por trabajador, además `payroll:read` |
+| `gastos_recurrentes` | Las plantillas de gasto fijo de cada propiedad y quién asumiría cada parte | «Importes y pagos» |
+| `trabajadores` | Quién trabaja en cada propiedad, su contrato, salario vigente y vacaciones pendientes; sin documento, EPS, dirección ni teléfono | «Importes y pagos» y «Nómina por trabajador» (`payroll:read`) |
+| `eventos_locales` | Ferias, festivales y fiestas del destino, con la estancia que el sitio propone | «Calendario» (`calendar:read`) |
+| `cumplimiento_tra_sire` | Qué falta reportar a la TRA o al SIRE, en estados y conteos, nunca identidades | «Cumplimiento TRA/SIRE» (`compliance:read`) |
 
 `deudas` añade la antigüedad de lo que le deben y las comisiones ya cobradas.
 Teléfono, cumpleaños y origen de los huéspedes llegan solo con «Consultar
@@ -369,7 +460,7 @@ contactos» (`contacts:read`), y los importes de las herramientas de reservas y
 huéspedes, con «Importes y pagos». La nómina viaja en totales y por concepto;
 por trabajador, con su nombre, solo con «Nómina por trabajador»
 (`payroll:read`), que exige «Importes y pagos» y se concede aparte. Los datos
-de TRA/SIRE no se usan. `gastos` y `gastos_de_nomina` dicen quién asume cada
+de TRA/SIRE llegan solo como estados y conteos. `gastos` y `gastos_de_nomina` dicen quién asume cada
 costo; `informe_financiero` entrega la cascada con su detalle y, con
 `documento`, el informe en Markdown para entregar sin recalcular. Primero debe
 desplegarse el [PR #583 del servidor](https://github.com/ruizbjaime/booked/pull/583),
@@ -378,7 +469,10 @@ actualizar el plugin no concede permisos.
 
 ## Lectura y escritura
 
-Cuarenta y ocho herramientas solo leen. `cotizar` calcula un precio; no aparta fechas.
+Sesenta y seis herramientas solo leen. `cotizar` y `cotizar_conjunto` calculan un
+precio; no apartan fechas. `ver_reserva` trae además `detalle` (fechas,
+cancelación, edades, pagos, devoluciones, recibos y su conjunto) y
+`ver_propiedad`, `descripcion` (tipo, zona, amenidades, habitaciones y baños).
 
 `ver_contactos` consulta la libreta del anfitrión con `contacts:read`: devuelve
 nombre, teléfono, email, documento y notas disponibles. Ese permiso permite
@@ -398,7 +492,7 @@ requiere `properties:read` y `bookings:read`, y sí respeta esa lista.
   no la lista de acompañantes. Una reserva pendiente o confirmada no prueba
   presencia física.
 
-Diecisiete herramientas escriben, y cada una lleva su permiso en Booked:
+Veintiocho herramientas escriben, y cada una lleva su permiso en Booked:
 
 | Herramienta | Permiso | Qué hace |
 | --- | --- | --- |
@@ -417,6 +511,17 @@ Diecisiete herramientas escriben, y cada una lleva su permiso en Booked:
 | `eliminar_reserva` | Eliminar reservas | Archiva una reserva ya cancelada y sin retención. |
 | `registrar_retencion_o_devolucion` | Retener o devolver pagos de cancelaciones (`bookings:settle_cancellation`) | Registra, tras preparar y confirmar, si el anfitrión retiene o devuelve lo cobrado de una reserva cancelada o no presentada, o el neto que liquidó el canal; no transfiere dinero. |
 | `convertir_bloqueo_en_reserva` | Convertir bloqueos en reservas | Convierte en reserva un bloqueo importado de Airbnb, Booking.com o VRBO. |
+| `editar_reserva` | Editar reservas (`bookings:update`) | Cambia fechas, ocupación, mascotas, notas, método de pago o responsable de una reserva no importada de Directo o del sitio público tras preparar y confirmar; re-precia con la configuración de hoy. |
+| `marcar_cambio_revisado` | Editar reservas (`bookings:update`) | Cierra un aviso de `cambios_por_revisar` tras confirmación explícita; no aplica ni deshace el cambio. |
+| `cambiar_estado_de_reserva` | Cambiar el estado de reservas (`bookings:transition`) | Confirma, devuelve a pendiente, marca no-show, reconfirma, reactiva o reabre una reserva de cualquier canal tras preparar y confirmar; no cancela ni hace check-in o salida. |
+| `registrar_pago_de_reserva` | Registrar pagos (`bookings:register_payment`) | Registra un pago ya recibido en una reserva no importada de Directo o del sitio público tras preparar y confirmar; no mueve dinero. |
+| `anular_pago` | Anular pagos (`bookings:void_payment`) | Anula, con motivo y tras preparar y confirmar, un pago o una devolución registrados por error y su recibo; no mueve dinero. |
+| `crear_reserva_de_conjunto` | Reservas de conjunto (`groups:manage`) | Crea una reserva pendiente por cabaña de un conjunto, todas o ninguna, tras preparar y confirmar; no registra pagos. |
+| `editar_conjunto` | Reservas de conjunto (`groups:manage`) | Mueve las fechas o cambia la ocupación de todas las cabañas de una estancia de conjunto a la vez, re-preciando cada una, tras preparar y confirmar. |
+| `cambiar_estado_de_conjunto` | Reservas de conjunto (`groups:manage`) | Cambia el estado de todas las cabañas de un conjunto a la vez, cancelar incluido, todo o nada, tras preparar y confirmar. |
+| `registrar_pago_de_conjunto` | Reservas de conjunto (`groups:manage`) | Registra un pago ya recibido por todo el conjunto, repartido entre sus cabañas, tras preparar y confirmar; no mueve dinero. |
+| `convertir_solicitud_en_cotizacion` | Gestionar solicitudes (`inquiries:manage`) | Convierte una solicitud pendiente del sitio en una cotización borrador con los precios vigentes tras preparar y confirmar; no retiene noches ni envía nada. |
+| `descartar_solicitud` | Gestionar solicitudes (`inquiries:manage`) | Descarta una solicitud pendiente tras confirmación explícita; es definitivo y borra después los datos de quien la envió. |
 | `crear_contacto` | Crear contactos (`contacts:create`) | Crea un contacto con nombre y teléfono internacional proporcionados por el anfitrión; no crea una reserva. |
 | `eliminar_contacto` | Eliminar contactos (`contacts:delete`) y Consultar contactos (`contacts:read`) | Prepara y, tras confirmación explícita, elimina un contacto que puede borrarse. |
 
@@ -451,13 +556,19 @@ confirmación.
 Las reservas se preparan antes con una herramienta que no escribe
 (`preparar_reserva_manual`, `preparar_reserva_comisionada`, `preparar_gestion_de_reserva`,
 `preparar_retencion_o_devolucion`, `preparar_conversion_de_bloqueo`,
-`preparar_conversion_de_cotizacion`): devuelve un resumen y una firma de un solo
+`preparar_conversion_de_cotizacion`, `preparar_edicion_de_reserva`,
+`preparar_cambio_de_estado_de_reserva`, `preparar_pago_de_reserva`,
+`preparar_anulacion_de_pago`, `preparar_reserva_de_conjunto`,
+`preparar_edicion_de_conjunto`, `preparar_cambio_de_estado_de_conjunto`,
+`preparar_pago_de_conjunto`, `preparar_conversion_de_solicitud`): devuelve un resumen y una firma de un solo
 uso, válida hasta treinta minutos, y el agente solo ejecuta tras leer el resumen
 y recibir el sí explícito del anfitrión. Cancelar y archivar una reserva son
 acciones separadas, cada una con su propia preparación y confirmación.
 Ninguna escritura mueve dinero: crear no registra pagos, cancelar o archivar
-no reembolsa, y registrar una retención o devolución solo anota lo que hizo el
-anfitrión.
+no reembolsa, y registrar o anular un pago, o una retención o devolución, solo
+anota lo que hizo el anfitrión. `marcar_cambio_revisado` y
+`descartar_solicitud` no llevan firma, pero sí la confirmación explícita con
+`confirmado: true`.
 
 La credencial es el interruptor, y los permisos de escritura solo se ofrecen
 cuando la instalación tiene `INTEGRATION_WRITES_ENABLED=true`. Además del
@@ -478,6 +589,11 @@ permiso de escritura de cada herramienta, se exigen estas lecturas acompañantes
 | `cancelar_reserva`, `eliminar_reserva` | «Propiedades» (`properties:read`) y «Reservas» (`bookings:read`). |
 | `registrar_retencion_o_devolucion` | «Propiedades» (`properties:read`), «Reservas» (`bookings:read`) e «Importes y pagos» (`finance:read`). |
 | `convertir_bloqueo_en_reserva` | «Bloqueos» (`blocks:read`) y «Cotizar estancias» (`pricing:read`). |
+| `editar_reserva`, `marcar_cambio_revisado`, `cambiar_estado_de_reserva` | «Propiedades» (`properties:read`) y «Reservas» (`bookings:read`). |
+| `registrar_pago_de_reserva`, `anular_pago` | «Propiedades» (`properties:read`), «Reservas» (`bookings:read`) e «Importes y pagos» (`finance:read`). |
+| `crear_reserva_de_conjunto`, `editar_conjunto`, `cambiar_estado_de_conjunto` | «Propiedades» (`properties:read`), «Reservas» (`bookings:read`) y «Cotizar estancias» (`pricing:read`). |
+| `registrar_pago_de_conjunto` | Las tres anteriores e «Importes y pagos» (`finance:read`). |
+| `convertir_solicitud_en_cotizacion`, `descartar_solicitud` | «Solicitudes del sitio» (`inquiries:read`) y «Cotizaciones» (`quotations:read`). |
 | `crear_contacto` | Ninguna. |
 | `eliminar_contacto` | «Consultar contactos» (`contacts:read`). |
 
