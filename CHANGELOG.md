@@ -3,6 +3,19 @@
 Cada versión publicada actualiza los manifiestos de los tres paquetes y las
 entradas del marketplace de Claude, y lleva un tag `vX.Y.Z`.
 
+## 0.14.0 — 2026-10-02
+
+- Registrar un pago, de reserva o de conjunto, es recuperable: la preparación
+  devuelve un `operacion_id` y, si la respuesta se pierde, se prepara de nuevo
+  con ese mismo id para recuperar el pago ya registrado (`repetido: true`) en
+  vez de duplicarlo. Un pago distinto se prepara sin `operacion_id`, aunque
+  tenga el mismo importe; si ya hay un pago vivo igual, la preparación lo
+  avisa. La skill deja de decir que repetir la preparación no duplica el pago.
+- `listar_propiedades_comisionadas` busca por parte del nombre (`busqueda`) y
+  pagina con `despues_id` / `siguiente_id`.
+- `estado_de_sincronizacion` informa `propiedades_sin_sincronizar`, y
+  `vencida` cubre también una sincronización incompleta o sin respuesta.
+
 ## 0.13.0 — 2026-09-24
 
 - Añade las reservas de conjunto en los tres paquetes: `ver_conjuntos`,
