@@ -29,6 +29,9 @@ pertenece a una herramienta sino a la respuesta.
 - **Las propiedades se nombran, no se numeran.** Jaime dice «la Cabaña del
   Bosque», no un id. Resuélvelo con `listar_propiedades` (o
   `listar_propiedades_comisionadas`), sin distinguir acentos ni mayúsculas.
+  Si hay muchas comisionadas, `listar_propiedades_comisionadas` busca por
+  parte del nombre con `busqueda` y pagina con `despues_id` igual al
+  `siguiente_id` anterior mientras `truncado` sea `true`.
 - **Hoy es hoy en Bogotá** (`America/Bogota`). Cualquier cuenta relativa —«esta
   semana», «el mes que viene», «quién está alojado ahora»— parte de ahí, no de
   la fecha del sistema donde corres.
@@ -238,6 +241,8 @@ Actualizar el plugin no amplía los permisos de una credencial existente.
   `ver_reserva_de_conjunto`, `ver_bloqueos` o `reservas_comisionadas`, según
   el inventario) y prepara de nuevo;
   no reintentes a ciegas, porque crearías un duplicado o repetirías una acción.
+  Los pagos son la excepción: se recuperan con su `operacion_id` (ver
+  «Registrar un pago»).
 - **Lo que venga en `impedimentos` no se arregla preguntando:** cuéntaselo.
 - **Ninguna escritura mueve dinero.** Crear no registra pagos; cancelar y
   archivar no reembolsan. Registrar un pago, anularlo o registrar una
@@ -422,8 +427,10 @@ puede crear o quitar bloqueos importados y cambiar o cancelar reservas
 sincronizadas. Sin `propiedad_id` sincroniza todas las de la credencial con
 calendario externo. Corre en segundo plano y solo dice qué quedó en cola: el
 resultado se consulta con `estado_de_sincronizacion` (`en_curso`,
-`terminada`, `vencida` —se puede repetir— o `ninguna`). No anuncies cambios
-antes de verlos ahí, y no la repitas mientras siga `en_curso`.
+`terminada`, `vencida` —incompleta o sin respuesta; se puede repetir— o
+`ninguna`). `propiedades_sin_sincronizar` cuenta las propiedades que no
+terminaron; dilo si no es cero. No anuncies cambios antes de verlos ahí, y no
+la repitas mientras siga `en_curso`.
 
 Sincronizar requiere «Sincronizar calendarios» (`blocks:sync`) y
 «Propiedades» (`properties:read`); consultar el estado, «Bloqueos»
@@ -628,7 +635,7 @@ pidió**, preguntar lo que devuelva `faltan`, contarle los `impedimentos`, leer
 resumen, avisos y consecuencias, esperar el sí y confirmar con la `firma` y
 `confirmado: true`. Si responden que la reserva cambió desde la preparación,
 no guardaron nada: prepara de nuevo. Ante una respuesta perdida, `ver_reserva`
-antes de reintentar.
+antes de reintentar; un pago, además, se recupera con su `operacion_id`.
 
 - **Editar** (`preparar_edicion_de_reserva` → `editar_reserva`): fechas,
   ocupación, mascotas, notas, método de pago o contacto responsable, solo en
@@ -654,8 +661,18 @@ antes de reintentar.
   nunca lo supongas: sin `monto_centavos` la preparación toma lo pendiente del
   segmento, y eso es una propuesta, no su respuesta. Lee por segmento lo pagado
   y lo pendiente antes y después, si se emite recibo y si la reserva pasa a
-  confirmada. Repetir la misma preparación no duplica el pago. Una cabaña de
-  un conjunto se cobra con `preparar_pago_de_conjunto`.
+  confirmada. Una cabaña de un conjunto se cobra con
+  `preparar_pago_de_conjunto`.
+- **Pagos y respuestas perdidas.** La preparación de un pago, de reserva o de
+  conjunto, devuelve un `operacion_id`; guárdalo. Si el registro falla o su
+  respuesta se pierde, prepara de nuevo **con ese mismo `operacion_id`**: si
+  el pago ya quedó registrado lo recupera (`repetido: true`) en vez de
+  duplicarlo, y si no, lo registra una sola vez. Un pago distinto —aunque
+  tenga el mismo importe y la misma fecha— se prepara **sin** `operacion_id`
+  y pide su propio sí. Si la preparación dice que ya hay un pago vivo igual,
+  no lo registres otra vez: pregúntale a Jaime si es el mismo pago y, si lo
+  es, recupéralo con su `operacion_id`. Si el pago se anuló después, se
+  prepara de nuevo sin ese `operacion_id`.
 - **Anular un pago o una devolución** (`preparar_anulacion_de_pago` →
   `anular_pago`): solo lo registrado por error, identificado con su id en
   `ver_reserva`. Deshace el registro, no mueve dinero, y anula o reemite el
@@ -724,7 +741,8 @@ perdida, `ver_reserva_de_conjunto`:
 - **Registrar un pago** (`preparar_pago_de_conjunto` →
   `registrar_pago_de_conjunto`): un pago que Jaime ya recibió por todo el
   conjunto; `reparto` dice cuánto cae en cada cabaña. Lee resumen, reparto y
-  consecuencias antes de pedir el sí.
+  consecuencias antes de pedir el sí. Ante una respuesta perdida, recupera con
+  el mismo `operacion_id`, como en una reserva.
 
 Ver conjuntos requiere «Propiedades» (`properties:read`); ver una estancia,
 «Reservas» (`bookings:read`); cotizar, además «Cotizar estancias»
