@@ -3,6 +3,39 @@
 Cada versión publicada actualiza los manifiestos de los tres paquetes y las
 entradas del marketplace de Claude, y lleva un tag `vX.Y.Z`.
 
+## 0.15.0 — 2026-11-02
+
+- Añade nueve herramientas en los tres paquetes. Agregar acompañantes a una
+  reserva de cualquier canal (`preparar_acompanantes_de_reserva` →
+  `agregar_acompanantes_a_reserva`, permiso nuevo «Agregar acompañantes»,
+  `guests:write`), todos o ninguno, sin devolver sus datos. Mover las fechas
+  límite de pago de una reserva o de un conjunto entero
+  (`preparar_cambio_de_plazos_de_pago` → `cambiar_plazos_de_pago`, con
+  «Registrar pagos»). Consultar y marcar el descanso semanal de un trabajador
+  (`descansos_de_contrato` y `marcar_dia_de_descanso`, permiso nuevo
+  «Registrar descansos», `payroll:rest_days`): la skill enseña que el descanso
+  obligatorio es el domingo salvo pacto escrito, que el día libre entre semana
+  es el compensatorio y que si lo trabajó sale de sus horas. Leer
+  `liquidacion_del_propietario` (el extracto mensual en PDF, cada estancia
+  entera en el mes en que empieza), `proyeccion` (semana a semana desde hoy,
+  con puentes libres) y `posibles_duplicados`.
+- `editar_bloqueo`, `eliminar_bloqueo` y `descartar_solicitud` se preparan con
+  una primera llamada sin firma y se confirman con la firma y
+  `confirmado: true`; la skill y el README ya no dicen que no llevan firma.
+- Registrar un pago vale en cualquier canal con compromiso de pago en Booked,
+  también en una reserva convertida desde iCal, y las notas de una reserva se
+  editan en cualquier canal.
+- `ver_contactos` y `posibles_duplicados` traen documento y notas solo con
+  «Nombre del huésped» (`guests:read`); `flujo_de_caja` cuenta solo la parte
+  del anfitrión, con los payouts de plataforma el día del check-in;
+  `trabajadores` trae el `descanso` vigente.
+- Las guías de autenticación nombran los permisos de escritura de reservas,
+  pagos, acompañantes y descansos que faltaban.
+- El catálogo pasa a 103 herramientas: 72 de lectura y 31 de escritura. Las
+  credenciales existentes no ganan permisos al actualizar. Todo lo que
+  documenta ya está desplegado en Booked (PR #673, #674, #676, #707, #766 y
+  #792, entre otros).
+
 ## 0.14.0 — 2026-10-02
 
 - Registrar un pago, de reserva o de conjunto, es recuperable: la preparación

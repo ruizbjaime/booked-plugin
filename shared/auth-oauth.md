@@ -21,9 +21,15 @@
   bloqueos», «Editar bloqueos», «Eliminar bloqueos», «Crear reservas manuales», «Crear reservas
   comisionadas», «Cancelar reservas»,
   «Eliminar reservas», «Retener o devolver pagos de cancelaciones»,
-  «Convertir bloqueos en reservas», «Crear contactos» o «Eliminar contactos».
+  «Convertir bloqueos en reservas», «Editar reservas», «Cambiar el estado de
+  reservas», «Registrar pagos», «Anular pagos», «Agregar acompañantes»,
+  «Registrar descansos», «Crear contactos» o «Eliminar contactos».
   Este último requiere también «Consultar contactos» en los permisos de
-  lectura. Para «Retener o devolver pagos de cancelaciones»
+  lectura. «Registrar pagos» —también para mover plazos de pago— y «Anular
+  pagos» requieren «Propiedades», «Reservas» e «Importes y pagos»; «Agregar
+  acompañantes» (`guests:write`), «Propiedades» y «Reservas»; «Registrar
+  descansos» (`payroll:rest_days`), «Importes y pagos» y «Nómina por
+  trabajador». Para «Retener o devolver pagos de cancelaciones»
   (`bookings:settle_cancellation`), selecciona además «Propiedades»,
   «Reservas» e «Importes y pagos». Para «Crear reservas
   comisionadas» (`brokered:create`), selecciona además «Reservas comisionadas»,
