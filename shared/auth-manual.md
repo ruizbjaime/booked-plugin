@@ -28,8 +28,8 @@
   «Registrar pagos» —también para mover plazos de pago— y «Anular pagos»
   requieren «Propiedades», «Reservas» e «Importes y pagos»; «Agregar
   acompañantes» (`guests:write`), «Propiedades» y «Reservas»; «Registrar
-  descansos» (`payroll:rest_days`), «Importes y pagos» y «Nómina por
-  trabajador».
+  descansos» (`payroll:rest_days`, también para conceder compensatorios),
+  «Importes y pagos» y «Nómina por trabajador».
   «Retener o devolver pagos de cancelaciones» (`bookings:settle_cancellation`)
   requiere «Propiedades», «Reservas» e «Importes y pagos».
   «Crear reservas comisionadas» (`brokered:create`) requiere «Reservas

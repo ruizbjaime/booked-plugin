@@ -1,8 +1,8 @@
 # Booked para Claude y ChatGPT
 
 Los paquetes conectan al servidor MCP de
-[Booked](https://booked.fincasdelavilla.com) —ciento tres herramientas sobre
-propiedades, reservas, contactos, calendario y dinero, treinta y una de ellas de escritura— e
+[Booked](https://booked.fincasdelavilla.com) —ciento cuatro herramientas sobre
+propiedades, reservas, contactos, calendario y dinero, treinta y dos de ellas de escritura— e
 incluyen una skill con las reglas de negocio que no caben en la descripción de
 una herramienta.
 
@@ -137,8 +137,9 @@ En el repositorio de la aplicación, con el soporte OAuth y los cambios del
    `preparar_cambio_de_plazos_de_pago` y `cambiar_plazos_de_pago`
    ([PR #707](https://github.com/ruizbjaime/booked/pull/707)), `proyeccion` y
    `liquidacion_del_propietario` ([PR #766](https://github.com/ruizbjaime/booked/pull/766))
-   y `posibles_duplicados` ([PR #792](https://github.com/ruizbjaime/booked/pull/792));
-   `tools/list` debe devolver las ciento tres en una sola página. Actualizar solo el plugin no
+   y `posibles_duplicados` ([PR #792](https://github.com/ruizbjaime/booked/pull/792)),
+   y `conceder_compensatorio` ([PR #804](https://github.com/ruizbjaime/booked/pull/804));
+   `tools/list` debe devolver las ciento cuatro en una sola página. Actualizar solo el plugin no
    incorpora estas herramientas ni sus permisos al backend.
 
 El registro dinámico permite HTTPS en `chatgpt.com`, `chat.openai.com`,
@@ -516,7 +517,7 @@ requiere `properties:read` y `bookings:read`, y sí respeta esa lista.
   no la lista de acompañantes. Una reserva pendiente o confirmada no prueba
   presencia física.
 
-Treinta y una herramientas escriben, y cada una lleva su permiso en Booked:
+Treinta y dos herramientas escriben, y cada una lleva su permiso en Booked:
 
 | Herramienta | Permiso | Qué hace |
 | --- | --- | --- |
@@ -549,6 +550,7 @@ Treinta y una herramientas escriben, y cada una lleva su permiso en Booked:
 | `convertir_solicitud_en_cotizacion` | Gestionar solicitudes (`inquiries:manage`) | Convierte una solicitud pendiente del sitio en una cotización borrador con los precios vigentes tras preparar y confirmar; no retiene noches ni envía nada. |
 | `descartar_solicitud` | Gestionar solicitudes (`inquiries:manage`) | Descarta una solicitud pendiente tras preparar sin firma y recibir confirmación explícita; es definitivo y borra después los datos de quien la envió. |
 | `marcar_dia_de_descanso` | Registrar descansos (`payroll:rest_days`) | Marca el descanso obligatorio de una semana en un contrato de descanso variable tras preparar y confirmar; si lo trabajó, deja un compensatorio pendiente. |
+| `conceder_compensatorio` | Registrar descansos (`payroll:rest_days`) | Concede el día libre que paga un descanso obligatorio trabajado tras preparar y confirmar; fuera del plazo legal, solo si el anfitrión acepta concederlo tarde. No avisa al trabajador. |
 | `crear_contacto` | Crear contactos (`contacts:create`) | Crea un contacto con nombre y teléfono internacional proporcionados por el anfitrión; no crea una reserva. |
 | `eliminar_contacto` | Eliminar contactos (`contacts:delete`) y Consultar contactos (`contacts:read`) | Prepara y, tras confirmación explícita, elimina un contacto que puede borrarse. |
 
@@ -596,7 +598,7 @@ acciones separadas, cada una con su propia preparación y confirmación.
 Ninguna escritura mueve dinero: crear no registra pagos, cancelar o archivar
 no reembolsa, y registrar o anular un pago, o una retención o devolución, solo
 anota lo que hizo el anfitrión. `editar_bloqueo`, `eliminar_bloqueo`,
-`descartar_solicitud` y `marcar_dia_de_descanso` se preparan con la misma
+`descartar_solicitud`, `marcar_dia_de_descanso` y `conceder_compensatorio` se preparan con la misma
 herramienta: la primera llamada, sin firma, devuelve el resumen y la firma, y
 la segunda la usa con `confirmado: true`. `marcar_cambio_revisado` no lleva
 firma, pero sí la confirmación explícita con `confirmado: true`.
@@ -628,7 +630,7 @@ permiso de escritura de cada herramienta, se exigen estas lecturas acompañantes
 | `convertir_solicitud_en_cotizacion`, `descartar_solicitud` | «Solicitudes del sitio» (`inquiries:read`) y «Cotizaciones» (`quotations:read`). |
 | `crear_contacto` | Ninguna. |
 | `eliminar_contacto` | «Consultar contactos» (`contacts:read`). |
-| `marcar_dia_de_descanso` | «Importes y pagos» (`finance:read`) y «Nómina por trabajador» (`payroll:read`). |
+| `marcar_dia_de_descanso`, `conceder_compensatorio` | «Importes y pagos» (`finance:read`) y «Nómina por trabajador» (`payroll:read`). |
 
 Si Booked responde que la escritura por integraciones está apagada en la
 instalación, el administrador debe revisar esa habilitación. Emitir otro token
