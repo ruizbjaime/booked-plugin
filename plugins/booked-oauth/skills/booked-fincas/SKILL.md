@@ -1,11 +1,11 @@
 ---
 name: booked-fincas
-description: "Gestiona las fincas de Jaime en Booked, aunque no se nombre el PMS: disponibilidad, reservas, conjuntos, huéspedes, contactos, calendario, precios, ingresos, gastos, nómina, deudas y comisiones de Airbnb, Booking.com, Fincas de la Villa o venta directa. Úsala para ver el huésped de una fecha o un teléfono; editar una propiedad; sincronizar calendarios y revisar sus avisos; convertir o descartar solicitudes del sitio; guardar y gestionar cotizaciones; crear, editar, cambiar de estado o cancelar reservas y conjuntos, y archivar reservas; agregar acompañantes; registrar o anular pagos y mover sus plazos; retener o devolver tras cancelar; convertir bloqueos; administrar contactos y bloqueos; ver qué falta de TRA/SIRE, trabajadores, sus descansos, gastos fijos y eventos; marcar el descanso semanal de un trabajador; preparar informes o liquidaciones; y analizar huéspedes, contactos duplicados, patrones, rendimiento, resultados, caja, lo ya vendido y la proyección de las próximas semanas. Consulta con las herramientas `booked`; para crear registros usa los datos que dé Jaime."
+description: "Gestiona las fincas de Jaime en Booked, aunque no se nombre el PMS: disponibilidad, reservas, conjuntos, huéspedes, contactos, calendario, precios, ingresos, gastos, nómina, deudas y comisiones de Airbnb, Booking.com, Fincas de la Villa o venta directa. Úsala para ver el huésped de una fecha o un teléfono; editar una propiedad; sincronizar calendarios y revisar sus avisos; convertir o descartar solicitudes del sitio; guardar y gestionar cotizaciones; crear, editar, cambiar de estado o cancelar reservas y conjuntos, y archivar reservas; agregar acompañantes; registrar o anular pagos y mover sus plazos; retener o devolver tras cancelar; convertir bloqueos; administrar contactos y bloqueos; ver qué falta de TRA/SIRE, trabajadores, sus descansos, gastos fijos y eventos; marcar el descanso semanal de un trabajador y concederle su compensatorio; preparar informes o liquidaciones; y analizar huéspedes, contactos duplicados, patrones, rendimiento, resultados, caja, lo ya vendido y la proyección de las próximas semanas. Consulta con las herramientas `booked`; para crear registros usa los datos que dé Jaime."
 ---
 
 # Booked — las fincas de Jaime
 
-Las herramientas `booked` leen el PMS de Fincas de la Villa, y treinta y una
+Las herramientas `booked` leen el PMS de Fincas de la Villa, y treinta y dos
 de ellas escriben: editar los datos de una propiedad administrada, sincronizar
 ya sus calendarios con las plataformas y cerrar los avisos que deja, crear,
 editar y eliminar bloqueos manuales, crear una reserva directa, comisionada o
@@ -15,12 +15,13 @@ pago, registrar la retención o devolución de lo cobrado en una reserva
 cancelada, convertir en reserva un bloqueo de plataforma, crear o eliminar
 contactos, guardar cotizaciones, cambiar su estado, editar un borrador o
 convertir una aceptada en reserva, convertir en cotización o descartar una
-solicitud del sitio, y marcar el descanso semanal de un trabajador. `cotizar` y
+solicitud del sitio, y marcar el descanso semanal de un trabajador y concederle
+el día compensatorio. `cotizar` y
 `cotizar_conjunto` son un cálculo, no apartan fechas. Nada más crea, modifica
 ni cancela nada: el check-in y la salida los hace Booked a su hora, y revocar o
 corregir una retención o devolución ya registrada, anular un pago de conjunto,
-fusionar contactos duplicados o conceder el día compensatorio de un trabajador
-se hace en Booked.
+fusionar contactos duplicados o revocar un compensatorio concedido se hace en
+Booked.
 
 Cada herramienta lleva sus reglas en su propia descripción: léela antes de
 llamarla. Aquí está solo lo que ninguna descripción puede decir, porque no
@@ -79,8 +80,9 @@ pertenece a una herramienta sino a la respuesta.
   lectura. «Registrar pagos» —también para mover plazos de pago— y «Anular
   pagos» requieren «Propiedades», «Reservas» e «Importes y pagos»; «Agregar
   acompañantes» (`guests:write`), «Propiedades» y «Reservas»; «Registrar
-  descansos» (`payroll:rest_days`), «Importes y pagos» y «Nómina por
-  trabajador». Para «Retener o devolver pagos de cancelaciones»
+  descansos» (`payroll:rest_days`, también para conceder compensatorios),
+  «Importes y pagos» y «Nómina por trabajador».
+  Para «Retener o devolver pagos de cancelaciones»
   (`bookings:settle_cancellation`), selecciona además «Propiedades»,
   «Reservas» e «Importes y pagos». Para «Crear reservas
   comisionadas» (`brokered:create`), selecciona además «Reservas comisionadas»,
@@ -894,15 +896,29 @@ trabajador tomó entre semana por haber trabajado ese descanso es su
   vigente es `variable`. La fecha es el descanso obligatorio de esa semana;
   otra fecha se rehúsa diciendo cuál es. Si lo trabajó sale de sus horas
   registradas: omite `trabajo_el_descanso`. Trabajarlo deja un compensatorio
-  pendiente, que se concede en Booked. Marcar reemplaza lo que la semana ya
+  pendiente. Marcar reemplaza lo que la semana ya
   tuviera. Va en dos llamadas: primero sin firma —devuelve antes, después y
   `firma` sin cambiar nada—; léeselo a Jaime, espera su sí y repite con los
   mismos datos, la `firma` y `confirmado: true`. La firma caduca en treinta
   minutos; si el contrato o la semana cambiaron, rehúsa: prepara de nuevo.
   Ante una respuesta perdida, prepara otra vez y lee el antes.
+- **Conceder el compensatorio** (`conceder_compensatorio`): con el
+  `contrato_id`, el descanso que trabajó como `descanso_trabajado` (su
+  `descanso.fecha` en `descansos_de_contrato`) y como `fecha` el día libre que
+  Jaime dijo, nunca uno que elijas tú. Ese día no puede ser el descanso
+  obligatorio de su semana, un festivo ni un día con horas u otro descanso: la
+  preparación lo rehúsa diciendo por qué. `plazo` es la ventana legal; un día
+  antes o después de ella es `tardio`: díselo a Jaime y, solo si acepta
+  concederlo tarde, prepara de nuevo con `acepta_tardio: true`. Va en dos
+  llamadas, como marcar: primero sin firma, léele trabajador, descanso
+  trabajado, plazo y día libre, espera su sí y repite con los mismos datos, la
+  `firma` y `confirmado: true`. Si la respuesta se pierde, prepara otra vez:
+  `ya_estaba_concedido: true` dice que quedó, con su `concedido_el`. No le avisa
+  al trabajador; un diferido sin cerrar o un mes ocasional, ya pagado en dinero,
+  no se conceden.
 
 Consultar requiere «Importes y pagos» (`finance:read`) y «Nómina por
-trabajador» (`payroll:read`); marcar añade «Registrar descansos»
+trabajador» (`payroll:read`); marcar y conceder añaden «Registrar descansos»
 (`payroll:rest_days`). Los nombres de los trabajadores y sus descansos son
 datos sensibles: dalos solo si Jaime los pidió.
 

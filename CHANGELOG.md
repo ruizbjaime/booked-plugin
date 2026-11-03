@@ -3,6 +3,22 @@
 Cada versión publicada actualiza los manifiestos de los tres paquetes y las
 entradas del marketplace de Claude, y lleva un tag `vX.Y.Z`.
 
+## 0.16.0 — 2026-11-02
+
+- Añade `conceder_compensatorio` en los tres paquetes: concede el día libre
+  que paga un descanso obligatorio trabajado, en dos llamadas con firma, con
+  el permiso «Registrar descansos» (`payroll:rest_days`). La skill enseña que
+  el `descanso_trabajado` es el `descanso.fecha` de `descansos_de_contrato`,
+  que el día libre lo dice Jaime y nunca es el descanso obligatorio de su
+  semana ni un festivo, que un día antes o después del `plazo` es `tardio` y
+  solo se concede con `acepta_tardio` tras su sí, y que `ya_estaba_concedido`
+  reconoce un compensatorio ya concedido tras una respuesta perdida. Deja de
+  decir que conceder el compensatorio se hace en Booked; revocarlo sí.
+- El catálogo pasa a 104 herramientas: 72 de lectura y 32 de escritura. Las
+  credenciales con «Registrar descansos» ya pueden conceder compensatorios sin
+  volver a autorizar. Requiere desplegar el
+  [PR #804](https://github.com/ruizbjaime/booked/pull/804) de Booked.
+
 ## 0.15.0 — 2026-11-02
 
 - Añade nueve herramientas en los tres paquetes. Agregar acompañantes a una
