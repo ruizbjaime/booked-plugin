@@ -1,8 +1,8 @@
 # Booked para Claude y ChatGPT
 
 Los paquetes conectan al servidor MCP de
-[Booked](https://booked.fincasdelavilla.com) —ciento cuatro herramientas sobre
-propiedades, reservas, contactos, calendario y dinero, treinta y dos de ellas de escritura— e
+[Booked](https://booked.fincasdelavilla.com) —ciento seis herramientas sobre
+propiedades, reservas, contactos, calendario y dinero, treinta y tres de ellas de escritura— e
 incluyen una skill con las reglas de negocio que no caben en la descripción de
 una herramienta.
 
@@ -434,10 +434,15 @@ sus pagos se hacen en Booked.
 `solicitudes` lista las solicitudes de reserva del sitio público con los datos
 de quien las envió. `preparar_conversion_de_solicitud` →
 `convertir_solicitud_en_cotizacion` crea, tras el sí, una cotización borrador
-con los precios vigentes; `descartar_solicitud` la cierra para siempre tras
-confirmación explícita. Leer requiere «Solicitudes del sitio»
-(`inquiries:read`); escribir, «Gestionar solicitudes» (`inquiries:manage`) con
-«Cotizaciones» (`quotations:read`).
+con el precio que elige el anfitrión —el que vio el huésped o el de hoy—;
+`preparar_conversion_de_solicitud_en_reserva` → `convertir_solicitud_en_reserva`
+la convierte directo en una reserva pendiente, sin cotización que enviar;
+`descartar_solicitud` la cierra para siempre tras confirmación explícita. Leer
+requiere «Solicitudes del sitio» (`inquiries:read`); escribir, «Gestionar
+solicitudes» (`inquiries:manage`) con «Cotizaciones» (`quotations:read`), y la
+reserva directa además «Cambiar el estado de cotizaciones»
+(`quotations:transition`) y «Convertir cotizaciones en reservas»
+(`quotations:convert`).
 
 `cumplimiento_tra_sire` dice qué falta reportar a la TRA o al SIRE por
 propiedad y reserva, como estados y conteos: nunca nombres, documentos ni
@@ -493,7 +498,7 @@ actualizar el plugin no concede permisos.
 
 ## Lectura y escritura
 
-Setenta y dos herramientas solo leen. `cotizar` y `cotizar_conjunto` calculan un
+Setenta y tres herramientas solo leen. `cotizar` y `cotizar_conjunto` calculan un
 precio; no apartan fechas. `ver_reserva` trae además `detalle` (fechas,
 cancelación, edades, pagos, devoluciones, recibos y su conjunto) y
 `ver_propiedad`, `descripcion` (tipo, zona, amenidades, habitaciones y baños).
@@ -517,7 +522,7 @@ requiere `properties:read` y `bookings:read`, y sí respeta esa lista.
   no la lista de acompañantes. Una reserva pendiente o confirmada no prueba
   presencia física.
 
-Treinta y dos herramientas escriben, y cada una lleva su permiso en Booked:
+Treinta y tres herramientas escriben, y cada una lleva su permiso en Booked:
 
 | Herramienta | Permiso | Qué hace |
 | --- | --- | --- |
@@ -547,7 +552,8 @@ Treinta y dos herramientas escriben, y cada una lleva su permiso en Booked:
 | `editar_conjunto` | Reservas de conjunto (`groups:manage`) | Mueve las fechas o cambia la ocupación de todas las cabañas de una estancia de conjunto a la vez, re-preciando cada una, tras preparar y confirmar. |
 | `cambiar_estado_de_conjunto` | Reservas de conjunto (`groups:manage`) | Cambia el estado de todas las cabañas de un conjunto a la vez, cancelar incluido, todo o nada, tras preparar y confirmar. |
 | `registrar_pago_de_conjunto` | Reservas de conjunto (`groups:manage`) | Registra un pago ya recibido por todo el conjunto, repartido entre sus cabañas, tras preparar y confirmar; no mueve dinero. |
-| `convertir_solicitud_en_cotizacion` | Gestionar solicitudes (`inquiries:manage`) | Convierte una solicitud pendiente del sitio en una cotización borrador con los precios vigentes tras preparar y confirmar; no retiene noches ni envía nada. |
+| `convertir_solicitud_en_cotizacion` | Gestionar solicitudes (`inquiries:manage`) | Convierte una solicitud pendiente del sitio en una cotización borrador con el precio que eligió el anfitrión tras preparar y confirmar; no retiene noches ni envía nada. |
+| `convertir_solicitud_en_reserva` | Gestionar solicitudes (`inquiries:manage`), Cambiar el estado de cotizaciones (`quotations:transition`) y Convertir cotizaciones en reservas (`quotations:convert`) | Convierte una solicitud pendiente de una propiedad directo en una reserva pendiente tras preparar y confirmar: crea la cotización, la acepta y la convierte, todo o nada; retiene las noches y no envía nada. |
 | `descartar_solicitud` | Gestionar solicitudes (`inquiries:manage`) | Descarta una solicitud pendiente tras preparar sin firma y recibir confirmación explícita; es definitivo y borra después los datos de quien la envió. |
 | `marcar_dia_de_descanso` | Registrar descansos (`payroll:rest_days`) | Marca el descanso obligatorio de una semana en un contrato de descanso variable tras preparar y confirmar; si lo trabajó, deja un compensatorio pendiente. |
 | `conceder_compensatorio` | Registrar descansos (`payroll:rest_days`) | Concede el día libre que paga un descanso obligatorio trabajado tras preparar y confirmar; fuera del plazo legal, solo si el anfitrión acepta concederlo tarde. No avisa al trabajador. |

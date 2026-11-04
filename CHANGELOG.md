@@ -3,6 +3,24 @@
 Cada versión publicada actualiza los manifiestos de los tres paquetes y las
 entradas del marketplace de Claude, y lleva un tag `vX.Y.Z`.
 
+## 0.17.0 — 2026-11-04
+
+- Añade la conversión directa de una solicitud del sitio en reserva en los
+  tres paquetes (`preparar_conversion_de_solicitud_en_reserva` →
+  `convertir_solicitud_en_reserva`): para el huésped que ya acordó por
+  teléfono o WhatsApp, sin cotización que enviar. Solo una propiedad o un
+  conjunto resuelto en una cabaña, con llegada futura; pregunta precio,
+  estadía mínima, método y compromiso de pago y un teléfono si falta, y crea
+  la cotización, la acepta y la convierte, todo o nada. Exige además «Cambiar
+  el estado de cotizaciones» (`quotations:transition`) y «Convertir
+  cotizaciones en reservas» (`quotations:convert`).
+- Las dos conversiones de solicitudes muestran el precio que vio el huésped y
+  el de hoy, y preguntan `precio` cuando difieren; la skill enseña que esa
+  elección es de Jaime. Sus firmas ya no cruzan la medianoche.
+- El catálogo pasa a 106 herramientas: 73 de lectura y 33 de escritura.
+  Requiere desplegar el [PR #818](https://github.com/ruizbjaime/booked/pull/818)
+  de Booked.
+
 ## 0.16.0 — 2026-11-02
 
 - Añade `conceder_compensatorio` en los tres paquetes: concede el día libre
