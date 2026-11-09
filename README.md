@@ -269,7 +269,10 @@ respuesta perdida, consulta `ver_cotizaciones` antes de repetir.
 
 `ver_cotizaciones` lista las cotizaciones de una propiedad (administrada o
 comisionada) con filtros por propiedad, estado y número, o da el detalle de una:
-desglose, destinatario, notas, `acciones_posibles` y si ya es una reserva. Las
+desglose, destinatario, notas, `acciones_posibles` y si ya es una reserva. En
+una administrada de Directo para cliente final, `oferta_publica` trae el
+enlace a la ficha del sitio público y, si el sitio la cotiza más cara, el
+descuento por reservar directo; también llega al crear o editar. Las
 de un conjunto llevan `tipo_inventario: conjunto` y sus cabañas; de ellas
 solo se editan las notas, y convertirlas crea una reserva por cabaña, todas o
 ninguna. Tres flujos escriben, cada uno con
@@ -553,7 +556,7 @@ Treinta y tres herramientas escriben, y cada una lleva su permiso en Booked:
 | `cambiar_estado_de_conjunto` | Reservas de conjunto (`groups:manage`) | Cambia el estado de todas las cabañas de un conjunto a la vez, cancelar incluido, todo o nada, tras preparar y confirmar. |
 | `registrar_pago_de_conjunto` | Reservas de conjunto (`groups:manage`) | Registra un pago ya recibido por todo el conjunto, repartido entre sus cabañas, tras preparar y confirmar; no mueve dinero. |
 | `convertir_solicitud_en_cotizacion` | Gestionar solicitudes (`inquiries:manage`) | Convierte una solicitud pendiente del sitio en una cotización borrador con el precio que eligió el anfitrión tras preparar y confirmar; no retiene noches ni envía nada. |
-| `convertir_solicitud_en_reserva` | Gestionar solicitudes (`inquiries:manage`), Cambiar el estado de cotizaciones (`quotations:transition`) y Convertir cotizaciones en reservas (`quotations:convert`) | Convierte una solicitud pendiente de una propiedad directo en una reserva pendiente tras preparar y confirmar: crea la cotización, la acepta y la convierte, todo o nada; retiene las noches y no envía nada. |
+| `convertir_solicitud_en_reserva` | Gestionar solicitudes (`inquiries:manage`), Cambiar el estado de cotizaciones (`quotations:transition`) y Convertir cotizaciones en reservas (`quotations:convert`) | Convierte una solicitud pendiente de una propiedad o de un conjunto directo en reserva pendiente, una por cabaña en un conjunto, tras preparar y confirmar: crea la cotización, la acepta y la convierte, todo o nada; retiene las noches y no envía nada. |
 | `descartar_solicitud` | Gestionar solicitudes (`inquiries:manage`) | Descarta una solicitud pendiente tras preparar sin firma y recibir confirmación explícita; es definitivo y borra después los datos de quien la envió. |
 | `marcar_dia_de_descanso` | Registrar descansos (`payroll:rest_days`) | Marca el descanso obligatorio de una semana en un contrato de descanso variable tras preparar y confirmar; si lo trabajó, deja un compensatorio pendiente. |
 | `conceder_compensatorio` | Registrar descansos (`payroll:rest_days`) | Concede el día libre que paga un descanso obligatorio trabajado tras preparar y confirmar; fuera del plazo legal, solo si el anfitrión acepta concederlo tarde. No avisa al trabajador. |
