@@ -3,6 +3,33 @@
 Cada versión publicada actualiza los manifiestos de los tres paquetes y las
 entradas del marketplace de Claude, y lleva un tag `vX.Y.Z`.
 
+## 0.18.0 — 2026-11-09
+
+- Convertir una solicitud del sitio directo en reserva ya vale también para un
+  conjunto de varias cabañas: crea una reserva pendiente por cabaña, todas o
+  ninguna, con `reserva.cabanas` en la vista previa y `reserva_conjunto_id` y
+  `reservas` en la respuesta. La skill deja de decir que un conjunto se
+  convierte en cotización. Requiere el
+  [PR #820](https://github.com/ruizbjaime/booked/pull/820) de Booked.
+- Al convertir un bloqueo en reserva, la skill enseña `recibido_centavos`: lo
+  que paga la plataforma («Ganas» en Airbnb) en vez de lo que pagó el
+  huésped, uno de los dos y nunca ambos. Requiere el
+  [PR #855](https://github.com/ruizbjaime/booked/pull/855).
+- Las cotizaciones administradas de Directo traen `oferta_publica`: el enlace a
+  la ficha del sitio público y, si el sitio cotiza más caro, el precio del
+  sitio y el descuento. Llega en el detalle de `ver_cotizaciones` y en las
+  respuestas de `crear_cotizacion` y `editar_cotizacion`; en las
+  preparaciones es una previsión. Requiere los
+  [PR #858](https://github.com/ruizbjaime/booked/pull/858) y
+  [#859](https://github.com/ruizbjaime/booked/pull/859).
+- `ver_reserva_de_conjunto` trae `por_resolver` y `retenido` de las cabañas
+  canceladas con dinero cobrado; la skill enseña que no son pagado ni saldo a
+  favor. Requiere los [PR #838](https://github.com/ruizbjaime/booked/pull/838)
+  y [#839](https://github.com/ruizbjaime/booked/pull/839).
+- Los manifiestos vuelven a contar bien el catálogo: 106 herramientas, 73 de
+  lectura y 33 de escritura. Sin herramientas ni permisos nuevos: ninguna
+  credencial necesita volver a autorizar.
+
 ## 0.17.0 — 2026-11-04
 
 - Añade la conversión directa de una solicitud del sitio en reserva en los
