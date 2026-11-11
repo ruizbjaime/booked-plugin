@@ -279,7 +279,8 @@ de un conjunto llevan `tipo_inventario: conjunto` y sus cabañas; de ellas se
 editan fechas, reparto y notas, y convertirlas crea una reserva por cabaña,
 todas o ninguna. Una cotización puede llevar un cupo excepcional
 (`cupo_excepcional`): más huéspedes que la capacidad publicada, acordados por
-el anfitrión, que la reserva hereda al convertirla. Tres flujos escriben,
+el anfitrión, que la reserva hereda al convertirla; la cabecera de una de
+conjunto cuenta en `cabanas_con_cupo_excepcional` cuántas cabañas lo llevan. Tres flujos escriben,
 cada uno con preparación, resumen, firma de un solo uso (treinta minutos, sin cruzar la
 medianoche) y el sí explícito del anfitrión:
 
@@ -351,7 +352,7 @@ modalidad la decide el servidor:
   liquidó al anfitrión (`monto_centavos` obligatorio).
 
 Admite reservas canceladas o no presentadas de cualquier canal, importadas
-incluidas. Las de grupo, las de un anfitrión externo, las de propiedades sin
+incluidas. Las de un anfitrión externo, las de propiedades sin
 finanzas y las que mezclan pagos del canal y del anfitrión se deciden en
 Booked, igual que revocar o corregir una decisión ya registrada. Con la
 decisión, la herramienta devuelve un resumen y una firma de un solo uso, válida
@@ -359,6 +360,16 @@ treinta minutos; `registrar_retencion_o_devolucion` recibe solo `firma` y
 `confirmado: true` tras el sí explícito del anfitrión. No transfiere dinero:
 anota lo que el anfitrión hizo. Si se pierde la respuesta, consulta
 `ver_reserva` antes de preparar otra vez.
+
+Una cabaña de conjunto responde por el conjunto entero: con el `reserva_id` de
+cualquiera de ellas, la preparación devuelve `situacion_conjunto` y, con
+`decision: retener`, `resumen_conjunto` con el reparto por cabaña. Solo se
+retiene todo lo retenible de las cabañas canceladas, sin montos parciales ni
+`retener_resto`; la devolución de un conjunto se registra en Booked. Registrar
+exige además «Reservas de conjunto» (`groups:manage`): sin él la preparación
+muestra el resumen con un aviso y sin firma. La respuesta trae en `conjunto` lo
+retenido por cabaña y el total retenido. Requiere el
+[PR #875](https://github.com/ruizbjaime/booked/pull/875) de Booked.
 
 Primero debe desplegarse el [PR #579 del servidor](https://github.com/ruizbjaime/booked/pull/579)
 y estar habilitado `INTEGRATION_WRITES_ENABLED=true`. Emite un token aparte o
@@ -435,8 +446,10 @@ lo lee ni lo escribe.
 
 Escribir requiere «Reservas de conjunto» (`groups:manage`) con «Propiedades»,
 «Reservas» y «Cotizar estancias»; cobrar, además «Importes y pagos».
-Retener o devolver lo cobrado de un conjunto cancelado, archivarlo y anular
-sus pagos se hacen en Booked.
+Lo cobrado de un conjunto cancelado se retiene con
+`preparar_retencion_o_devolucion` → `registrar_retencion_o_devolucion`
+(sección «Retener o devolver tras cancelar»); devolverlo, archivar el conjunto
+y anular sus pagos se hacen en Booked.
 
 ## Solicitudes del sitio y TRA/SIRE
 
@@ -548,7 +561,7 @@ Treinta y tres herramientas escriben, y cada una lleva su permiso en Booked:
 | `crear_reserva_comisionada` | Crear reservas comisionadas (`brokered:create`) | Crea una reserva pendiente o confirmada en una propiedad comisionada tras preparar y confirmar huésped, estancia, importes y comisión; no registra pagos ni cobros de comisión. |
 | `cancelar_reserva` | Cancelar reservas | Cancela una reserva directa o del sitio público, conservando su historial. |
 | `eliminar_reserva` | Eliminar reservas | Archiva una reserva ya cancelada y sin retención. |
-| `registrar_retencion_o_devolucion` | Retener o devolver pagos de cancelaciones (`bookings:settle_cancellation`) | Registra, tras preparar y confirmar, si el anfitrión retiene o devuelve lo cobrado de una reserva cancelada o no presentada, o el neto que liquidó el canal; no transfiere dinero. |
+| `registrar_retencion_o_devolucion` | Retener o devolver pagos de cancelaciones (`bookings:settle_cancellation`) | Registra, tras preparar y confirmar, si el anfitrión retiene o devuelve lo cobrado de una reserva cancelada o no presentada, o el neto que liquidó el canal; en un conjunto cancelado, retiene todo lo retenible de sus cabañas; no transfiere dinero. |
 | `convertir_bloqueo_en_reserva` | Convertir bloqueos en reservas | Convierte en reserva un bloqueo importado de Airbnb, Booking.com o VRBO. |
 | `editar_reserva` | Editar reservas (`bookings:update`) | Cambia fechas, ocupación, mascotas, método de pago o responsable de una reserva no importada de Directo o del sitio público, o las notas de una de cualquier canal, tras preparar y confirmar; re-precia con la configuración de hoy. |
 | `marcar_cambio_revisado` | Editar reservas (`bookings:update`) | Cierra un aviso de `cambios_por_revisar` tras confirmación explícita; no aplica ni deshace el cambio. |
@@ -635,7 +648,7 @@ permiso de escritura de cada herramienta, se exigen estas lecturas acompañantes
 | `crear_reserva_manual` | «Propiedades» (`properties:read`) y «Cotizar estancias» (`pricing:read`). |
 | `crear_reserva_comisionada` | «Reservas comisionadas» (`brokered:read`), «Importes y pagos» (`finance:read`) y «Consultar contactos» (`contacts:read`). |
 | `cancelar_reserva`, `eliminar_reserva` | «Propiedades» (`properties:read`) y «Reservas» (`bookings:read`). |
-| `registrar_retencion_o_devolucion` | «Propiedades» (`properties:read`), «Reservas» (`bookings:read`) e «Importes y pagos» (`finance:read`). |
+| `registrar_retencion_o_devolucion` | «Propiedades» (`properties:read`), «Reservas» (`bookings:read`) e «Importes y pagos» (`finance:read`); en un conjunto, además «Reservas de conjunto» (`groups:manage`). |
 | `convertir_bloqueo_en_reserva` | «Bloqueos» (`blocks:read`) y «Cotizar estancias» (`pricing:read`). |
 | `editar_reserva`, `marcar_cambio_revisado`, `cambiar_estado_de_reserva` | «Propiedades» (`properties:read`) y «Reservas» (`bookings:read`). |
 | `registrar_pago_de_reserva`, `anular_pago`, `cambiar_plazos_de_pago` | «Propiedades» (`properties:read`), «Reservas» (`bookings:read`) e «Importes y pagos» (`finance:read`). |

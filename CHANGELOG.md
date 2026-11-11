@@ -3,6 +3,34 @@
 Cada versión publicada actualiza los manifiestos de los tres paquetes y las
 entradas del marketplace de Claude, y lleva un tag `vX.Y.Z`.
 
+## 0.20.0 — 2026-11-11
+
+- La skill enseña a retener lo cobrado de un conjunto cancelado con la pareja
+  de siempre, `preparar_retencion_o_devolucion` →
+  `registrar_retencion_o_devolucion`: el `reserva_id` de cualquier cabaña
+  responde por el conjunto entero, con `situacion_conjunto` sin `decision` y
+  `resumen_conjunto` con `decision: retener`. Solo se retiene todo lo
+  retenible de las cabañas canceladas, sin monto parcial ni `retener_resto`;
+  devolver lo de un conjunto sigue registrándose en Booked. Registrar exige
+  además «Reservas de conjunto» (`groups:manage`): sin él, la preparación
+  devuelve el resumen con un aviso y sin firma, y la skill no intenta
+  registrar. En la respuesta, `retenido` es lo de esta operación y el detalle
+  por cabaña y el total retenido van en `conjunto`. Tras cancelar un conjunto
+  con pagos, la skill ofrece registrar la retención en vez de mandar todo a
+  Booked. Requiere el
+  [PR #875](https://github.com/ruizbjaime/booked/pull/875) de Booked.
+- `ver_cotizaciones` trae en la cabecera de una cotización de conjunto
+  `cabanas_con_cupo_excepcional`: cuántas de sus cabañas, dentro del token,
+  llevan cupo excepcional, para saberlo desde el listado. Requiere el
+  [PR #872](https://github.com/ruizbjaime/booked/pull/872).
+- La descripción de la skill baja de 1.144 a menos de 1.024 caracteres, el
+  límite de algunos clientes, y su lista inicial de escrituras ya nombra
+  convertir una solicitud del sitio directo en reserva.
+- Sin herramientas nuevas: siguen siendo ciento seis, treinta y tres de
+  escritura. Retener un conjunto usa permisos que ya existían
+  (`bookings:settle_cancellation` y `groups:manage`); una credencial que no
+  los tenga juntos debe volver a autorizarse para hacerlo.
+
 ## 0.19.0 — 2026-11-11
 
 - La skill enseña el cupo excepcional: alojar en una cotización de una
