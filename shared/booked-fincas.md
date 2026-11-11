@@ -1,6 +1,6 @@
 ---
 name: booked-fincas
-description: "Gestiona las fincas de Jaime en Booked, aunque no se nombre el PMS: disponibilidad, reservas, conjuntos, huéspedes, contactos, calendario, precios, ingresos, gastos, nómina, deudas y comisiones de Airbnb, Booking.com, Fincas de la Villa o venta directa. Úsala para ver el huésped de una fecha o un teléfono; editar una propiedad; sincronizar calendarios y revisar sus avisos; convertir en cotización o en reserva, o descartar, solicitudes del sitio; guardar y gestionar cotizaciones; crear, editar, cambiar de estado o cancelar reservas y conjuntos, y archivar reservas; agregar acompañantes; registrar o anular pagos y mover sus plazos; retener o devolver tras cancelar; convertir bloqueos; administrar contactos y bloqueos; ver qué falta de TRA/SIRE, trabajadores, sus descansos, gastos fijos y eventos; marcar el descanso semanal de un trabajador y concederle su compensatorio; preparar informes o liquidaciones; y analizar huéspedes, contactos duplicados, patrones, rendimiento, resultados, caja, lo ya vendido y la proyección de las próximas semanas. Consulta con las herramientas `booked`; para crear registros usa los datos que dé Jaime."
+description: "Gestiona las fincas de Jaime en Booked, aunque no se nombre el PMS: disponibilidad, reservas, conjuntos, huéspedes, contactos, calendario, precios, ingresos, gastos, nómina, deudas y comisiones de Airbnb, Booking.com, Fincas de la Villa o venta directa. Úsala para ver el huésped de una fecha o un teléfono; editar una propiedad; sincronizar calendarios; convertir en cotización o en reserva, o descartar, solicitudes del sitio; guardar y gestionar cotizaciones; crear, editar, cambiar de estado o cancelar reservas y conjuntos, y archivar reservas; agregar acompañantes; registrar o anular pagos y mover sus plazos; retener o devolver tras cancelar; convertir bloqueos; administrar contactos y bloqueos; ver TRA/SIRE pendiente, trabajadores, descansos, gastos fijos y eventos; marcar descansos y conceder compensatorios; preparar informes o liquidaciones; y analizar huéspedes, duplicados, patrones, rendimiento, resultados, caja, lo vendido y la proyección. Para crear registros usa los datos que dé Jaime."
 ---
 
 # Booked — las fincas de Jaime
@@ -12,15 +12,17 @@ editar y eliminar bloqueos manuales, crear una reserva directa, comisionada o
 de conjunto, editarla, cambiar su estado, cancelar o archivar una directa,
 agregarle acompañantes, registrar o anular sus pagos, mover sus plazos de
 pago, registrar la retención o devolución de lo cobrado en una reserva
-cancelada, convertir en reserva un bloqueo de plataforma, crear o eliminar
-contactos, guardar cotizaciones, cambiar su estado, editar un borrador o
-convertir una aceptada en reserva, convertir en cotización o descartar una
-solicitud del sitio, y marcar el descanso semanal de un trabajador y concederle
-el día compensatorio. `cotizar` y
+cancelada o la retención de un conjunto cancelado, convertir en reserva un
+bloqueo de plataforma, crear o eliminar contactos, guardar cotizaciones,
+cambiar su estado, editar un borrador o convertir una aceptada en reserva,
+convertir en cotización o en reserva, o descartar, una solicitud del sitio, y
+marcar el descanso semanal de un trabajador y concederle el día
+compensatorio. `cotizar` y
 `cotizar_conjunto` son un cálculo, no apartan fechas. Nada más crea, modifica
 ni cancela nada: el check-in y la salida los hace Booked a su hora, y revocar o
-corregir una retención o devolución ya registrada, anular un pago de conjunto,
-fusionar contactos duplicados o revocar un compensatorio concedido se hace en
+corregir una retención o devolución ya registrada, devolver lo cobrado de un
+conjunto cancelado, anular un pago de conjunto, fusionar contactos
+duplicados o revocar un compensatorio concedido se hace en
 Booked.
 
 Cada herramienta lleva sus reglas en su propia descripción: léela antes de
@@ -400,7 +402,10 @@ convertirlo crea una reserva pendiente por cabaña, todas o ninguna.
   ahora; `convertida` y `reserva_id` dicen si ya es una reserva.
   `cupo_excepcional` (`huespedes`, `capacidad_publicada`) llega en la
   cabecera de una propiedad y, en un conjunto, en cada cabaña del detalle; su
-  cabecera, en `null`. Solo aparece mientras el acordado supere la capacidad
+  cabecera lo trae en `null` y cuenta en `cabanas_con_cupo_excepcional`
+  cuántas cabañas, de las que alcanza el token, lo llevan: con eso basta para
+  decir desde el listado qué cotizaciones de conjunto tienen cupo, sin abrir
+  cada una. Solo aparece mientras el acordado supere la capacidad
   publicada de hoy: `null` es que no hay cupo o que la capacidad ya cubre al
   grupo.
 - **Enlace al sitio y descuento de Directo.** En una administrada,
@@ -731,9 +736,10 @@ gestionan en Booked, y un conjunto se cancela entero con
 ## Retener o devolver lo cobrado de una reserva cancelada
 
 Para reservas canceladas o no presentadas de cualquier canal, importadas
-incluidas. Las de grupo, las de un anfitrión externo y las de propiedades sin
-finanzas se deciden en Booked, igual que revocar o corregir una decisión ya
-registrada. La decisión es de Jaime; tú solo la registras.
+incluidas. Las de un anfitrión externo y las de propiedades sin finanzas se
+deciden en Booked, igual que revocar o corregir una decisión ya registrada.
+Una cabaña de conjunto responde por el conjunto entero (al final de esta
+sección). La decisión es de Jaime; tú solo la registras.
 
 1. Identifica la reserva y llama `preparar_retencion_o_devolucion` con
    `propiedad_id` y `reserva_id`, **sin `decision`**. Devuelve la situación, sin
@@ -765,9 +771,39 @@ registrada. La decisión es de Jaime; tú solo la registras.
    devolución que quizá ya quedó registrada.
 6. Una retención registrada impide archivar la reserva con `eliminar_reserva`.
 
+**En un conjunto** el dinero se decide por el conjunto entero, y por aquí solo
+se retiene; devolver, aunque sea una parte, se registra en Booked.
+
+- Llama `preparar_retencion_o_devolucion` con el `reserva_id` y el
+  `propiedad_id` de cualquiera de sus cabañas. Sin `decision`, en vez de la
+  situación de una reserva devuelve `situacion_conjunto`: `por_resolver`, lo
+  ya `retenido`, lo `retenible` ahora y, en `cabanas`, el monto de cada
+  cabaña cancelada o no presentada. Si
+  rehúsa —nada por resolver, lo que queda solo sale con una devolución, una
+  cabaña importada, de otro canal, de un anfitrión externo o sin finanzas—,
+  cuéntale el motivo tal cual.
+- La única decisión es `retener`, y retiene **todo lo retenible** de esas
+  cabañas: no hay monto parcial ni `retener_resto`, y no envíes
+  `monto_centavos`. Si Jaime quiere quedarse solo con una parte o devolver,
+  dile que eso se registra en Booked; no lo aproximes reteniendo.
+- Con `decision: retener` llega `resumen_conjunto`: léele cuánto se retiene
+  en cada cabaña, el total, lo que queda `pendiente_por_decidir` —que solo
+  saldrá con una devolución en Booked— y las `consecuencias`, y espera su sí.
+  Si llega con `avisos` y **sin `firma`**, la credencial no puede
+  registrarlo: dile por qué y que lo retenga en Booked; no llames a
+  `registrar_retencion_o_devolucion`.
+- Al registrar, `retenido` es lo retenido en esta operación y
+  `pendiente_por_decidir`, lo que el conjunto sigue teniendo por resolver. El
+  detalle por cabaña y el total retenido del conjunto están en `conjunto`
+  (`cabanas`, `retenido_conjunto`): el `reserva_id` y el `numero` de arriba
+  son solo los de la cabaña que nombraste, que puede no haber retenido nada.
+- Ante una respuesta perdida, `ver_reserva_de_conjunto` (`retenido` y
+  `por_resolver`) antes de preparar otra vez.
+
 Preparar requiere `properties:read`, `bookings:read` y `finance:read`;
 registrar añade «Retener o devolver pagos de cancelaciones»
-(`bookings:settle_cancellation`). Sin ese permiso, dile que lo registre en
+(`bookings:settle_cancellation`), y en un conjunto, además, «Reservas de
+conjunto» (`groups:manage`). Sin ese permiso, dile que lo registre en
 Booked. Actualizar el plugin no amplía los permisos de una credencial existente.
 
 ## Editar, cambiar de estado y cobrar una reserva
@@ -918,8 +954,11 @@ perdida, `ver_reserva_de_conjunto`:
   cancelar (solo cabañas no importadas de Directo o del sitio público). Las
   cabañas ya canceladas o no-show quedan fuera y la preparación lo avisa; las
   demás deben estar en el mismo estado y, si no, dice cuáles y cada una se
-  cambia con `cambiar_estado_de_reserva`. Retener o devolver lo cobrado de
-  un conjunto cancelado, y archivarlo, se hacen en Booked.
+  cambia con `cambiar_estado_de_reserva`. Cancelar no registra retenciones
+  ni devoluciones: si el conjunto tenía pagos, díselo y ofrécele registrar
+  la retención (sección «Retener o devolver lo cobrado de una reserva
+  cancelada»), sin empezarla por tu cuenta. Devolver lo cobrado de un
+  conjunto cancelado, y archivarlo, se hacen en Booked.
 - **Registrar un pago** (`preparar_pago_de_conjunto` →
   `registrar_pago_de_conjunto`): un pago que Jaime ya recibió por todo el
   conjunto; `reparto` dice cuánto cae en cada cabaña. Lee resumen, reparto y
