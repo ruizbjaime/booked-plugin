@@ -3,6 +3,32 @@
 Cada versión publicada actualiza los manifiestos de los tres paquetes y las
 entradas del marketplace de Claude, y lleva un tag `vX.Y.Z`.
 
+## 0.21.0 — 2026-11-11
+
+- La skill enseña el gasto de mano de obra ocasional: cada gasto de `gastos`
+  trae `tipo` (`general` o `mano_de_obra_ocasional`) y, en el segundo,
+  `persona` con su `tipo` (`trabajador_ocasional` o `trabajador` de la
+  nómina), `id` y `nombre`. Un gasto general lleva `persona: null`. Con `id`
+  y `nombre` en `null` falta un permiso: del anfitrión en Booked para ver a
+  esa persona o, si es de nómina, «Nómina por trabajador» (`payroll:read`) en
+  la credencial; la skill dice el tipo de persona sin adivinar quién. `gastos`
+  no filtra por tipo ni por persona, así que lo pagado a alguien se suma
+  sobre los gastos listados y, con `truncado`, se acotan las fechas o se sube
+  `limite`. Un trabajador ocasional no sale en `trabajadores` ni en
+  `gastos_de_nomina`; su ficha y sus gastos se registran en Booked. Requiere
+  los [PR #879](https://github.com/ruizbjaime/booked/pull/879) y
+  [#880](https://github.com/ruizbjaime/booked/pull/880) de Booked.
+- `preparar_edicion_de_conjunto` ya no prepara un cambio de fechas cuando una
+  cabaña que sigue en la estancia tiene el check-in hecho o la estancia
+  terminada: lo devuelve en `impedimentos`, nombrando las cabañas, sin firma.
+  La skill deja de prometer «nuevas fechas para todas las cabañas» sin esa
+  condición: lee el impedimento, recuerda que la ocupación sí se cambia y que
+  una cabaña sola va por `preparar_edicion_de_reserva`, y vuelve a preparar si
+  `editar_conjunto` rechaza porque una cabaña entró en estancia entretanto.
+  Requiere el [PR #878](https://github.com/ruizbjaime/booked/pull/878).
+- Sin herramientas ni permisos nuevos: siguen siendo ciento seis, treinta y
+  tres de escritura.
+
 ## 0.20.0 — 2026-11-11
 
 - La skill enseña a retener lo cobrado de un conjunto cancelado con la pareja
