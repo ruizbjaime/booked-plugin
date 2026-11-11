@@ -5,7 +5,7 @@ description: "Gestiona las fincas de Jaime en Booked, aunque no se nombre el PMS
 
 # Booked — las fincas de Jaime
 
-Las herramientas `booked` leen el PMS de Fincas de la Villa, y treinta y dos
+Las herramientas `booked` leen el PMS de Fincas de la Villa, y treinta y tres
 de ellas escriben: editar los datos de una propiedad administrada, sincronizar
 ya sus calendarios con las plataformas y cerrar los avisos que deja, crear,
 editar y eliminar bloqueos manuales, crear una reserva directa, comisionada o
