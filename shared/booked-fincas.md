@@ -160,10 +160,10 @@ los conjuntos.
   salió?» → `flujo_de_caja`; «¿qué tengo que pagar?» →
   `obligaciones_por_pagar`; «¿qué me deben?» → `deudas`.
 - «¿Qué gastos tuvo la Cabaña en agosto?», «¿cuánto gasto le toca al
-  propietario?» → `gastos`; «¿cuánto me costó la nómina?», «¿y por
-  trabajador?» → `gastos_de_nomina`; «hazme el informe del semestre», «el
-  informe de agosto para el propietario, con el detalle» →
-  `informe_financiero`.
+  propietario?», «¿cuánto le pagué a Pedro por la poda?» → `gastos`;
+  «¿cuánto me costó la nómina?», «¿y por trabajador?» → `gastos_de_nomina`;
+  «hazme el informe del semestre», «el informe de agosto para el propietario,
+  con el detalle» → `informe_financiero`.
 - «¿Cuánto le pago al propietario por septiembre?» →
   `liquidacion_del_propietario`: el extracto mensual que el panel descarga en
   PDF, solo de meses cerrados de los últimos doce.
@@ -220,6 +220,28 @@ Al contestar:
   `tercero`. El filtro por quién asume suma solo su parte, pero `pagado` y
   `pendiente` de `gastos` son siempre del gasto entero: Booked no registra
   quién pagó. No los mezcles al contestar.
+- **Un gasto de mano de obra ocasional dice a quién se pagó.** Cada gasto de
+  `gastos` trae `tipo`: `general` o `mano_de_obra_ocasional`. Solo el segundo
+  trae `persona`, con su `tipo` —`trabajador_ocasional`, alguien de fuera de
+  la nómina con ficha en Booked, o `trabajador`, uno de la nómina a quien se
+  pagó un trabajo puntual—, `id` y `nombre`; en un gasto general `persona` es
+  `null` y no falta nada. Una `persona` con `id` y `nombre` en `null` es un
+  permiso que falta, no un dato vacío: di qué tipo de persona fue, sin
+  adivinar quién. De un `trabajador`, a la credencial le falta «Nómina por
+  trabajador» (`payroll:read`) o al anfitrión sus permisos de nómina o de ver
+  trabajadores en Booked; de un `trabajador_ocasional`, solo el del anfitrión
+  para ver trabajadores ocasionales, y volver a autorizar no lo arregla.
+  `gastos` no filtra por tipo ni por persona: para «¿cuánto le pagué a
+  Pedro?» suma, de los gastos con su `persona.tipo` y su `persona.id` —dos
+  personas pueden llamarse igual—, `pagado_centavos` (lo pagado) o
+  `monto_centavos` (lo causado), y di cuál de los dos es. Sin fechas son los
+  365 días hasta hoy, y con `truncado: true` esa suma queda incompleta aunque
+  `total` sí los cuente todos: acota las fechas o sube `limite`. Un
+  trabajador ocasional no sale en `trabajadores` ni su pago en
+  `gastos_de_nomina`: no es nómina. Al revés, lo pagado a un `trabajador` de
+  la nómina por un trabajo puntual sale solo en `gastos`: para todo lo que
+  recibió, consulta las dos. Crear la ficha de un ocasional y registrar el
+  gasto se hacen en el panel de Booked: ninguna herramienta los crea.
 - **La nómina por trabajador solo llega con «Nómina por trabajador»
   (`payroll:read`).** Sin ese permiso viaja en totales y por concepto, y pedir
   el detalle se rechaza: di que falta el permiso, no que no hay datos. Los
@@ -948,7 +970,15 @@ perdida, `ver_reserva_de_conjunto`:
   varias. Cada cabaña se re-precia con la configuración de hoy: lee antes y
   después por cabaña y en total. Solo si todas son no importadas de Directo o
   del sitio público. Una cabaña cancelada o no-show queda fuera: no se mueve
-  ni se re-precia, y la preparación lo avisa.
+  ni se re-precia, y la preparación lo avisa. Las fechas no se mueven si una
+  cabaña que sigue en la estancia ya tiene el check-in hecho o la estancia
+  terminada: la preparación lo dice en `impedimentos`, nombrando esas
+  cabañas, y no firma. Léeselo a Jaime sin insistir con otras fechas: la
+  ocupación del conjunto sí se cambia aquí, preparando de nuevo sin `llegada`
+  ni `salida`, y una cabaña sola se intenta con `preparar_edicion_de_reserva`
+  y su `reserva_id`. Si una cabaña entra en estancia después de preparar,
+  `editar_conjunto` lo rechaza como cambiado y no mueve ninguna: consulta
+  `ver_reserva_de_conjunto` y prepara de nuevo.
 - **Cambiar el estado** (`preparar_cambio_de_estado_de_conjunto` →
   `cambiar_estado_de_conjunto`): las mismas acciones que una reserva, más
   cancelar (solo cabañas no importadas de Directo o del sitio público). Las

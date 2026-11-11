@@ -442,7 +442,12 @@ lo lee ni lo escribe.
   `editar_conjunto`, `preparar_cambio_de_estado_de_conjunto` →
   `cambiar_estado_de_conjunto` (cancelar incluido) y
   `preparar_pago_de_conjunto` → `registrar_pago_de_conjunto`, siempre para
-  todas las cabañas a la vez, todo o nada.
+  todas las cabañas a la vez, todo o nada. Las fechas no se mueven mientras
+  una cabaña que sigue en la estancia tenga el check-in hecho o la estancia
+  terminada: `preparar_edicion_de_conjunto` lo devuelve como impedimento, sin
+  firma, y nombra `preparar_edicion_de_reserva` para una cabaña sola; la
+  ocupación sí se cambia, preparando sin fechas. Requiere el
+  [PR #878](https://github.com/ruizbjaime/booked/pull/878) de Booked.
 
 Escribir requiere «Reservas de conjunto» (`groups:manage`) con «Propiedades»,
 «Reservas» y «Cotizar estancias»; cobrar, además «Importes y pagos».
@@ -495,7 +500,7 @@ y resultados sin paginar reservas ni sumar a mano:
 | `ingresos_comprometidos` | Lo ya vendido por mes y el ritmo frente al año pasado | Igual |
 | `comparativo_interanual` | Ingresos, ocupación y ADR por año | Igual |
 | `proyeccion` | Semana a semana desde hoy: noches vendidas, ocupación, ritmo frente al año pasado y noches libres de alta demanda | Igual |
-| `gastos` | Los gastos causados, uno por uno, y quién asume cada parte: anfitrión, propietario o tercero | Igual |
+| `gastos` | Los gastos causados, uno por uno, y quién asume cada parte: anfitrión, propietario o tercero; de un gasto de mano de obra ocasional, a quién se pagó | Igual; el nombre de un trabajador de nómina, además «Nómina por trabajador» (`payroll:read`) |
 | `gastos_de_nomina` | El costo de nómina por concepto, quién lo asume, propiedad y mes | Igual; por trabajador, además «Nómina por trabajador» (`payroll:read`) |
 | `informe_financiero` | El informe del anfitrión o la liquidación de un propietario, con el detalle de cada línea y, si se pide, en Markdown | Igual; la nómina por trabajador, además `payroll:read` |
 | `liquidacion_del_propietario` | El extracto mensual del propietario que el panel descarga en PDF: cada estancia entera en el mes en que empieza | «Importes y pagos» |
@@ -512,8 +517,14 @@ huéspedes, con «Importes y pagos». La nómina viaja en totales y por concepto
 por trabajador, con su nombre, solo con «Nómina por trabajador»
 (`payroll:read`), que exige «Importes y pagos» y se concede aparte. Los datos
 de TRA/SIRE llegan solo como estados y conteos. `gastos` y `gastos_de_nomina` dicen quién asume cada
-costo; `informe_financiero` entrega la cascada con su detalle y, con
-`documento`, el informe en Markdown para entregar sin recalcular. Primero debe
+costo. Cada gasto de `gastos` trae `tipo` (`general` o
+`mano_de_obra_ocasional`) y, en el segundo, `persona`: un
+`trabajador_ocasional` o un `trabajador` de la nómina, con `id` y `nombre`,
+que llegan en `null` cuando el anfitrión no puede ver a esa persona en Booked
+o, si es de nómina, cuando la credencial no tiene «Nómina por trabajador»
+([PR #880](https://github.com/ruizbjaime/booked/pull/880));
+`informe_financiero` entrega la cascada con su detalle y, con `documento`, el
+informe en Markdown para entregar sin recalcular. Primero debe
 desplegarse el [PR #583 del servidor](https://github.com/ruizbjaime/booked/pull/583),
 y para las tres de costos e informes el [PR #589](https://github.com/ruizbjaime/booked/pull/589);
 actualizar el plugin no concede permisos.
@@ -571,7 +582,7 @@ Treinta y tres herramientas escriben, y cada una lleva su permiso en Booked:
 | `agregar_acompanantes_a_reserva` | Agregar acompañantes (`guests:write`) | Agrega acompañantes con su documento a una reserva, todos o ninguno, tras preparar y confirmar; los crea en la libreta y los precarga en la autogestión, sin avisar al huésped ni cambiar el precio. |
 | `anular_pago` | Anular pagos (`bookings:void_payment`) | Anula, con motivo y tras preparar y confirmar, un pago o una devolución registrados por error y su recibo; no mueve dinero. |
 | `crear_reserva_de_conjunto` | Reservas de conjunto (`groups:manage`) | Crea una reserva pendiente por cabaña de un conjunto, todas o ninguna, tras preparar y confirmar; no registra pagos. |
-| `editar_conjunto` | Reservas de conjunto (`groups:manage`) | Mueve las fechas o cambia la ocupación de todas las cabañas de una estancia de conjunto a la vez, re-preciando cada una, tras preparar y confirmar. |
+| `editar_conjunto` | Reservas de conjunto (`groups:manage`) | Mueve las fechas o cambia la ocupación de todas las cabañas de una estancia de conjunto a la vez, re-preciando cada una, tras preparar y confirmar; no mueve fechas con una cabaña en estancia o terminada. |
 | `cambiar_estado_de_conjunto` | Reservas de conjunto (`groups:manage`) | Cambia el estado de todas las cabañas de un conjunto a la vez, cancelar incluido, todo o nada, tras preparar y confirmar. |
 | `registrar_pago_de_conjunto` | Reservas de conjunto (`groups:manage`) | Registra un pago ya recibido por todo el conjunto, repartido entre sus cabañas, tras preparar y confirmar; no mueve dinero. |
 | `convertir_solicitud_en_cotizacion` | Gestionar solicitudes (`inquiries:manage`) | Convierte una solicitud pendiente del sitio en una cotización borrador con el precio que eligió el anfitrión tras preparar y confirmar; no retiene noches ni envía nada. |
