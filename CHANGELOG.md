@@ -13,18 +13,21 @@ entradas del marketplace de Claude, y lleva un tag `vX.Y.Z`.
   esa persona o, si es de nómina, «Nómina por trabajador» (`payroll:read`) en
   la credencial; la skill dice el tipo de persona sin adivinar quién. `gastos`
   no filtra por tipo ni por persona, así que lo pagado a alguien se suma
-  sobre los gastos listados y, con `truncado`, se acotan las fechas o se sube
-  `limite`. Un trabajador ocasional no sale en `trabajadores` ni en
-  `gastos_de_nomina`; su ficha y sus gastos se registran en Booked. Requiere
-  los [PR #879](https://github.com/ruizbjaime/booked/pull/879) y
+  sobre sus gastos listados (`pagado_centavos`, o `monto_centavos` para lo
+  causado) y, con `truncado`, se acotan las fechas o se sube `limite`. Un
+  trabajador ocasional no sale en `trabajadores` ni en `gastos_de_nomina`, y
+  el trabajo puntual pagado a uno de la nómina sale solo en `gastos`; la
+  ficha de un ocasional y los gastos se registran en el panel de Booked.
+  Requiere los [PR #879](https://github.com/ruizbjaime/booked/pull/879) y
   [#880](https://github.com/ruizbjaime/booked/pull/880) de Booked.
 - `preparar_edicion_de_conjunto` ya no prepara un cambio de fechas cuando una
   cabaña que sigue en la estancia tiene el check-in hecho o la estancia
   terminada: lo devuelve en `impedimentos`, nombrando las cabañas, sin firma.
   La skill deja de prometer «nuevas fechas para todas las cabañas» sin esa
-  condición: lee el impedimento, recuerda que la ocupación sí se cambia y que
-  una cabaña sola va por `preparar_edicion_de_reserva`, y vuelve a preparar si
-  `editar_conjunto` rechaza porque una cabaña entró en estancia entretanto.
+  condición: lee el impedimento, recuerda que la ocupación sí se cambia
+  preparando sin fechas y que una cabaña sola va por
+  `preparar_edicion_de_reserva`, y vuelve a preparar si `editar_conjunto`
+  rechaza porque una cabaña entró en estancia entretanto.
   Requiere el [PR #878](https://github.com/ruizbjaime/booked/pull/878).
 - Sin herramientas ni permisos nuevos: siguen siendo ciento seis, treinta y
   tres de escritura.

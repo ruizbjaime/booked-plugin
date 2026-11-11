@@ -446,7 +446,7 @@ lo lee ni lo escribe.
   una cabaña que sigue en la estancia tenga el check-in hecho o la estancia
   terminada: `preparar_edicion_de_conjunto` lo devuelve como impedimento, sin
   firma, y nombra `preparar_edicion_de_reserva` para una cabaña sola; la
-  ocupación sí se cambia. Requiere el
+  ocupación sí se cambia, preparando sin fechas. Requiere el
   [PR #878](https://github.com/ruizbjaime/booked/pull/878) de Booked.
 
 Escribir requiere «Reservas de conjunto» (`groups:manage`) con «Propiedades»,
@@ -522,8 +522,9 @@ costo. Cada gasto de `gastos` trae `tipo` (`general` o
 `trabajador_ocasional` o un `trabajador` de la nómina, con `id` y `nombre`,
 que llegan en `null` cuando el anfitrión no puede ver a esa persona en Booked
 o, si es de nómina, cuando la credencial no tiene «Nómina por trabajador»
-([PR #880](https://github.com/ruizbjaime/booked/pull/880)); `informe_financiero` entrega la cascada con su detalle y, con
-`documento`, el informe en Markdown para entregar sin recalcular. Primero debe
+([PR #880](https://github.com/ruizbjaime/booked/pull/880));
+`informe_financiero` entrega la cascada con su detalle y, con `documento`, el
+informe en Markdown para entregar sin recalcular. Primero debe
 desplegarse el [PR #583 del servidor](https://github.com/ruizbjaime/booked/pull/583),
 y para las tres de costos e informes el [PR #589](https://github.com/ruizbjaime/booked/pull/589);
 actualizar el plugin no concede permisos.
