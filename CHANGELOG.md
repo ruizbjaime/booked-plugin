@@ -3,6 +3,39 @@
 Cada versión publicada actualiza los manifiestos de los tres paquetes y las
 entradas del marketplace de Claude, y lleva un tag `vX.Y.Z`.
 
+## 0.19.0 — 2026-11-11
+
+- La skill enseña el cupo excepcional: alojar en una cotización de una
+  propiedad administrada o de un conjunto más huéspedes que la capacidad
+  publicada. `cupo_excepcional: true` en `preparar_cotizacion` y
+  `preparar_edicion_de_cotizacion` solo se envía si el anfitrión lo pide
+  expresamente, tras leerle `cupo_excepcional_disponible` (o
+  `cupo_excepcional_disponible_por_cabana`) con huéspedes, capacidad publicada
+  y tope; si el aviso dice que no es posible, no se ofrece. El tope es la
+  capacidad más 2 o más el 25 %, lo que sea mayor; niños e infantes siguen
+  estrictos, y en un conjunto un solo acuse vale para todas las cabañas
+  excedidas, todo o nada. `ver_cotizaciones`, `ver_reserva`,
+  `ver_reserva_de_conjunto` y las preparaciones de conversión y de edición de
+  reserva traen `cupo_excepcional` mientras siga sobre la capacidad
+  publicada. Una reserva solo lo hereda al convertir la cotización: `cotizar`,
+  `cotizar_conjunto`, las reservas directas y las solicitudes del sitio siguen
+  estrictos. Requiere los
+  [PR #864](https://github.com/ruizbjaime/booked/pull/864),
+  [#865](https://github.com/ruizbjaime/booked/pull/865) y
+  [#866](https://github.com/ruizbjaime/booked/pull/866) de Booked.
+- Una cotización de conjunto en borrador ya cambia de fechas y de reparto con
+  `preparar_edicion_de_cotizacion` → `editar_cotizacion`: `entrada`,
+  `salida`, `cabanas` —el reparto completo que dicta el anfitrión; sin él se
+  conserva el guardado— y `notas`. Re-precia todas las cabañas con las
+  tarifas vigentes y la vigencia la pone Booked, renovada si ya venció. La
+  skill deja de decir que de un conjunto solo se editan las notas. Requiere
+  los [PR #867](https://github.com/ruizbjaime/booked/pull/867),
+  [#868](https://github.com/ruizbjaime/booked/pull/868) y
+  [#869](https://github.com/ruizbjaime/booked/pull/869).
+- El marketplace y el README vuelven a contar ciento seis herramientas. Sin
+  herramientas ni permisos nuevos: ninguna credencial necesita volver a
+  autorizar.
+
 ## 0.18.0 — 2026-11-09
 
 - Convertir una solicitud del sitio directo en reserva ya vale también para un

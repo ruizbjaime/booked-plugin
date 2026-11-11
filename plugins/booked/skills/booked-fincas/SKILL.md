@@ -5,7 +5,7 @@ description: "Gestiona las fincas de Jaime en Booked, aunque no se nombre el PMS
 
 # Booked — las fincas de Jaime
 
-Las herramientas `booked` leen el PMS de Fincas de la Villa, y treinta y dos
+Las herramientas `booked` leen el PMS de Fincas de la Villa, y treinta y tres
 de ellas escriben: editar los datos de una propiedad administrada, sincronizar
 ya sus calendarios con las plataformas y cerrar los avisos que deja, crear,
 editar y eliminar bloqueos manuales, crear una reserva directa, comisionada o
@@ -341,7 +341,9 @@ actualizar Booked; no simules un guardado con otra herramienta.
    reparto que dictó Jaime. Sin mascotas, descuentos ni comisionista; se
    guarda como un documento con una línea por cabaña.
 2. Pregunta `faltan` con sus opciones y corrige `errores`; presenta
-   `avisos` e `impedimentos` antes de seguir. Si un aviso indica que falta un
+   `avisos` e `impedimentos` antes de seguir. Un grupo sobre la capacidad
+   publicada no es un error que corrijas tú: ni lo achiques ni envíes el cupo
+   (ver «Cupo excepcional», abajo). Si un aviso indica que falta un
    permiso de escritura, explica que solo quedó preparada; no solicites la
    confirmación de guardado hasta contar con una credencial habilitada.
    No vuelvas a preguntar datos ya entregados. Adultos, niños y mascotas deben
@@ -376,6 +378,44 @@ actualizar Booked; no simules un guardado con otra herramienta.
    `ver_cotizaciones` antes de intentar otra creación: no hay idempotencia
    entre firmas distintas.
 
+**Cupo excepcional.** En una administrada o en un conjunto, Jaime puede
+acordar en la cotización alojar más huéspedes que la capacidad publicada; una
+comisionada no lo admite.
+
+- **Nunca lo envíes ni lo sugieras por tu cuenta.** Sin `cupo_excepcional`, el
+  grupo que no cabe sigue rechazado —al guardar, en `errores` (`adultos`; en
+  un conjunto, `cabanas` con el nombre de la cabaña); al editar un conjunto,
+  como impedimento—. Si un cupo podría alojarlo, la preparación trae un aviso
+  y `cupo_excepcional_disponible` —`huespedes`, `capacidad_publicada` y
+  `tope`— o, en un conjunto, `cupo_excepcional_disponible_por_cabana`, lo
+  mismo por cabaña con `propiedad_id` y `propiedad`. Léele esas cifras y
+  pregúntale; solo con su sí expreso, prepara de nuevo con
+  `cupo_excepcional: true`.
+- **Si no es posible, no hay oferta y el aviso dice por qué:** el grupo supera
+  el tope —la capacidad publicada más 2, o más su 25 % redondeado hacia arriba
+  si es mayor—, el canal no tiene cargo por persona adicional con importe, una
+  tarifa especial de precio completo cubre esas fechas, la propiedad tiene
+  precio por rangos de ocupación o los niños o infantes no caben ni con el
+  cupo. No le ofrezcas el cupo. En un conjunto solo hay oferta si todas las
+  cabañas excedidas pueden tomarlo; si no, el aviso nombra la que no.
+- **Con `cupo_excepcional: true`**, `resumen.cupo_excepcional` (en un
+  conjunto, el de cada cabaña de `resumen.cabanas`) trae `huespedes` y
+  `capacidad_publicada`, y el precio cobra a cada huésped por encima de la
+  base el cargo por persona adicional del canal (a un niño, su tarifa por edad
+  si la hay): léeselo antes del sí de guardar. Un cupo que no se puede
+  acordar vuelve como `impedimento`. En un conjunto, un solo `true` lo
+  concede a la vez a todas las cabañas excedidas, todo o nada: pregúntale por
+  todas antes de enviarlo.
+- Amplía el total de huéspedes y el máximo de adultos; los máximos de niños e
+  infantes y «no se admiten niños» siguen estrictos. Va solo en la
+  preparación, nunca en `crear_cotizacion` ni `editar_cotizacion`; `false` es
+  no enviarlo, y un grupo que cabe no guarda cupo.
+- **Solo una cotización lo concede**, y una reserva lo hereda únicamente al
+  convertirla. `cotizar`, `cotizar_conjunto`, la reserva directa, la de
+  conjunto directa, las solicitudes del sitio y el sitio público siguen en la
+  capacidad publicada: ese grupo se aloja guardando una cotización con cupo y
+  convirtiéndola.
+
 Preparar requiere `quotations:read`; guardar añade `quotations:create`.
 Propias/administradas necesitan `properties:read` y `pricing:read`; comisionadas,
 `brokered:read` y `finance:read`. Un destinatario comisionista requiere además
@@ -389,8 +429,7 @@ Si el servidor aún no ofrece estas herramientas, explica que falta actualizar
 Booked; no las simules con otras. Sirven para una propiedad (administrada o
 comisionada) y para un conjunto: `ver_cotizaciones` trae `tipo_inventario:
 conjunto` con sus cabañas, y `propiedad_grupo_id` filtra por conjunto. De un
-conjunto, editar un borrador solo cambia las notas —otras fechas, otra
-ocupación, otro reparto o una vigencia vencida piden una cotización nueva— y
+conjunto, editar un borrador cambia fechas, reparto y notas (más abajo), y
 convertirlo crea una reserva pendiente por cabaña, todas o ninguna.
 
 - **Consultar.** `ver_cotizaciones` lista con filtros (propiedad, estado,
@@ -399,6 +438,11 @@ convertirlo crea una reserva pendiente por cabaña, todas o ninguna.
   las ve, no que no existan. Una cotización en borrador o enviada con la
   vigencia pasada figura como `expired`. `acciones_posibles` dice qué admite
   ahora; `convertida` y `reserva_id` dicen si ya es una reserva.
+  `cupo_excepcional` (`huespedes`, `capacidad_publicada`) llega en la
+  cabecera de una propiedad y, en un conjunto, en cada cabaña del detalle; su
+  cabecera, en `null`. Solo aparece mientras el acordado supere la capacidad
+  publicada de hoy: `null` es que no hay cupo o que la capacidad ya cubre al
+  grupo.
 - **Enlace al sitio y descuento de Directo.** En una administrada,
   `oferta_publica` trae `enlace`, la ficha de la propiedad en el sitio
   público con esas fechas; `precio_sitio`, lo que cobra el sitio por esa
@@ -437,7 +481,24 @@ convertirlo crea una reserva pendiente por cabaña, todas o ninguna.
   comisionadas se editan también alojamiento, cargos (la lista entera) y
   comisión: sin porcentaje ni monto, la comisión se recalcula con la tasa
   guardada y el resumen lo avisa. Pregunta lo que devuelva `faltan` (edades,
-  excepción de estadía mínima, vigencia).
+  excepción de estadía mínima, vigencia). Un cupo guardado se mantiene o baja
+  sin pedirlo otra vez; subirlo, o concederlo al editar, sigue las reglas de
+  «Cupo excepcional».
+- **Editar un conjunto** (las mismas dos herramientas): `entrada`, `salida`,
+  `cabanas` —el reparto ENTERO que dicte Jaime, con la forma del alta; quitar o
+  añadir cabañas del conjunto vale, y sin `cabanas` se conserva el guardado— y
+  `notas`. Rehúsa `valida_hasta`, mascotas, descuentos e importes, y unos
+  `adultos`, `ninos` o `edades_ninos` que no cuadren con el reparto; sin
+  `cabanas`, otro grupo es una pregunta: qué cabaña lo toma lo dice Jaime,
+  nunca tú. Solo borradores. Cambiar fechas o reparto re-precia todas las
+  cabañas con las tarifas vigentes, aunque no se muevan las fechas, y la
+  vigencia la pone Booked: la guardada recortada a la nueva llegada o, si ya
+  venció, una nueva. Cambiar solo las notas no re-precia. Una cabaña que no
+  puede entrar —de otro conjunto, inactiva, ocupada— es un impedimento con su
+  nombre; si se mueven las fechas, `faltan` puede pedir la estadía mínima. El
+  cupo de una cabaña se mantiene si su grupo no sube; subirlo, o concederlo a
+  una cabaña nueva, pide el sí de «Cupo excepcional», y una cabaña que sale o
+  vuelve a caber pierde el suyo con un aviso.
 - **Convertir en reserva** (`preparar_conversion_de_cotizacion` →
   `convertir_cotizacion_en_reserva`): solo una cotización aceptada que aún no
   es reserva. La reserva nace pendiente con el precio de la cotización y
@@ -448,16 +509,17 @@ convertirlo crea una reserva pendiente por cabaña, todas o ninguna.
   guardó el suyo. Lee `reserva` y `consecuencias` —crea el contacto del
   huésped o guarda el teléfono cuando corresponde— antes de pedir el sí. En
   un conjunto, método y compromiso se preguntan una vez y `reserva.cabanas`
-  trae cada cabaña con su total y su parte del abono. No registra pagos ni
-  envía mensajes.
+  trae cada cabaña con su total y su parte del abono. La reserva hereda el
+  cupo excepcional: `reserva.cupo_excepcional` (en un conjunto, el de cada
+  cabaña de `reserva.cabanas`) lo dice. No registra pagos ni envía mensajes.
 
 Consultar y preparar requieren «Cotizaciones» (`quotations:read`). Escribir
 añade «Cambiar el estado de cotizaciones» (`quotations:transition`), «Editar
 cotizaciones» (`quotations:update`) o «Convertir cotizaciones en reservas»
-(`quotations:convert`). Editar una administrada, o convertir una antigua sin
-precio guardado, requiere además «Cotizar estancias» (`pricing:read`); las
-comisionadas requieren «Reservas comisionadas» (`brokered:read`) e «Importes y
-pagos» (`finance:read`). El nombre del destinatario solo llega con
+(`quotations:convert`). Editar una administrada o un conjunto, o convertir
+una antigua sin precio guardado, requiere además «Cotizar estancias»
+(`pricing:read`); las comisionadas requieren «Reservas comisionadas»
+(`brokered:read`) e «Importes y pagos» (`finance:read`). El nombre del destinatario solo llega con
 `contacts:read`. Actualizar el plugin no amplía los permisos de una
 credencial existente.
 
@@ -772,6 +834,11 @@ antes de reintentar; un pago, además, se recupera con su `operacion_id`.
   aquí si el token alcanza el conjunto entero; mover el conjunto entero es
   `preparar_edicion_de_conjunto`, y su responsable se cambia en Booked. Las
   fechas límite de pago no se editan aquí: van por «Mover los plazos de pago».
+  Una reserva convertida de una cotización con cupo excepcional trae
+  `cupo_excepcional`, mientras supere la capacidad publicada de hoy, en el
+  `detalle` de `ver_reserva` y en `antes` y `despues` de la preparación: el
+  grupo puede mantenerse o bajar, nunca superarlo. Editar una reserva no
+  concede cupo; se acuerda al cotizar.
 - **Cambiar el estado** (`preparar_cambio_de_estado_de_reserva` →
   `cambiar_estado_de_reserva`): sin `accion` devuelve `acciones_posibles`
   —confirmar, volver a pendiente, no-show, reconfirmar, reactivar (re-precia
@@ -844,10 +911,11 @@ estancia de conjunto por su id o por el `reserva_id` de cualquiera de sus
 cabañas, con el `estado` de todas o `mixto`. Si se canceló alguna cabaña con
 dinero cobrado, `por_resolver` es lo que Jaime aún no devolvió ni retuvo y
 `retenido`, lo que retuvo como ingreso: ninguno es pagado ni saldo a favor,
-así que no los sumes a lo cobrado. **Solo existen para el token los
-conjuntos cuyas cabañas alcanza todas**: con una fuera de la lista no se ven,
-no se cotizan y no se escriben, y eso se arregla en *Booked → Ajustes →
-Integraciones API*, no preguntando.
+así que no los sumes a lo cobrado. Cada cabaña trae `cupo_excepcional`,
+heredado de la cotización (sección «Guardar una cotización»), o `null`.
+**Solo existen para el token los conjuntos cuyas cabañas alcanza todas**:
+con una fuera de la lista no se ven, no se cotizan y no se escriben, y eso se
+arregla en *Booked → Ajustes → Integraciones API*, no preguntando.
 
 Reservar un conjunto sin cotización guardada:
 
@@ -871,7 +939,9 @@ Reservar un conjunto sin cotización guardada:
    intentar otra.
 
 Para guardar la propuesta como cotización, el mismo `reparto_para_cotizar` va
-a `preparar_cotizacion` (sección «Guardar una cotización»).
+a `preparar_cotizacion` (sección «Guardar una cotización»). Ninguno de estos
+pasos aloja una cabaña sobre su capacidad publicada: eso solo lo concede una
+cotización con cupo excepcional.
 
 Una estancia de conjunto ya creada se escribe entera, todo o nada, con el
 mismo patrón de preparar, leer, esperar el sí y confirmar; ante una respuesta
