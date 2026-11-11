@@ -138,8 +138,10 @@ En el repositorio de la aplicación, con el soporte OAuth y los cambios del
    ([PR #707](https://github.com/ruizbjaime/booked/pull/707)), `proyeccion` y
    `liquidacion_del_propietario` ([PR #766](https://github.com/ruizbjaime/booked/pull/766))
    y `posibles_duplicados` ([PR #792](https://github.com/ruizbjaime/booked/pull/792)),
-   y `conceder_compensatorio` ([PR #804](https://github.com/ruizbjaime/booked/pull/804));
-   `tools/list` debe devolver las ciento cuatro en una sola página. Actualizar solo el plugin no
+   `conceder_compensatorio` ([PR #804](https://github.com/ruizbjaime/booked/pull/804))
+   y `preparar_conversion_de_solicitud_en_reserva` y `convertir_solicitud_en_reserva`
+   ([PR #818](https://github.com/ruizbjaime/booked/pull/818));
+   `tools/list` debe devolver las ciento seis en una sola página. Actualizar solo el plugin no
    incorpora estas herramientas ni sus permisos al backend.
 
 El registro dinámico permite HTTPS en `chatgpt.com`, `chat.openai.com`,
@@ -273,10 +275,12 @@ desglose, destinatario, notas, `acciones_posibles` y si ya es una reserva. En
 una administrada de Directo para cliente final, `oferta_publica` trae el
 enlace a la ficha del sitio público y, si el sitio la cotiza más cara, el
 descuento por reservar directo; también llega al crear o editar. Las
-de un conjunto llevan `tipo_inventario: conjunto` y sus cabañas; de ellas
-solo se editan las notas, y convertirlas crea una reserva por cabaña, todas o
-ninguna. Tres flujos escriben, cada uno con
-preparación, resumen, firma de un solo uso (treinta minutos, sin cruzar la
+de un conjunto llevan `tipo_inventario: conjunto` y sus cabañas; de ellas se
+editan fechas, reparto y notas, y convertirlas crea una reserva por cabaña,
+todas o ninguna. Una cotización puede llevar un cupo excepcional
+(`cupo_excepcional`): más huéspedes que la capacidad publicada, acordados por
+el anfitrión, que la reserva hereda al convertirla. Tres flujos escriben,
+cada uno con preparación, resumen, firma de un solo uso (treinta minutos, sin cruzar la
 medianoche) y el sí explícito del anfitrión:
 
 - **Cambiar el estado** (`preparar_cambio_de_estado_de_cotizacion` →
@@ -285,8 +289,10 @@ medianoche) y el sí explícito del anfitrión:
   nada al huésped. Rechazar es definitivo.
 - **Editar un borrador** (`preparar_edicion_de_cotizacion` →
   `editar_cotizacion`): fechas, vigencia, ocupación, descuentos y notas, y en
-  comisionadas alojamiento, cargos y comisión. Solo se envían los campos que
-  cambian; el precio se recalcula a la fecha de hoy como en la ficha.
+  comisionadas alojamiento, cargos y comisión. De un conjunto, fechas, el
+  reparto entero por cabaña y notas; su vigencia la pone Booked. Solo se envían
+  los campos que cambian; el precio se recalcula a la fecha de hoy como en la
+  ficha.
 - **Convertir en reserva** (`preparar_conversion_de_cotizacion` →
   `convertir_cotizacion_en_reserva`): una cotización aceptada pasa a reserva
   pendiente con su precio y retiene las noches. La preparación pregunta método
@@ -531,7 +537,7 @@ Treinta y tres herramientas escriben, y cada una lleva su permiso en Booked:
 | --- | --- | --- |
 | `crear_cotizacion` | Guardar cotizaciones (`quotations:create`) | Guarda un borrador tras preparar, presentar el resumen y recibir confirmación explícita; no reserva noches ni envía mensajes. |
 | `cambiar_estado_de_cotizacion` | Cambiar el estado de cotizaciones (`quotations:transition`) | Marca una cotización como enviada, aceptada o rechazada, o la devuelve a borrador, tras preparar y confirmar; no envía nada al huésped. |
-| `editar_cotizacion` | Editar cotizaciones (`quotations:update`) | Corrige un borrador tras preparar y confirmar, recalculando el precio como la ficha; no reserva noches. |
+| `editar_cotizacion` | Editar cotizaciones (`quotations:update`) | Corrige un borrador, también las fechas y el reparto de uno de conjunto, tras preparar y confirmar, recalculando el precio como la ficha; no reserva noches. |
 | `convertir_cotizacion_en_reserva` | Convertir cotizaciones en reservas (`quotations:convert`) | Convierte una cotización aceptada en una reserva pendiente con su precio tras preparar y confirmar; retiene las noches y no registra pagos. |
 | `editar_propiedad` | Editar propiedades (`properties:update`) | Cambia nombre, ciudad, dirección, horarios o capacidad de una propiedad administrada tras preparar, mostrar antes y después y recibir confirmación explícita; no toca precios ni canales. |
 | `sincronizar_calendarios` | Sincronizar calendarios (`blocks:sync`) | Importa ya los calendarios iCal de las plataformas, solo a petición; puede crear o quitar bloqueos importados y cambiar o cancelar reservas sincronizadas. El resultado se consulta con `estado_de_sincronizacion`. |
@@ -620,7 +626,7 @@ permiso de escritura de cada herramienta, se exigen estas lecturas acompañantes
 | --- | --- |
 | `crear_cotizacion` | «Cotizaciones» (`quotations:read`); propias/administradas requieren `properties:read` y `pricing:read`; comisionadas requieren `brokered:read` y `finance:read`. Elegir un contacto o comisionista requiere `contacts:read`; crear un contacto nuevo requiere además la escritura `contacts:create`. |
 | `cambiar_estado_de_cotizacion` | «Cotizaciones» (`quotations:read`); comisionadas requieren `brokered:read` y `finance:read`. |
-| `editar_cotizacion` | «Cotizaciones» (`quotations:read`); administradas requieren `pricing:read`; comisionadas, `brokered:read` y `finance:read`. |
+| `editar_cotizacion` | «Cotizaciones» (`quotations:read`); administradas y conjuntos requieren `pricing:read`; comisionadas, `brokered:read` y `finance:read`. |
 | `convertir_cotizacion_en_reserva` | «Cotizaciones» (`quotations:read`); una cotización antigua sin precio guardado requiere `pricing:read`; comisionadas, `brokered:read` y `finance:read`. |
 | `editar_propiedad` | «Propiedades y canales» (`properties:read`). |
 | `sincronizar_calendarios` | «Propiedades» (`properties:read`). |
