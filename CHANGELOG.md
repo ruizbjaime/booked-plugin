@@ -21,7 +21,7 @@ entradas del marketplace de Claude, y lleva un tag `vX.Y.Z`.
 - Una reserva completada, cancelada o no-show tiene el precio cerrado: la
   skill sabe que corregir su ocupación no pregunta ni toca el dinero, que
   llega un solo aviso y que sus fechas no se mueven (una cancelada se
-  reactiva primero).
+  reactiva primero). El rechazo de las fechas llega en `errores`.
 - `preparar_edicion_de_conjunto` hace la misma pregunta al cambiar solo la
   ocupación: una por guardado, que nombra las cabañas cuyos precios cambiaron
   y da el total del conjunto si se recalcula y si se mantiene; las demás
