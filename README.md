@@ -386,8 +386,16 @@ anfitrión; si la reserva cambió desde la preparación, no guardan nada:
 - **Editar** (`preparar_edicion_de_reserva` → `editar_reserva`): fechas,
   ocupación, mascotas, método de pago o responsable de una reserva no
   importada de Directo o del sitio público, y las notas de una de cualquier
-  canal. Si cambia la estancia, el precio se recalcula con la configuración de
-  hoy y se guarda el total mostrado.
+  canal. Si cambian las fechas, el precio se recalcula con la configuración de
+  hoy y se guarda el total mostrado. Si solo cambia la ocupación o las
+  mascotas y los precios de la reserva cambiaron desde que se reservó, la
+  preparación no firma: `faltan` trae `campo: precio` con la pregunta y sus
+  cifras, y el anfitrión elige `precio: recalcular` (precios de hoy) o
+  `precio: mantener` (no se toca el dinero; un cargo aparte se añade a mano
+  en Booked). El asistente nunca elige por él. Una reserva completada,
+  cancelada o no-show tiene el precio cerrado: su ocupación se corrige sin
+  tocar el dinero y sus fechas no se mueven. Requiere el
+  [PR #884](https://github.com/ruizbjaime/booked/pull/884) de Booked.
 - **Cambiar el estado** (`preparar_cambio_de_estado_de_reserva` →
   `cambiar_estado_de_reserva`): confirmar, volver a pendiente, no-show,
   reconfirmar, reactivar o reabrir, en cualquier canal. Cancelar sigue siendo
@@ -447,7 +455,11 @@ lo lee ni lo escribe.
   terminada: `preparar_edicion_de_conjunto` lo devuelve como impedimento, sin
   firma, y nombra `preparar_edicion_de_reserva` para una cabaña sola; la
   ocupación sí se cambia, preparando sin fechas. Requiere el
-  [PR #878](https://github.com/ruizbjaime/booked/pull/878) de Booked.
+  [PR #878](https://github.com/ruizbjaime/booked/pull/878) de Booked. Al
+  cambiar solo la ocupación, `preparar_edicion_de_conjunto` hace la misma
+  pregunta de `precio` que una reserva, una sola por guardado y solo para las
+  cabañas cuyos precios cambiaron
+  ([PR #884](https://github.com/ruizbjaime/booked/pull/884)).
 
 Escribir requiere «Reservas de conjunto» (`groups:manage`) con «Propiedades»,
 «Reservas» y «Cotizar estancias»; cobrar, además «Importes y pagos».
@@ -574,7 +586,7 @@ Treinta y tres herramientas escriben, y cada una lleva su permiso en Booked:
 | `eliminar_reserva` | Eliminar reservas | Archiva una reserva ya cancelada y sin retención. |
 | `registrar_retencion_o_devolucion` | Retener o devolver pagos de cancelaciones (`bookings:settle_cancellation`) | Registra, tras preparar y confirmar, si el anfitrión retiene o devuelve lo cobrado de una reserva cancelada o no presentada, o el neto que liquidó el canal; en un conjunto cancelado, retiene todo lo retenible de sus cabañas; no transfiere dinero. |
 | `convertir_bloqueo_en_reserva` | Convertir bloqueos en reservas | Convierte en reserva un bloqueo importado de Airbnb, Booking.com o VRBO. |
-| `editar_reserva` | Editar reservas (`bookings:update`) | Cambia fechas, ocupación, mascotas, método de pago o responsable de una reserva no importada de Directo o del sitio público, o las notas de una de cualquier canal, tras preparar y confirmar; re-precia con la configuración de hoy. |
+| `editar_reserva` | Editar reservas (`bookings:update`) | Cambia fechas, ocupación, mascotas, método de pago o responsable de una reserva no importada de Directo o del sitio público, o las notas de una de cualquier canal, tras preparar y confirmar; re-precia con la configuración de hoy o, si los precios cambiaron y no se mueven las fechas, según elija el anfitrión entre recalcular y mantener. |
 | `marcar_cambio_revisado` | Editar reservas (`bookings:update`) | Cierra un aviso de `cambios_por_revisar` tras confirmación explícita; no aplica ni deshace el cambio. |
 | `cambiar_estado_de_reserva` | Cambiar el estado de reservas (`bookings:transition`) | Confirma, devuelve a pendiente, marca no-show, reconfirma, reactiva o reabre una reserva de cualquier canal tras preparar y confirmar; no cancela ni hace check-in o salida. |
 | `registrar_pago_de_reserva` | Registrar pagos (`bookings:register_payment`) | Registra un pago ya recibido en una reserva de cualquier canal con compromiso de pago en Booked tras preparar y confirmar; no mueve dinero. |
@@ -582,7 +594,7 @@ Treinta y tres herramientas escriben, y cada una lleva su permiso en Booked:
 | `agregar_acompanantes_a_reserva` | Agregar acompañantes (`guests:write`) | Agrega acompañantes con su documento a una reserva, todos o ninguno, tras preparar y confirmar; los crea en la libreta y los precarga en la autogestión, sin avisar al huésped ni cambiar el precio. |
 | `anular_pago` | Anular pagos (`bookings:void_payment`) | Anula, con motivo y tras preparar y confirmar, un pago o una devolución registrados por error y su recibo; no mueve dinero. |
 | `crear_reserva_de_conjunto` | Reservas de conjunto (`groups:manage`) | Crea una reserva pendiente por cabaña de un conjunto, todas o ninguna, tras preparar y confirmar; no registra pagos. |
-| `editar_conjunto` | Reservas de conjunto (`groups:manage`) | Mueve las fechas o cambia la ocupación de todas las cabañas de una estancia de conjunto a la vez, re-preciando cada una, tras preparar y confirmar; no mueve fechas con una cabaña en estancia o terminada. |
+| `editar_conjunto` | Reservas de conjunto (`groups:manage`) | Mueve las fechas o cambia la ocupación de todas las cabañas de una estancia de conjunto a la vez, re-preciando cada una —o manteniendo el precio de las que el anfitrión elija mantener—, tras preparar y confirmar; no mueve fechas con una cabaña en estancia o terminada. |
 | `cambiar_estado_de_conjunto` | Reservas de conjunto (`groups:manage`) | Cambia el estado de todas las cabañas de un conjunto a la vez, cancelar incluido, todo o nada, tras preparar y confirmar. |
 | `registrar_pago_de_conjunto` | Reservas de conjunto (`groups:manage`) | Registra un pago ya recibido por todo el conjunto, repartido entre sus cabañas, tras preparar y confirmar; no mueve dinero. |
 | `convertir_solicitud_en_cotizacion` | Gestionar solicitudes (`inquiries:manage`) | Convierte una solicitud pendiente del sitio en una cotización borrador con el precio que eligió el anfitrión tras preparar y confirmar; no retiene noches ni envía nada. |
