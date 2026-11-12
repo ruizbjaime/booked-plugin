@@ -3,6 +3,36 @@
 Cada versión publicada actualiza los manifiestos de los tres paquetes y las
 entradas del marketplace de Claude, y lleva un tag `vX.Y.Z`.
 
+## 0.22.0 — 2026-11-12
+
+- La skill enseña a mantener o recalcular el precio al corregir una reserva.
+  Cuando `preparar_edicion_de_reserva` cambia la ocupación o las mascotas sin
+  mover las fechas y los precios de esa reserva cambiaron desde que se
+  reservó, la preparación no firma y `faltan` trae `campo: precio` con una
+  pregunta y sus cifras (total actual y con los precios de hoy, lo que vale
+  la corrección sola y, cuando difieren, comisión de la plataforma y pago al
+  anfitrión; sin «Importes y pagos», sin cifras). La skill se la lee entera
+  al anfitrión y vuelve a preparar con `precio: recalcular` o
+  `precio: mantener`; nunca elige por él ni envía `precio` sin que se pida.
+  `mantener` no toca el dinero y un cargo aparte se añade a mano en Booked.
+  Si la corrección no se puede recalcular hoy, la pregunta ofrece solo
+  mantener, con el motivo. Requiere el
+  [PR #884](https://github.com/ruizbjaime/booked/pull/884) de Booked.
+- Una reserva completada, cancelada o no-show tiene el precio cerrado: la
+  skill sabe que corregir su ocupación no pregunta ni toca el dinero, que
+  llega un solo aviso y que sus fechas no se mueven (una cancelada se
+  reactiva primero). El rechazo de las fechas llega en `errores`.
+- `preparar_edicion_de_conjunto` hace la misma pregunta al cambiar solo la
+  ocupación: una por guardado, que nombra las cabañas cuyos precios cambiaron
+  y da el total del conjunto si se recalcula y si se mantiene; las demás
+  cabañas se calculan como siempre.
+- Si `editar_reserva` o `editar_conjunto` responden que cambió —también
+  porque los precios se movieron entre preparar y confirmar—, la skill
+  prepara de nuevo sin `precio` y repite la pregunta.
+- La skill recoge además que una reserva con importes declarados los conserva
+  al corregir la ocupación, con su aviso
+  ([PR #883](https://github.com/ruizbjaime/booked/pull/883)).
+
 ## 0.21.0 — 2026-11-11
 
 - La skill enseña el gasto de mano de obra ocasional: cada gasto de `gastos`

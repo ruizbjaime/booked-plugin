@@ -885,18 +885,66 @@ antes de reintentar; un pago, además, se recupera con su `operacion_id`.
 - **Editar** (`preparar_edicion_de_reserva` → `editar_reserva`): fechas,
   ocupación, mascotas, método de pago o contacto responsable, solo en
   reservas no importadas de Directo o del sitio público; las notas se editan
-  en cualquier canal, también en una de Booking o Airbnb. Si cambian fechas,
-  ocupación o mascotas, el precio se recalcula con la configuración de hoy y
-  así se guarda: compara `antes` y `despues` y lee los avisos (un segmento ya
-  pagado que se mueve, cargos a mano). Una cabaña de un conjunto se edita sola
-  aquí si el token alcanza el conjunto entero; mover el conjunto entero es
-  `preparar_edicion_de_conjunto`, y su responsable se cambia en Booked. Las
+  en cualquier canal, también en una de Booking o Airbnb. Si cambian las
+  fechas, el precio se recalcula siempre con la configuración de hoy y así se
+  guarda: compara `antes` y `despues` y lee los avisos (un segmento ya pagado
+  que se mueve, cargos a mano). Si solo cambian la ocupación o las mascotas,
+  vale la regla de «Mantener o recalcular el precio», más abajo: puede que
+  `faltan` pida `precio`, y eso lo decide Jaime. Una cabaña de un conjunto se
+  edita sola aquí si el token alcanza el conjunto entero; mover el conjunto
+  entero es `preparar_edicion_de_conjunto`, y su responsable se cambia en
+  Booked. Las
   fechas límite de pago no se editan aquí: van por «Mover los plazos de pago».
   Una reserva convertida de una cotización con cupo excepcional trae
   `cupo_excepcional`, mientras supere la capacidad publicada de hoy, en el
   `detalle` de `ver_reserva` y en `antes` y `despues` de la preparación: el
   grupo puede mantenerse o bajar, nunca superarlo. Editar una reserva no
   concede cupo; se acuerda al cotizar.
+
+  **Mantener o recalcular el precio.** Al corregir la ocupación o las
+  mascotas sin mover las fechas, Booked mira si los precios de esa reserva
+  cambiaron desde que se reservó (tarifas, cargos, descuentos o la comisión
+  de la plataforma):
+  - **No cambiaron:** recalcula como siempre y lo ves en `antes` y `despues`.
+  - **Cambiaron:** la preparación no firma y `faltan` trae `campo: precio`
+    con una `pregunta`. Léesela **entera** a Jaime, con sus cifras: el total
+    actual y el de los precios de hoy, lo que vale la corrección sola y,
+    cuando difieren, la comisión de la plataforma y el pago al anfitrión. Sin
+    «Importes y pagos» la pregunta llega sin cifras: dilo así. Si solo
+    cambió la comisión, los dos totales coinciden y la elección sigue siendo
+    real. Con su respuesta, vuelve a preparar con lo mismo y
+    `precio: recalcular` o `precio: mantener`. Esa respuesta no es el sí: la
+    nueva preparación trae el resumen, su aviso y la `firma`; léeselos y
+    espera la confirmación como siempre.
+  - **Nunca lo elijas tú ni lo supongas**, y no envíes `precio` si `faltan` no
+    lo pidió: se ignora (con un aviso cuando la edición toca la estancia).
+  - **Solo cabe mantener:** si con los precios de hoy la corrección no se
+    puede recalcular (una noche sin precio, por ejemplo), la pregunta lo dice
+    con su motivo y trae solo el total actual. Léeselo y envía
+    `precio: mantener` solo si Jaime lo acepta; `recalcular` ahí solo repite
+    la pregunta. Si prefiere recalcular, Jaime corrige antes los precios en
+    Booked y preparas de nuevo.
+  - **`mantener` no toca el dinero:** el total, los cargos, los descuentos y
+    la comisión quedan como están, aunque haya una persona más. Si el cambio
+    se cobra o se devuelve aparte, Jaime añade el cargo o el descuento a mano
+    en Booked; díselo. No existe «cobrar la corrección al precio de antes»:
+    no lo ofrezcas. Los precios siguen cambiados, así que la próxima
+    corrección de esa reserva volverá a preguntar.
+  - **Precio cerrado:** una reserva completada, cancelada o no-show ya no
+    cambia de precio. Corregir su ocupación no pregunta ni toca el dinero, y
+    un solo aviso lo dice. Sus fechas no se mueven: la preparación lo rechaza
+    en `errores` (campo `llegada` o `salida`), sin firma, con el motivo;
+    léeselo. Una cancelada se reactiva primero, y al reactivarla se
+    recalcula.
+  - **Importes declarados:** una reserva en la que Jaime declaró lo que pagó
+    el huésped normalmente los conserva sin preguntar y un aviso lo dice; si
+    mueve las fechas, se descartan y vuelve al precio calculado, también con
+    aviso.
+  - **Si `editar_reserva` responde que cambió** —también porque los precios
+    se movieron otra vez entre preparar y confirmar—, no guardó nada: prepara
+    de nuevo **sin** `precio`. Si `faltan` vuelve a pedirlo, repite a Jaime
+    la pregunta con las cifras nuevas; si no, lee el resumen nuevo y espera
+    el sí.
 - **Cambiar el estado** (`preparar_cambio_de_estado_de_reserva` →
   `cambiar_estado_de_reserva`): sin `accion` devuelve `acciones_posibles`
   —confirmar, volver a pendiente, no-show, reconfirmar, reactivar (re-precia
@@ -1007,18 +1055,39 @@ perdida, `ver_reserva_de_conjunto`:
 
 - **Mover o cambiar la ocupación** (`preparar_edicion_de_conjunto` →
   `editar_conjunto`): nuevas fechas para todas las cabañas, o la ocupación de
-  varias. Cada cabaña se re-precia con la configuración de hoy: lee antes y
-  después por cabaña y en total. Solo si todas son no importadas de Directo o
-  del sitio público. Una cabaña cancelada o no-show queda fuera: no se mueve
+  varias. Si se mueven las fechas, cada cabaña se re-precia con la
+  configuración de hoy: lee antes y después por cabaña y en total. Si solo
+  cambia la ocupación, vale cabaña por cabaña la regla de «Mantener o
+  recalcular el precio» de una reserva: cuando los precios de alguna
+  cambiaron desde que se reservó, la preparación no firma y `faltan` trae
+  `campo: precio` con **una sola** pregunta que nombra esas cabañas, sus
+  cifras y el total del conjunto si se recalcula y si se mantiene. Léesela
+  entera a Jaime y vuelve a preparar con `precio: recalcular` o `precio:
+  mantener`: la respuesta es una para todo el guardado y solo alcanza a las
+  cabañas nombradas; las demás se calculan como siempre. Si alguna de ellas
+  no se puede recalcular hoy, solo cabe mantener en todas las nombradas: la
+  pregunta dice en cuál y por qué, y da el total actual y el del conjunto si
+  se mantiene. Nunca lo elijas tú ni envíes `precio` sin que `faltan` lo
+  pida. Cada cabaña trae como mucho un aviso sobre su precio (mantenido por
+  elección o como única opción, recalculado por elección, cerrado por su
+  estado si está completada, importes declarados conservados o
+  descartados); aparte pueden venir el de cargos a mano y el de un segmento
+  ya pagado. Solo si todas son no importadas de Directo o del sitio
+  público. Una cabaña cancelada o no-show queda fuera: no se mueve
   ni se re-precia, y la preparación lo avisa. Las fechas no se mueven si una
   cabaña que sigue en la estancia ya tiene el check-in hecho o la estancia
   terminada: la preparación lo dice en `impedimentos`, nombrando esas
   cabañas, y no firma. Léeselo a Jaime sin insistir con otras fechas: la
   ocupación del conjunto sí se cambia aquí, preparando de nuevo sin `llegada`
   ni `salida`, y una cabaña sola se intenta con `preparar_edicion_de_reserva`
-  y su `reserva_id`. Si una cabaña entra en estancia después de preparar,
-  `editar_conjunto` lo rechaza como cambiado y no mueve ninguna: consulta
-  `ver_reserva_de_conjunto` y prepara de nuevo.
+  y su `reserva_id` (una ya completada tampoco mueve sus fechas por esa vía:
+  tiene el precio cerrado). No nombres en `cabanas` una cabaña cancelada o
+  no-show: es un impedimento; su ocupación se corrige con
+  `preparar_edicion_de_reserva`. Si una cabaña entra en estancia después de
+  preparar, `editar_conjunto` lo rechaza como cambiado y no mueve ninguna: consulta
+  `ver_reserva_de_conjunto` y prepara de nuevo. Lo mismo si los precios se
+  movieron otra vez entre preparar y confirmar: prepara sin `precio` y, si
+  `faltan` vuelve a pedirlo, repite la pregunta.
 - **Cambiar el estado** (`preparar_cambio_de_estado_de_conjunto` →
   `cambiar_estado_de_conjunto`): las mismas acciones que una reserva, más
   cancelar (solo cabañas no importadas de Directo o del sitio público). Las
