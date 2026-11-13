@@ -3,6 +3,18 @@
 Cada versión publicada actualiza los manifiestos de los tres paquetes y las
 entradas del marketplace de Claude, y lleva un tag `vX.Y.Z`.
 
+## 0.23.0 — 2026-11-12
+
+- La skill enseña que la estadía mínima se avisa y no frena una cotización:
+  si `cotizar` trae `avisos.estadia_minima`, se le dice a Jaime antes del
+  mensaje («esa estadía pide 5 noches mínimas y son 3»), se ofrece cotizar el
+  mínimo y el mensaje se entrega igual; la excepción la deciden
+  `preparar_cotizacion` o `preparar_reserva_manual` antes de guardar. En
+  Airbnb o Booking un null no significa que se cumpla: Booked no la comprueba
+  ahí, y se dice. En `cotizar_conjunto` el aviso mide solo la `propuesta`;
+  una alternativa se mide cotizando su `reparto`. Requiere el
+  [PR #889](https://github.com/ruizbjaime/booked/pull/889) de Booked.
+
 ## 0.22.0 — 2026-11-12
 
 - La skill enseña a mantener o recalcular el precio al corregir una reserva.
