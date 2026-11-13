@@ -3,6 +3,19 @@
 Cada versión publicada actualiza los manifiestos de los tres paquetes y las
 entradas del marketplace de Claude, y lleva un tag `vX.Y.Z`.
 
+## 0.24.0 — 2026-11-13
+
+- La skill enseña a añadir una cabaña a un conjunto ya reservado con
+  `preparar_adicion_de_cabana_a_conjunto` → `agregar_cabana_a_conjunto`: una
+  reserva nueva en una propiedad del grupo, con el precio de hoy y la misma
+  proporción de anticipo del conjunto, sin tocar las demás cabañas. Entra
+  pendiente y se confirma en el mismo acto si las otras están confirmadas y
+  el tramo sigue cubierto; si un tramo vuelve a quedar debido con su fecha
+  límite vencida, la fecha nueva se le pregunta a Jaime y se aplica a todas
+  las cabañas. Una cabaña cancelada se reactiva en vez de añadirse, y quitar
+  una es cancelarla. Requiere el
+  [PR #888](https://github.com/ruizbjaime/booked/pull/888) de Booked.
+
 ## 0.23.0 — 2026-11-12
 
 - La skill enseña que la estadía mínima se avisa y no frena una cotización:

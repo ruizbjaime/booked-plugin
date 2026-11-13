@@ -1,8 +1,8 @@
 # Booked para Claude y ChatGPT
 
 Los paquetes conectan al servidor MCP de
-[Booked](https://booked.fincasdelavilla.com) —ciento seis herramientas sobre
-propiedades, reservas, contactos, calendario y dinero, treinta y tres de ellas de escritura— e
+[Booked](https://booked.fincasdelavilla.com) —ciento ocho herramientas sobre
+propiedades, reservas, contactos, calendario y dinero, treinta y cuatro de ellas de escritura— e
 incluyen una skill con las reglas de negocio que no caben en la descripción de
 una herramienta.
 
@@ -140,8 +140,10 @@ En el repositorio de la aplicación, con el soporte OAuth y los cambios del
    y `posibles_duplicados` ([PR #792](https://github.com/ruizbjaime/booked/pull/792)),
    `conceder_compensatorio` ([PR #804](https://github.com/ruizbjaime/booked/pull/804))
    y `preparar_conversion_de_solicitud_en_reserva` y `convertir_solicitud_en_reserva`
-   ([PR #818](https://github.com/ruizbjaime/booked/pull/818));
-   `tools/list` debe devolver las ciento seis en una sola página. Actualizar solo el plugin no
+   ([PR #818](https://github.com/ruizbjaime/booked/pull/818)), y
+   `preparar_adicion_de_cabana_a_conjunto` y `agregar_cabana_a_conjunto`
+   ([PR #888](https://github.com/ruizbjaime/booked/pull/888));
+   `tools/list` debe devolver las ciento ocho en una sola página. Actualizar solo el plugin no
    incorpora estas herramientas ni sus permisos al backend.
 
 El registro dinámico permite HTTPS en `chatgpt.com`, `chat.openai.com`,
@@ -460,6 +462,14 @@ lo lee ni lo escribe.
   pregunta de `precio` que una reserva, una sola por guardado y solo para las
   cabañas cuyos precios cambiaron
   ([PR #884](https://github.com/ruizbjaime/booked/pull/884)).
+- **Añadir una cabaña:** `preparar_adicion_de_cabana_a_conjunto` →
+  `agregar_cabana_a_conjunto` crea una reserva nueva dentro de un conjunto ya
+  reservado, en una propiedad de su grupo, con el precio de hoy y la misma
+  proporción de anticipo del conjunto; las demás cabañas no cambian. Si con
+  ella un tramo vuelve a quedar debido con su fecha límite vencida, la
+  preparación pide una fecha nueva al anfitrión para todas las cabañas.
+  Quitar una cabaña es cancelar su reserva. Requiere el
+  [PR #888](https://github.com/ruizbjaime/booked/pull/888) de Booked.
 
 Escribir requiere «Reservas de conjunto» (`groups:manage`) con «Propiedades»,
 «Reservas» y «Cotizar estancias»; cobrar, además «Importes y pagos».
@@ -543,7 +553,7 @@ actualizar el plugin no concede permisos.
 
 ## Lectura y escritura
 
-Setenta y tres herramientas solo leen. `cotizar` y `cotizar_conjunto` calculan un
+Setenta y cuatro herramientas solo leen. `cotizar` y `cotizar_conjunto` calculan un
 precio; no apartan fechas. Si la estancia no cumple la estadía mínima, el
 asistente lo avisa antes del mensaje y cotiza igual: la excepción se acepta al
 guardar la cotización o crear la reserva. Requiere el
@@ -570,7 +580,7 @@ requiere `properties:read` y `bookings:read`, y sí respeta esa lista.
   no la lista de acompañantes. Una reserva pendiente o confirmada no prueba
   presencia física.
 
-Treinta y tres herramientas escriben, y cada una lleva su permiso en Booked:
+Treinta y cuatro herramientas escriben, y cada una lleva su permiso en Booked:
 
 | Herramienta | Permiso | Qué hace |
 | --- | --- | --- |
@@ -600,6 +610,7 @@ Treinta y tres herramientas escriben, y cada una lleva su permiso en Booked:
 | `editar_conjunto` | Reservas de conjunto (`groups:manage`) | Mueve las fechas o cambia la ocupación de todas las cabañas de una estancia de conjunto a la vez, re-preciando cada una —o manteniendo el precio de las que el anfitrión elija mantener—, tras preparar y confirmar; no mueve fechas con una cabaña en estancia o terminada. |
 | `cambiar_estado_de_conjunto` | Reservas de conjunto (`groups:manage`) | Cambia el estado de todas las cabañas de un conjunto a la vez, cancelar incluido, todo o nada, tras preparar y confirmar. |
 | `registrar_pago_de_conjunto` | Reservas de conjunto (`groups:manage`) | Registra un pago ya recibido por todo el conjunto, repartido entre sus cabañas, tras preparar y confirmar; no mueve dinero. |
+| `agregar_cabana_a_conjunto` | Reservas de conjunto (`groups:manage`) | Crea, tras preparar y confirmar, la reserva de una cabaña nueva dentro de un conjunto ya reservado, con el precio de hoy y su parte del anticipo, y aplica a todas las cabañas las fechas límite nuevas que dio el anfitrión; no avisa al huésped ni registra pagos. |
 | `convertir_solicitud_en_cotizacion` | Gestionar solicitudes (`inquiries:manage`) | Convierte una solicitud pendiente del sitio en una cotización borrador con el precio que eligió el anfitrión tras preparar y confirmar; no retiene noches ni envía nada. |
 | `convertir_solicitud_en_reserva` | Gestionar solicitudes (`inquiries:manage`), Cambiar el estado de cotizaciones (`quotations:transition`) y Convertir cotizaciones en reservas (`quotations:convert`) | Convierte una solicitud pendiente de una propiedad o de un conjunto directo en reserva pendiente, una por cabaña en un conjunto, tras preparar y confirmar: crea la cotización, la acepta y la convierte, todo o nada; retiene las noches y no envía nada. |
 | `descartar_solicitud` | Gestionar solicitudes (`inquiries:manage`) | Descarta una solicitud pendiente tras preparar sin firma y recibir confirmación explícita; es definitivo y borra después los datos de quien la envió. |
@@ -644,8 +655,8 @@ Las reservas se preparan antes con una herramienta que no escribe
 `preparar_cambio_de_estado_de_reserva`, `preparar_pago_de_reserva`,
 `preparar_anulacion_de_pago`, `preparar_reserva_de_conjunto`,
 `preparar_edicion_de_conjunto`, `preparar_cambio_de_estado_de_conjunto`,
-`preparar_pago_de_conjunto`, `preparar_conversion_de_solicitud`,
-`preparar_cambio_de_plazos_de_pago`, `preparar_acompanantes_de_reserva`): devuelve un resumen y una firma de un solo
+`preparar_pago_de_conjunto`, `preparar_adicion_de_cabana_a_conjunto`,
+`preparar_conversion_de_solicitud`, `preparar_cambio_de_plazos_de_pago`, `preparar_acompanantes_de_reserva`): devuelve un resumen y una firma de un solo
 uso, válida hasta treinta minutos, y el agente solo ejecuta tras leer el resumen
 y recibir el sí explícito del anfitrión. Cancelar y archivar una reserva son
 acciones separadas, cada una con su propia preparación y confirmación.
