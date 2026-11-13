@@ -544,7 +544,10 @@ actualizar el plugin no concede permisos.
 ## Lectura y escritura
 
 Setenta y tres herramientas solo leen. `cotizar` y `cotizar_conjunto` calculan un
-precio; no apartan fechas. `ver_reserva` trae además `detalle` (fechas,
+precio; no apartan fechas. Si la estancia no cumple la estadía mínima, el
+asistente lo avisa antes del mensaje y cotiza igual: la excepción se acepta al
+guardar la cotización o crear la reserva. Requiere el
+[PR #889](https://github.com/ruizbjaime/booked/pull/889) de Booked. `ver_reserva` trae además `detalle` (fechas,
 cancelación, edades, pagos, devoluciones, recibos y su conjunto) y
 `ver_propiedad`, `descripcion` (tipo, zona, amenidades, habitaciones y baños).
 
