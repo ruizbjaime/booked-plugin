@@ -5,11 +5,12 @@ description: "Gestiona las fincas de Jaime en Booked, aunque no se nombre el PMS
 
 # Booked — las fincas de Jaime
 
-Las herramientas `booked` leen el PMS de Fincas de la Villa, y treinta y tres
+Las herramientas `booked` leen el PMS de Fincas de la Villa, y treinta y cuatro
 de ellas escriben: editar los datos de una propiedad administrada, sincronizar
 ya sus calendarios con las plataformas y cerrar los avisos que deja, crear,
 editar y eliminar bloqueos manuales, crear una reserva directa, comisionada o
 de conjunto, editarla, cambiar su estado, cancelar o archivar una directa,
+añadir una cabaña a un conjunto ya reservado,
 agregarle acompañantes, registrar o anular sus pagos, mover sus plazos de
 pago, registrar la retención o devolución de lo cobrado en una reserva
 cancelada o la retención de un conjunto cancelado, convertir en reserva un
@@ -1116,6 +1117,35 @@ perdida, `ver_reserva_de_conjunto`:
 - **Mover los plazos de pago** (`preparar_cambio_de_plazos_de_pago` con
   `conjunto_id` → `cambiar_plazos_de_pago`): las mismas fechas para todas sus
   cabañas, como en una reserva.
+- **Añadir una cabaña** (`preparar_adicion_de_cabana_a_conjunto` →
+  `agregar_cabana_a_conjunto`): crea una reserva NUEVA dentro del conjunto,
+  en una propiedad de su grupo que nunca fue cabaña de él; no une una
+  reserva suelta que ya existe. Prepara con el id de
+  `ver_reserva_de_conjunto` en `conjunto_reserva_id`; sin `propiedad_id`,
+  `faltan` dice cuáles caben. Las fechas son por defecto las de la cabaña
+  principal; adultos, niños y edades los da Jaime. La cabaña nueva toma el
+  precio de hoy y, como parte del anticipo, la misma proporción que el
+  conjunto (anticipo ÷ total); las demás no recalculan su precio ni cambian
+  su parte. Entra pendiente y se confirma en el mismo acto si las otras están
+  confirmadas y el tramo sigue cubierto con ella (`se_confirma_al_guardar`).
+  Si con ella el anticipo o el saldo vuelven a quedar debidos y su fecha
+  límite ya pasó, `faltan` pide `nueva_fecha_limite` o
+  `nueva_fecha_limite_saldo`: pregúntasela a Jaime, nunca la propongas; se
+  aplica a todas las cabañas. Un anticipo ya pagado vuelve a pendiente: su
+  recibo se anula hasta completarlo o se reemite por lo pagado, y `recibos`
+  dice cuál. Una estadía bajo el mínimo
+  es una pregunta de `faltan`: `aceptar_estadia_minima: true` solo si Jaime
+  aceptó la excepción. Antes de pedir el sí lee el `resumen` —la cabaña
+  nueva, el conjunto antes y después, `fechas_limite` y `recibos`— y los
+  `avisos`; sin «Importes y pagos» no trae importes. Solo se añade mientras
+  todas las cabañas activas están pendientes o confirmadas, son no
+  importadas de Directo o del sitio público y llevan sus finanzas en Booked;
+  si no, un impedimento lo dice y se añade en la aplicación. Una cabaña que
+  quedó cancelada o no presentada en el conjunto se reactiva con
+  `preparar_cambio_de_estado_de_reserva` (`reactivar`), no se añade de nuevo; quitar una
+  es cancelar su reserva. No avisa al huésped ni registra pagos. Ante una
+  respuesta perdida, `ver_reserva_de_conjunto` antes de preparar de nuevo;
+  nunca reintentes con la misma firma.
 
 Ver conjuntos requiere «Propiedades» (`properties:read`); ver una estancia,
 «Reservas» (`bookings:read`); cotizar, además «Cotizar estancias»
