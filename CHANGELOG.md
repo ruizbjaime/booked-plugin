@@ -3,6 +3,26 @@
 Cada versión publicada actualiza los manifiestos de los tres paquetes y las
 entradas del marketplace de Claude, y lleva un tag `vX.Y.Z`.
 
+## 0.26.0 — 2026-11-15
+
+- `cambios_por_revisar` trae un aviso nuevo, `posible_doble_reserva`: la
+  plataforma vendió noches que una reserva ya ocupa en Booked y no se importó.
+  La skill enseña a contarlo primero, con `fechas_remotas` frente a
+  `fechas_en_booked` y `estado_en_booked`, a no cancelar ni mover nada que
+  Jaime no pida, a llevar la cabaña de un conjunto por el conjunto y a
+  cerrarlo con `marcar_cambio_revisado` cuando esté resuelto. Requiere el
+  [PR #905](https://github.com/ruizbjaime/booked/pull/905) de Booked.
+- `obligaciones_por_pagar` reparte los gastos con vencimiento en `vencido`,
+  `proximos` y `despues`; `causado_sin_pagar` y `gastos.pendiente` quedan solo
+  para los que no tienen fecha y `gastos.total` es todo lo de gastos.
+  `gastos_recurrentes` trae `cada_meses`, `mes_ancla` y `dia_vencimiento`
+  por plantilla; la skill aclara que Booked no causa el gasto solo y que
+  `constantes_activas` no es un costo mensual. Requiere el
+  [PR #910](https://github.com/ruizbjaime/booked/pull/910) de Booked.
+- Los recibos de `ver_reserva` traen la `url` de su página en el panel, también
+  los anulados; la skill manda a usarla tal cual. Requiere el
+  [PR #902](https://github.com/ruizbjaime/booked/pull/902) de Booked.
+
 ## 0.25.0 — 2026-11-14
 
 - La skill enseña a convertir una reserva o una cotización individual en
