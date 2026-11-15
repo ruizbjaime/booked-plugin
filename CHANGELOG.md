@@ -3,6 +3,22 @@
 Cada versión publicada actualiza los manifiestos de los tres paquetes y las
 entradas del marketplace de Claude, y lleva un tag `vX.Y.Z`.
 
+## 0.25.0 — 2026-11-14
+
+- La skill enseña a convertir una reserva o una cotización individual en
+  conjunto con `preparar_conversion_de_reserva_a_conjunto` →
+  `convertir_reserva_a_conjunto` y `preparar_conversion_de_cotizacion_a_conjunto`
+  → `convertir_cotizacion_a_conjunto`: la cabaña original conserva fechas,
+  huéspedes y precio y se suma una cabaña del mismo conjunto con el precio de
+  hoy. En una reserva, pagos y registros de huéspedes pasan al conjunto y el
+  enlace individual de registro deja de funcionar; una cotización solo se
+  convierte en borrador. Requiere el
+  [PR #897](https://github.com/ruizbjaime/booked/pull/897) de Booked.
+- La regla 12 cubre también la estadía máxima: `avisos.estadia_minima` trae
+  `maximo` y aparece si la estadía se pasa del tope; las preparaciones dan
+  `estadia_maxima`. Requiere el
+  [PR #894](https://github.com/ruizbjaime/booked/pull/894) de Booked.
+
 ## 0.24.0 — 2026-11-13
 
 - La skill enseña a añadir una cabaña a un conjunto ya reservado con

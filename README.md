@@ -142,8 +142,12 @@ En el repositorio de la aplicación, con el soporte OAuth y los cambios del
    y `preparar_conversion_de_solicitud_en_reserva` y `convertir_solicitud_en_reserva`
    ([PR #818](https://github.com/ruizbjaime/booked/pull/818)), y
    `preparar_adicion_de_cabana_a_conjunto` y `agregar_cabana_a_conjunto`
-   ([PR #888](https://github.com/ruizbjaime/booked/pull/888));
-   `tools/list` debe devolver las ciento ocho en una sola página. Actualizar solo el plugin no
+   ([PR #888](https://github.com/ruizbjaime/booked/pull/888)), y
+   `preparar_conversion_de_reserva_a_conjunto`, `convertir_reserva_a_conjunto`,
+   `preparar_conversion_de_cotizacion_a_conjunto` y
+   `convertir_cotizacion_a_conjunto`
+   ([PR #897](https://github.com/ruizbjaime/booked/pull/897));
+   `tools/list` debe devolver las ciento doce en una sola página. Actualizar solo el plugin no
    incorpora estas herramientas ni sus permisos al backend.
 
 El registro dinámico permite HTTPS en `chatgpt.com`, `chat.openai.com`,
