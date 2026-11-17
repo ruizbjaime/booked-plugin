@@ -3,6 +3,18 @@
 Cada versión publicada actualiza los manifiestos de los tres paquetes y las
 entradas del marketplace de Claude, y lleva un tag `vX.Y.Z`.
 
+## 0.27.0 — 2026-11-16
+
+- La conversión de una cotización individual en conjunto suma una o varias
+  cabañas nuevas: `preparar_conversion_de_cotizacion_a_conjunto` recibe
+  `cabanas` (cada una `{propiedad_id, adultos, ninos, edades_ninos}`) en
+  lugar de la cabaña suelta, y la original conserva su precio. Un borrador
+  vencido pide `valida_hasta` y la herramienta ya no acepta
+  `nueva_fecha_limite`. La conversión de una reserva no cambia: una cabaña.
+  La skill explica qué se puede convertir, que la preparación dice la causa
+  concreta cuando no, y cómo leer el `resumen` de varias líneas. Requiere el
+  [PR #929](https://github.com/ruizbjaime/booked/pull/929) de Booked.
+
 ## 0.26.0 — 2026-11-15
 
 - `cambios_por_revisar` trae un aviso nuevo, `posible_doble_reserva`: la
