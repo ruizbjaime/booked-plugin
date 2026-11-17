@@ -445,7 +445,8 @@ lo lee ni lo escribe.
 
 - **Consultar:** `ver_conjuntos` y `ver_reserva_de_conjunto`.
 - **Reservar sin cotización:** `cotizar_conjunto` propone el reparto más
-  barato entre las cabañas libres, o cotiza el que dicte el anfitrión;
+  barato entre las cabañas libres, o cotiza el que dicte el anfitrión, con
+  las mascotas por cabaña;
   `preparar_reserva_de_conjunto` recibe ese `reparto_para_cotizar` y pregunta
   huésped, método y compromiso de pago una sola vez; `crear_reserva_de_conjunto`,
   tras el sí, crea una reserva pendiente por cabaña, todas o ninguna.
@@ -592,7 +593,7 @@ Treinta y cuatro herramientas escriben, y cada una lleva su permiso en Booked:
 | `cambiar_estado_de_cotizacion` | Cambiar el estado de cotizaciones (`quotations:transition`) | Marca una cotización como enviada, aceptada o rechazada, o la devuelve a borrador, tras preparar y confirmar; no envía nada al huésped. |
 | `editar_cotizacion` | Editar cotizaciones (`quotations:update`) | Corrige un borrador, también las fechas y el reparto de uno de conjunto, tras preparar y confirmar, recalculando el precio como la ficha; no reserva noches. |
 | `convertir_cotizacion_en_reserva` | Convertir cotizaciones en reservas (`quotations:convert`) | Convierte una cotización aceptada en una reserva pendiente con su precio tras preparar y confirmar; retiene las noches y no registra pagos. |
-| `editar_propiedad` | Editar propiedades (`properties:update`) | Cambia nombre, ciudad, dirección, horarios o capacidad de una propiedad administrada tras preparar, mostrar antes y después y recibir confirmación explícita; no toca precios ni canales. |
+| `editar_propiedad` | Editar propiedades (`properties:update`) | Cambia nombre, ciudad, dirección, horarios, capacidad o si acepta mascotas de una propiedad administrada tras preparar, mostrar antes y después y recibir confirmación explícita; no toca precios ni canales. |
 | `sincronizar_calendarios` | Sincronizar calendarios (`blocks:sync`) | Importa ya los calendarios iCal de las plataformas, solo a petición; puede crear o quitar bloqueos importados y cambiar o cancelar reservas sincronizadas. El resultado se consulta con `estado_de_sincronizacion`. |
 | `crear_bloqueo` | Crear bloqueos | Bloquea noches de una propiedad administrada. |
 | `editar_bloqueo` | Editar bloqueos (`blocks:update`) | Cambia las fechas o las notas de un bloqueo manual tras preparar sin firma, mostrar cómo quedará y recibir confirmación explícita; si las fechas se cruzan con otra ocupación no cambia nada; nunca uno importado. |

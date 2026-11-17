@@ -3,6 +3,22 @@
 Cada versión publicada actualiza los manifiestos de los tres paquetes y las
 entradas del marketplace de Claude, y lleva un tag `vX.Y.Z`.
 
+## 0.28.0 — 2026-11-17
+
+- Las mascotas de un conjunto van por cabaña. `cotizar_conjunto` acepta
+  `reparto.*.mascotas` y las cobra con la tarifa de cada cabaña; con mascotas
+  y sin reparto, `faltan` pregunta en qué cabaña van. `reparto_para_cotizar`
+  trae `mascotas` por cabaña y entra tal cual en `preparar_cotizacion` y en
+  `preparar_reserva_de_conjunto`, que ahora las aceptan. Editar una cotización
+  de conjunto conserva las mascotas de una cabaña que no las manda y las quita
+  con `0`. Las solicitudes de conjunto del sitio traen sus mascotas por cabaña
+  y las conversiones las llevan.
+- `preparar_edicion_de_propiedad` edita `pets_allowed`: decide si el sitio
+  público pregunta por mascotas o avisa que no se admiten, y la amenidad
+  «Admite mascotas». No limita lo que el anfitrión registra en Booked.
+- Requiere el [PR #931](https://github.com/ruizbjaime/booked/pull/931) de
+  Booked.
+
 ## 0.27.0 — 2026-11-16
 
 - La conversión de una cotización individual en conjunto suma una o varias
