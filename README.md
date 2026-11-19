@@ -289,7 +289,8 @@ todas o ninguna. Una cotización puede llevar un cupo excepcional
 el anfitrión, que la reserva hereda al convertirla; la cabecera de una de
 conjunto cuenta en `cabanas_con_cupo_excepcional` cuántas cabañas lo llevan.
 Cada escritura requiere preparación, lectura del resumen, una firma de un
-solo uso y el sí explícito del anfitrión.
+solo uso (treinta minutos; salvo la del envío por correo, sin cruzar la
+medianoche) y el sí explícito del anfitrión.
 
 - **Cambiar el estado** (`preparar_cambio_de_estado_de_cotizacion` →
   `cambiar_estado_de_cotizacion`): enviar, aceptar, rechazar o volver a
