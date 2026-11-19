@@ -1,8 +1,8 @@
 # Booked para Claude y ChatGPT
 
 Los paquetes conectan al servidor MCP de
-[Booked](https://booked.fincasdelavilla.com) —ciento ocho herramientas sobre
-propiedades, reservas, contactos, calendario y dinero, treinta y cuatro de ellas de escritura— e
+[Booked](https://booked.fincasdelavilla.com) —120 herramientas sobre
+propiedades, reservas, contactos, calendario y dinero, con escrituras explícitas— e
 incluyen una skill con las reglas de negocio que no caben en la descripción de
 una herramienta.
 
@@ -123,7 +123,7 @@ En el repositorio de la aplicación, con el soporte OAuth y los cambios del
    servidor ofrece `ver_contactos`, `crear_contacto` y `eliminar_contacto`, y que
    `editar_bloqueo` y `eliminar_bloqueo` exigen firma y `confirmado: true`. Comprueba también que ofrece
    `preparar_cotizacion`, `crear_cotizacion` y `ver_cotizaciones`, con sus
-   tres flujos de gestión, las doce de análisis (de `huespedes_recurrentes`
+   flujos de gestión y las herramientas de análisis (de `huespedes_recurrentes`
    a `comparativo_interanual`), `gastos`, `gastos_de_nomina` e
    `informe_financiero`, `preparar_edicion_de_propiedad` con
    `editar_propiedad`, `sincronizar_calendarios` con
@@ -276,7 +276,8 @@ respuesta perdida, consulta `ver_cotizaciones` antes de repetir.
 ## Gestionar cotizaciones
 
 `ver_cotizaciones` lista las cotizaciones de una propiedad (administrada o
-comisionada) con filtros por propiedad, estado y número, o da el detalle de una:
+comisionada) con filtros por propiedad, estado, número y `seguimiento` de
+enviadas vigentes (`expiring` o `unanswered`), o da el detalle de una:
 desglose, destinatario, notas, `acciones_posibles` y si ya es una reserva. En
 una administrada de Directo para cliente final, `oferta_publica` trae el
 enlace a la ficha del sitio público y, si el sitio la cotiza más cara, el
@@ -286,14 +287,19 @@ editan fechas, reparto y notas, y convertirlas crea una reserva por cabaña,
 todas o ninguna. Una cotización puede llevar un cupo excepcional
 (`cupo_excepcional`): más huéspedes que la capacidad publicada, acordados por
 el anfitrión, que la reserva hereda al convertirla; la cabecera de una de
-conjunto cuenta en `cabanas_con_cupo_excepcional` cuántas cabañas lo llevan. Tres flujos escriben,
-cada uno con preparación, resumen, firma de un solo uso (treinta minutos, sin cruzar la
-medianoche) y el sí explícito del anfitrión:
+conjunto cuenta en `cabanas_con_cupo_excepcional` cuántas cabañas lo llevan.
+Cada escritura requiere preparación, lectura del resumen, una firma de un
+solo uso y el sí explícito del anfitrión.
 
 - **Cambiar el estado** (`preparar_cambio_de_estado_de_cotizacion` →
   `cambiar_estado_de_cotizacion`): enviar, aceptar, rechazar o volver a
   borrador. «Enviar» solo registra que el anfitrión la envió; Booked no manda
   nada al huésped. Rechazar es definitivo.
+- **Enviar por correo** (`preparar_envio_de_cotizacion` →
+  `enviar_cotizacion`). Solo a petición del anfitrión, para un borrador
+  vigente de venta directa. Tras leerle el destinatario y las consecuencias,
+  espera su confirmación explícita. Booked programa un correo real con el
+  PDF y el enlace y marca la cotización como enviada.
 - **Editar un borrador** (`preparar_edicion_de_cotizacion` →
   `editar_cotizacion`): fechas, vigencia, ocupación, descuentos y notas, y en
   comisionadas alojamiento, cargos y comisión. De un conjunto, fechas, el
@@ -314,7 +320,9 @@ habilitado `INTEGRATION_WRITES_ENABLED=true`. Emite un token aparte o vuelve a
 autorizar OAuth con «Cambiar el estado de cotizaciones» (`quotations:transition`),
 «Editar cotizaciones» (`quotations:update`) o «Convertir cotizaciones en
 reservas» (`quotations:convert`), además de «Cotizaciones» (`quotations:read`).
-Actualizar el plugin no concede estos permisos.
+El envío por correo requiere «Enviar cotizaciones por correo»
+(`quotations:send`) y «Consultar contactos» (`contacts:read`). Actualizar el
+plugin no concede estos permisos.
 
 ## Crear reservas comisionadas
 
@@ -530,6 +538,8 @@ y resultados sin paginar reservas ni sumar a mano:
 | `gastos` | Los gastos causados, uno por uno, y quién asume cada parte: anfitrión, propietario o tercero; de un gasto de mano de obra ocasional, a quién se pagó | Igual; el nombre de un trabajador de nómina, además «Nómina por trabajador» (`payroll:read`) |
 | `gastos_de_nomina` | El costo de nómina por concepto, quién lo asume, propiedad y mes | Igual; por trabajador, además «Nómina por trabajador» (`payroll:read`) |
 | `informe_financiero` | El informe del anfitrión o la liquidación de un propietario, con el detalle de cada línea y, si se pide, en Markdown | Igual; la nómina por trabajador, además `payroll:read` |
+| `libro_contable` | Los asientos activos por comienzo de reconocimiento, con cursor si hay más páginas | «Importes y pagos» |
+| `presupuesto_mensual` | Presupuesto frente al devengo real por categoría, con alcance sobre todo el informe | «Importes y pagos» |
 | `liquidacion_del_propietario` | El extracto mensual del propietario que el panel descarga en PDF: cada estancia entera en el mes en que empieza | «Importes y pagos» |
 | `gastos_recurrentes` | Las plantillas de gasto fijo de cada propiedad y quién asumiría cada parte | «Importes y pagos» |
 | `trabajadores` | Quién trabaja en cada propiedad, su contrato, salario vigente, vacaciones pendientes y descanso semanal; sin documento, EPS, dirección ni teléfono | «Importes y pagos» y «Nómina por trabajador» (`payroll:read`) |
@@ -585,15 +595,17 @@ requiere `properties:read` y `bookings:read`, y sí respeta esa lista.
   no la lista de acompañantes. Una reserva pendiente o confirmada no prueba
   presencia física.
 
-Treinta y cuatro herramientas escriben, y cada una lleva su permiso en Booked:
+Cada herramienta de escritura tiene su permiso en Booked.
 
 | Herramienta | Permiso | Qué hace |
 | --- | --- | --- |
 | `crear_cotizacion` | Guardar cotizaciones (`quotations:create`) | Guarda un borrador tras preparar, presentar el resumen y recibir confirmación explícita; no reserva noches ni envía mensajes. |
+| `enviar_cotizacion` | Enviar cotizaciones por correo (`quotations:send`) | Programa el correo real de un borrador vigente de venta directa tras preparar y confirmar. |
 | `cambiar_estado_de_cotizacion` | Cambiar el estado de cotizaciones (`quotations:transition`) | Marca una cotización como enviada, aceptada o rechazada, o la devuelve a borrador, tras preparar y confirmar; no envía nada al huésped. |
 | `editar_cotizacion` | Editar cotizaciones (`quotations:update`) | Corrige un borrador, también las fechas y el reparto de uno de conjunto, tras preparar y confirmar, recalculando el precio como la ficha; no reserva noches. |
 | `convertir_cotizacion_en_reserva` | Convertir cotizaciones en reservas (`quotations:convert`) | Convierte una cotización aceptada en una reserva pendiente con su precio tras preparar y confirmar; retiene las noches y no registra pagos. |
 | `editar_propiedad` | Editar propiedades (`properties:update`) | Cambia nombre, ciudad, dirección, horarios, capacidad o si acepta mascotas de una propiedad administrada tras preparar, mostrar antes y después y recibir confirmación explícita; no toca precios ni canales. |
+| `crear_tarifa_especial`, `editar_tarifa_especial` | Editar propiedades (`properties:update`) | Guardan una tarifa especial de una propiedad tras preparar, mostrar las noches y el cobro y recibir confirmación explícita. |
 | `sincronizar_calendarios` | Sincronizar calendarios (`blocks:sync`) | Importa ya los calendarios iCal de las plataformas, solo a petición; puede crear o quitar bloqueos importados y cambiar o cancelar reservas sincronizadas. El resultado se consulta con `estado_de_sincronizacion`. |
 | `crear_bloqueo` | Crear bloqueos | Bloquea noches de una propiedad administrada. |
 | `editar_bloqueo` | Editar bloqueos (`blocks:update`) | Cambia las fechas o las notas de un bloqueo manual tras preparar sin firma, mostrar cómo quedará y recibir confirmación explícita; si las fechas se cruzan con otra ocupación no cambia nada; nunca uno importado. |
@@ -680,10 +692,12 @@ permiso de escritura de cada herramienta, se exigen estas lecturas acompañantes
 | Herramienta | Lecturas acompañantes |
 | --- | --- |
 | `crear_cotizacion` | «Cotizaciones» (`quotations:read`); propias/administradas requieren `properties:read` y `pricing:read`; comisionadas requieren `brokered:read` y `finance:read`. Elegir un contacto o comisionista requiere `contacts:read`; crear un contacto nuevo requiere además la escritura `contacts:create`. |
+| `enviar_cotizacion` | «Cotizaciones» (`quotations:read`) y «Consultar contactos» (`contacts:read`). |
 | `cambiar_estado_de_cotizacion` | «Cotizaciones» (`quotations:read`); comisionadas requieren `brokered:read` y `finance:read`. |
 | `editar_cotizacion` | «Cotizaciones» (`quotations:read`); administradas y conjuntos requieren `pricing:read`; comisionadas, `brokered:read` y `finance:read`. |
 | `convertir_cotizacion_en_reserva` | «Cotizaciones» (`quotations:read`); una cotización antigua sin precio guardado requiere `pricing:read`; comisionadas, `brokered:read` y `finance:read`. |
 | `editar_propiedad` | «Propiedades y canales» (`properties:read`). |
+| `crear_tarifa_especial`, `editar_tarifa_especial` | «Propiedades y canales» (`properties:read`) y «Cotizar estancias» (`pricing:read`). |
 | `sincronizar_calendarios` | «Propiedades» (`properties:read`). |
 | `crear_bloqueo` | «Propiedades» (`properties:read`). |
 | `editar_bloqueo`, `eliminar_bloqueo` | «Propiedades» (`properties:read`) y «Bloqueos» (`blocks:read`). |
