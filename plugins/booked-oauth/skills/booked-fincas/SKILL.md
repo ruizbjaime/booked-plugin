@@ -1,22 +1,24 @@
 ---
 name: booked-fincas
-description: "Gestiona las fincas de Jaime en Booked, aunque no se nombre el PMS: disponibilidad, reservas, conjuntos, huéspedes, contactos, calendario, precios, ingresos, gastos, nómina, deudas y comisiones de Airbnb, Booking.com, Fincas de la Villa o venta directa. Úsala para ver el huésped de una fecha o un teléfono; editar una propiedad; sincronizar calendarios; convertir en cotización o en reserva, o descartar, solicitudes del sitio; guardar y gestionar cotizaciones; crear, editar, cambiar de estado o cancelar reservas y conjuntos, y archivar reservas; agregar acompañantes; registrar o anular pagos y mover sus plazos; retener o devolver tras cancelar; convertir bloqueos; administrar contactos y bloqueos; ver TRA/SIRE pendiente, trabajadores, descansos, gastos fijos y eventos; marcar descansos y conceder compensatorios; preparar informes o liquidaciones; y analizar huéspedes, duplicados, patrones, rendimiento, resultados, caja, lo vendido y la proyección. Para crear registros usa los datos que dé Jaime."
+description: "Gestiona las fincas de Jaime en Booked, aunque no se nombre el PMS: disponibilidad, reservas, conjuntos, huéspedes, contactos, calendario, precios, ingresos, gastos, nómina, deudas y comisiones de Airbnb, Booking.com, Fincas de la Villa o venta directa. Úsala para ver el huésped de una fecha o un teléfono; editar una propiedad; sincronizar calendarios; convertir en cotización o en reserva, o descartar, solicitudes del sitio; guardar, enviar y gestionar cotizaciones; crear o editar tarifas especiales; crear, editar, cambiar de estado o cancelar reservas y conjuntos, y archivar reservas; agregar acompañantes; registrar o anular pagos y mover sus plazos; retener o devolver tras cancelar; convertir bloqueos; administrar contactos y bloqueos; ver TRA/SIRE pendiente, trabajadores, descansos, gastos fijos y eventos; marcar descansos y conceder compensatorios; consultar el libro contable y el presupuesto mensual; preparar informes o liquidaciones; y analizar huéspedes, duplicados, patrones, rendimiento, resultados, caja, lo vendido y la proyección. Para crear registros usa los datos que dé Jaime."
 ---
 
 # Booked — las fincas de Jaime
 
-Las herramientas `booked` leen el PMS de Fincas de la Villa, y treinta y cuatro
-de ellas escriben: editar los datos de una propiedad administrada, sincronizar
-ya sus calendarios con las plataformas y cerrar los avisos que deja, crear,
-editar y eliminar bloqueos manuales, crear una reserva directa, comisionada o
+Las herramientas `booked` leen el PMS de Fincas de la Villa. También permiten
+editar los datos de una propiedad administrada, crear o editar sus tarifas
+especiales, sincronizar ya sus calendarios con las plataformas y cerrar los
+avisos que deja, crear, editar y eliminar bloqueos manuales, crear una
+reserva directa, comisionada o
 de conjunto, editarla, cambiar su estado, cancelar o archivar una directa,
 añadir una cabaña a un conjunto ya reservado,
 agregarle acompañantes, registrar o anular sus pagos, mover sus plazos de
 pago, registrar la retención o devolución de lo cobrado en una reserva
 cancelada o la retención de un conjunto cancelado, convertir en reserva un
 bloqueo de plataforma, crear o eliminar contactos, guardar cotizaciones,
-cambiar su estado, editar un borrador o convertir una aceptada en reserva,
-convertir en cotización o en reserva, o descartar, una solicitud del sitio, y
+enviar un borrador por correo, cambiar su estado, editarlo o convertir una
+aceptada en reserva, convertir en cotización o en reserva, o descartar, una
+solicitud del sitio, y
 marcar el descanso semanal de un trabajador y concederle el día
 compensatorio. `cotizar` y
 `cotizar_conjunto` son un cálculo, no apartan fechas. Nada más crea, modifica
@@ -172,6 +174,24 @@ pertenece a una herramienta sino a la respuesta.
     el aviso mide solo la `propuesta`; una alternativa se mide cotizando su
     `reparto`.
 
+## Consultar disponibilidad y calendario
+
+- «¿Está libre la finca del 10 al 13?» → `consultar_disponibilidad`.
+  `noches_minimas` filtra los huecos que muestra. Si un hueco trae
+  `continues_after_window: true`, las noches contadas son las que caben en
+  la ventana consultada. Amplíala si Jaime quiere saber hasta cuándo sigue.
+- Para saber qué reservas **ocuparon noches**, usa `buscar_reservas` con
+  `ocupa_desde` y `ocupa_hasta` (exclusiva). Para saber cuáles **llegaron**,
+  usa `llega_desde` y `llega_hasta` (inclusiva). Elige una sola clase de
+  filtro y, si te piden cuántas, usa `coinciden`.
+- «¿Quién llega después?» → `proxima_llegada`. Pide varias con `cuantas`.
+  Una reserva que ya hizo check-in queda fuera, aunque haya llegado hoy.
+- «¿Qué puentes vienen?» → `festivos_y_puentes`, que ya los agrupa. Si un
+  festivo también aparece dentro de un puente, cuenta la fecha una sola vez.
+  Para ver la clasificación, el mínimo de llegada o la tarifa bruta de cada
+  noche, usa `ver_calendario`. El precio requiere `canal_id`; para el total
+  y la duración permitida de la estancia, usa `cotizar`.
+
 ## Consultar contactos y huéspedes
 
 - **«¿Cuál es el teléfono de María?»** Usa `ver_contactos` con `busqueda` por
@@ -216,6 +236,12 @@ los conjuntos.
 - «¿Cuánto me dejó?» → `estado_de_resultados`; «¿cuánta plata entró o
   salió?» → `flujo_de_caja`; «¿qué tengo que pagar?» →
   `obligaciones_por_pagar`; «¿qué me deben?» → `deudas`.
+- «¿Cómo va la ocupación, el ADR o las cancelaciones de esta propiedad?» →
+  `indicadores`. Para el año en curso, usa `ocupacion.hasta_hoy_porcentaje`.
+  «¿Cuánto retuve este año?» → `retenido_del_ano`. Usa `total` para lo
+  retenido entre todos, según el año de llegada de las reservas.
+- «¿Qué asientos entraron al libro en agosto?» → `libro_contable`.
+  «¿Cómo va agosto frente al presupuesto?» → `presupuesto_mensual`.
 - «¿Qué gastos tuvo la Cabaña en agosto?», «¿cuánto gasto le toca al
   propietario?», «¿cuánto le pagué a Pedro por la poda?» → `gastos`;
   «¿cuánto me costó la nómina?», «¿y por trabajador?» → `gastos_de_nomina`;
@@ -240,6 +266,16 @@ los conjuntos.
 
 Al contestar:
 
+- **Libro contable.** Los asientos activos se filtran por el comienzo de su
+  reconocimiento (`reconocido_desde`), con ambos límites incluidos. Si
+  `siguiente_despues_de_id` trae un valor, pásalo como `despues_de_id` con
+  las mismas fechas y el mismo filtro de propiedad. Un listado que aún
+  tiene cursor está incompleto.
+- **Presupuesto frente a lo realizado.** `presupuesto_mensual` compara por
+  categoría el presupuesto del anfitrión con el devengo real del `mes`
+  (`AAAA-MM`). Un presupuesto en `null` está sin configurar. Ambas lecturas
+  requieren `finance:read`. Para el presupuesto, si el token no alcanza
+  todas las propiedades del informe, explica el alcance que falta.
 - **Devengo y caja no cuadran, y no es un error.** `estado_de_resultados` e
   `ingresos_del_ano` cuentan cada reserva en el mes de su llegada;
   `flujo_de_caja`, el día en que se movió el dinero. Di de cuál hablas y no
@@ -481,7 +517,7 @@ Propias/administradas necesitan `properties:read` y `pricing:read`; comisionadas
 y crearlos inline, `contacts:create`. Los permisos existentes no se amplían
 al actualizar el plugin: solicita solo los necesarios para la operación.
 
-## Consultar, cambiar de estado, editar y convertir cotizaciones
+## Consultar, enviar, cambiar de estado, editar y convertir cotizaciones
 
 Si el servidor aún no ofrece estas herramientas, explica que falta actualizar
 Booked; no las simules con otras. Sirven para una propiedad (administrada o
@@ -507,6 +543,11 @@ una o varias cabañas nuevas y su precio original intacto, con
   cada una. Solo aparece mientras el acordado supere la capacidad
   publicada de hoy: `null` es que no hay cupo o que la capacidad ya cubre al
   grupo.
+- **Seguimiento.** En el listado de `ver_cotizaciones`, usa `seguimiento:
+  expiring` para enviadas vigentes próximas a vencer, o `seguimiento:
+  unanswered` para enviadas vigentes sin respuesta. Booked aplica los plazos
+  de Jaime. Con `cotizacion_id` se devuelve el detalle sin aplicar los
+  filtros del listado. Consultar el seguimiento no envía avisos ni correos.
 - **Enlace al sitio y descuento de Directo.** En una administrada,
   `oferta_publica` trae `enlace`, la ficha de la propiedad en el sitio
   público con esas fechas; `precio_sitio`, lo que cobra el sitio por esa
@@ -527,15 +568,28 @@ una o varias cabañas nuevas y su precio original intacto, con
   completo y la credencial puede escribir. Léele lo que cambia y espera un sí
   explícito posterior en el chat; entonces llama la herramienta que escribe
   únicamente con `firma` y `confirmado: true`. La firma es de un solo uso, está
-  ligada a la credencial, caduca en hasta treinta minutos y no cruza la
-  medianoche. Si la escritura responde que la cotización cambió, prepara y
+  ligada a la credencial y caduca en hasta treinta minutos; salvo la del
+  envío por correo, no cruza la medianoche, porque el resumen se cotiza con
+  los precios de hoy. Revisa `expira_el`. Si la escritura responde que la cotización cambió, prepara y
   confirma de nuevo; ante una respuesta perdida, consulta `ver_cotizaciones`
   antes de repetir nada.
 - **Cambiar el estado** (`preparar_cambio_de_estado_de_cotizacion` →
   `cambiar_estado_de_cotizacion`): `enviar`, `aceptar`, `rechazar` o
   `volver_a_borrador`, la que pidió Jaime. «Enviar» solo registra que Jaime ya
-  la envió: Booked no le manda nada al huésped. Aceptar no reserva noches.
+  la envió: no le manda nada al huésped (para eso está «Enviar por correo»).
+  Aceptar no reserva noches.
   Rechazar es definitivo: no se reabre, edita ni convierte.
+- **Enviar por correo** (`preparar_envio_de_cotizacion` →
+  `enviar_cotizacion`). Solo a petición de Jaime, para un borrador vigente
+  de venta directa con correo del contacto en Booked. Prepara con
+  `cotizacion_id` y lee el resumen, incluido `resumen.correo` y las
+  consecuencias. Explica que Booked programará un correo real al huésped
+  con el PDF y el enlace, y marcará la cotización como enviada. Espera el sí
+  explícito de Jaime al resumen y solo entonces llama `enviar_cotizacion`
+  con la `firma` y `confirmado: true`. `estado: sent` confirma que quedó
+  marcada como enviada y se programó el correo. Si se pierde la respuesta,
+  revisa el envío en Booked antes de repetir nada. Este flujo requiere
+  `quotations:read` y `contacts:read`; para confirmar, `quotations:send`.
 - **Editar** (`preparar_edicion_de_cotizacion` → `editar_cotizacion`): solo
   borradores; una enviada se vuelve antes a borrador. Envía **solo los campos
   que Jaime pidió cambiar**: lo omitido se conserva. No cambia canal,
@@ -626,8 +680,9 @@ capacidad base y máxima, y si acepta mascotas (`pets_allowed`, `true` o
 `false`). Ese último solo decide lo que dice el sitio público: si la solicitud
 pregunta por mascotas o avisa que no se admiten, y la amenidad «Admite
 mascotas»; lo que se cobra por ellas lo da la tarifa de mascota, y en Booked
-las reservas y cotizaciones siguen aceptando mascotas aunque esté apagado. Precios, canales, fotos y lo demás se cambian en
-Booked. `ver_propiedad` trae en `descripcion` el tipo, la zona, las amenidades
+las reservas y cotizaciones siguen aceptando mascotas aunque esté apagado.
+Para cambiar una tarifa especial, usa el flujo de la sección siguiente.
+`ver_propiedad` trae en `descripcion` el tipo, la zona, las amenidades
 y las habitaciones con camas y baños; vacío o `null` es que no está
 configurado, no que no lo tenga.
 
@@ -646,6 +701,39 @@ configurado, no que no lo tenga.
 La dirección solo se lee y se cambia con «Editar propiedades»
 (`properties:update`), que requiere además «Propiedades y canales»
 (`properties:read`).
+
+## Crear o editar una tarifa especial
+
+- Usa `preparar_tarifa_especial` para crear y
+  `preparar_edicion_de_tarifa_especial` para editar. Identifica la propiedad
+  administrada y, al editar, la tarifa con su `tarifa_id`. `desde` y
+  `hasta` son la primera y la última noche **incluidas**. Booked rechaza
+  cruces con otra tarifa especial de esa propiedad.
+- El nombre es opcional. Si Jaime lo da, pide las dos versiones y envía
+  `es_name` y `en_name` juntos. En una edición, omitir ambos conserva los
+  nombres y enviarlos ambos en `null` los borra. Revisa también `nota` y
+  `minimo_noches` en el antes y después. Omitirlos deja la nota vacía y
+  hace que el mínimo se herede de la temporada.
+- El modo `full_rate` cobra un fijo por noche con todos los huéspedes
+  incluidos. `base_extra_guest` aplica el precio base más los extras según
+  la ocupación. Para `per_guest_range`, envía `precios_por_rango` con un
+  precio por cada rango activo de la propiedad y omite `precio`: Booked
+  rechaza el precio plano en ese modo. `per_guest_range` requiere que la
+  propiedad cobre por rangos. Si omites `modo`, Booked usa el de la tarifa
+  al editar o el predeterminado de la propiedad al crear. En los modos
+  planos puedes fijar `precios_por_plataforma`. Un `precio` en `null` en
+  una fila vuelve a la fórmula del canal. Al pasar a cobro por rangos, se
+  quitan los precios explícitos por plataforma. Los importes de entrada
+  de este flujo van en **pesos COP enteros**. Al leer los importes devueltos
+  usa su texto en pesos.
+- Lee `despues` y, al editar, compáralo con `antes`. Incluye noches,
+  nombres y cómo se cobra. Con `lista_para_confirmar: true`, espera el sí
+  explícito antes de llamar `crear_tarifa_especial` o `editar_tarifa_especial`
+  con la `firma` y `confirmado: true`. Si la tarifa cambió desde la
+  preparación, presenta el nuevo resumen y pide otro sí. Ante una respuesta
+  perdida, comprueba la tarifa en Booked antes de repetir nada.
+- Preparar requiere `properties:read` y `pricing:read`. Confirmar requiere
+  además `properties:update`.
 
 ## Sincronizar calendarios
 
@@ -798,6 +886,10 @@ créalo primero con `crear_contacto`, con los datos que proporcione Jaime; la
 preparación de la reserva usa un `contacto_id` existente, de persona natural y
 con teléfono completo. No confundas una propiedad comisionada con un
 comisionista destinatario de una cotización ni con el inventario administrado.
+`ver_propiedad_comisionada` usa el id de ese inventario para consultar la
+ficha. Si aparece `default_commission_rate`, es la tasa de partida para una
+reserva nueva. Consulta `reservas_comisionadas` para la comisión que quedó en
+una reserva concreta.
 
 1. Llama `preparar_reserva_comisionada` con `propiedad_comisionada_id`,
    `contacto_id`, entrada y salida, y solo los datos que Jaime ya dio. Aclara el
@@ -1055,11 +1147,14 @@ antes de reintentar; un pago, además, se recupera con su `operacion_id`.
   formulario de autogestión del huésped. No le avisa ni cambia el precio ni la
   ocupación, y nunca devuelve sus datos personales.
 - **Anular un pago o una devolución** (`preparar_anulacion_de_pago` →
-  `anular_pago`): solo lo registrado por error, identificado con su id en
-  `ver_reserva`. Deshace el registro, no mueve dinero, y anula o reemite el
-  recibo del segmento. Pregunta el motivo y, en una devolución por
-  cancelación, si Jaime confirma que ese dinero **no** se entregó al huésped;
-  nunca lo supongas. Los pagos de un conjunto se anulan en Booked.
+  `anular_pago`): solo lo registrado por error. Con el id de `ver_reserva`,
+  usa `pago_id` o `devolucion_id`, uno solo. Deshace el registro, no mueve
+  dinero y anula o reemite el recibo del segmento. Pide el motivo y, si la
+  preparación lo pregunta, usa `confirmado_no_desembolsado: true` solo cuando
+  Jaime confirme que la devolución **no** se entregó al huésped. Si pide
+  retener el dinero restaurado de una devolución por cancelación, incluye
+  `registrar_retencion: true` y las `notas_retencion` que indique. Los pagos
+  de un conjunto se anulan en Booked.
 
 Todas requieren «Propiedades» (`properties:read`) y «Reservas»
 (`bookings:read`). Escribir añade «Editar reservas» (`bookings:update`),
@@ -1094,9 +1189,9 @@ Reservar un conjunto sin cotización guardada:
    cifra se da igual; ver la regla 12), `por_rangos`—;
    `una_sola_cabana` es que el grupo cabe en una: esa se cotiza con `cotizar`.
    Con mascotas, el `reparto` las lleva por cabaña (`mascotas`) y cada una se
-   cobra con su tarifa; sin `reparto`, `faltan` pregunta en qué cabaña van:
-   pregúntaselo a Jaime, no lo elijas. `reparto_para_cotizar` trae `mascotas`
-   por cabaña, también en 0.
+   cobra con su tarifa. Si `faltan` pregunta en qué cabaña van, pregúntaselo a
+   Jaime. Si sigues con `cotizar`, incluye las mascotas de esa cabaña.
+   `reparto_para_cotizar` trae `mascotas` por cabaña, también en 0.
 2. Con el reparto que Jaime elija, `preparar_reserva_de_conjunto` con
    `conjunto_id`, canal Directo o del sitio público, fechas y `cabanas`: el
    `reparto_para_cotizar` tal cual, con sus mascotas por cabaña. Pregunta lo que devuelva `faltan` —el
@@ -1204,19 +1299,21 @@ perdida, `ver_reserva_de_conjunto`:
   (`preparar_conversion_de_reserva_a_conjunto` → `convertir_reserva_a_conjunto`,
   o `preparar_conversion_de_cotizacion_a_conjunto` →
   `convertir_cotizacion_a_conjunto`): la cabaña original conserva sus fechas,
-  huéspedes y precio, y las cabañas nuevas del mismo conjunto se cotizan con
-  el precio de hoy. Prepara con `origen_id` (la reserva o la cotización) y
+  huéspedes, mascotas y precio. Las cabañas nuevas del mismo conjunto se
+  cotizan con el precio de hoy. Prepara con `origen_id` (la reserva o la cotización) y
   `conjunto_id` (el conjunto activo que contiene la cabaña original). Una
   reserva suma UNA cabaña: `propiedad_id`, `adultos`, `ninos` y
   `edades_ninos`; las demás se suman después con «Añadir una cabaña». Una
-  cotización suma una o varias en `cabanas`, cada una
-  `{propiedad_id, adultos, ninos, edades_ninos}`, sin repetir ninguna ni
-  incluir la original. Una edad por niño, vacía sin niños: todo lo dice
-  Jaime, nunca lo infieras.
+  cotización suma una o varias en `cabanas`, sin repetir ninguna ni incluir
+  la original. Indica adultos, niños y una edad por niño en cada cabaña
+  nueva. Usa `mascotas` para la cabaña nueva de la reserva o
+  `cabanas.*.mascotas` para cada cabaña nueva de la cotización. Si el campo
+  se omite, Booked cuenta cero. Pide el reparto a Jaime si hay mascotas, y
+  lee cuántas quedan en cada cabaña con su precio antes de confirmar.
 - **Qué se convierte.** Una reserva individual pendiente o confirmada, de
-  venta directa (no importada de una plataforma), sin mascotas ni
-  comisionista, con la llegada por delante y el responsable con sus datos
-  completos. Una cotización, solo en borrador y con la llegada por delante: si
+  venta directa (no importada de una plataforma), sin comisionista, con la
+  llegada por delante y el responsable con sus datos completos. Una
+  cotización, solo en borrador y con la llegada por delante: si
   está enviada, díselo —volverla a borrador es un cambio de estado que decide
   él—; aceptada, rechazada o vencida ya no se convierte (se hace una
   cotización de conjunto nueva). Si no se puede, la preparación dice la causa

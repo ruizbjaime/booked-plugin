@@ -3,6 +3,25 @@
 Cada versión publicada actualiza los manifiestos de los tres paquetes y las
 entradas del marketplace de Claude, y lleva un tag `vX.Y.Z`.
 
+## 0.29.0 — 2026-11-19
+
+- `preparar_envio_de_cotizacion` y `enviar_cotizacion` permiten enviar por
+  correo un borrador vigente de venta directa después de confirmar el
+  destinatario y las consecuencias. `ver_cotizaciones` filtra el seguimiento
+  de las enviadas vigentes con `seguimiento: expiring` o `unanswered`.
+  Requiere el [PR #949](https://github.com/ruizbjaime/booked/pull/949) de
+  Booked.
+- La skill enseña a crear y editar tarifas especiales por propiedad, con
+  nombre bilingüe, fechas inclusivas y cobro fijo, base más extras o por
+  rangos. También cubre el cursor de `libro_contable` y la comparación de
+  `presupuesto_mensual` con el devengo real. Requiere el
+  [PR #950](https://github.com/ruizbjaime/booked/pull/950) de Booked.
+- Las conversiones a conjunto conservan las mascotas de la cabaña original
+  y admiten mascotas en cada cabaña nueva, como en el
+  [PR #934](https://github.com/ruizbjaime/booked/pull/934) de Booked.
+  La skill incorpora siete lecturas del catálogo y aclara los filtros de
+  reservas y la anulación de devoluciones.
+
 ## 0.28.0 — 2026-11-17
 
 - Las mascotas de un conjunto van por cabaña. `cotizar_conjunto` acepta
