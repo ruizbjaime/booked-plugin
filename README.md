@@ -586,10 +586,10 @@ requiere `properties:read` y `bookings:read`, y sí respeta esa lista.
 
 - «¿Cuál es el teléfono de María Pérez?» busca con `busqueda`; si hay varias
   coincidencias, pregunta cuál antes de atribuir datos.
-- «Dame nombre y teléfono del huésped actual de Casita Artemisa» identifica la
+- «Dame nombre y teléfono del huésped actual de Cabaña El Roble» identifica la
   propiedad con `listar_propiedades` y consulta `ver_contactos` con
   `propiedad_id`; la fecha predeterminada es hoy.
-- «¿Quién es el huésped principal de la reserva de Casita Artemisa para el
+- «¿Quién es el huésped principal de la reserva de Cabaña El Roble para el
   25 de septiembre de 2026?» usa el mismo filtro y `fecha: "2026-09-25"`.
   La llegada está incluida y la salida excluida; no incluye canceladas ni
   no-show. Devuelve el responsable de la reserva, su estado y si se hospeda,
