@@ -3,6 +3,15 @@
 Cada versión publicada actualiza los manifiestos de los tres paquetes y las
 entradas del marketplace de Claude, y lleva un tag `vX.Y.Z`.
 
+## 0.31.0 — 2026-11-22
+
+- La skill documenta cómo consultar tarifas especiales y restricciones de
+  estancia por propiedad, confirmar la eliminación de una tarifa completa
+  con el aviso de noches sin precio y crear, editar o eliminar restricciones.
+  Aclara las fechas inclusivas y el rango de fechas admitido.
+  Requiere los PR [#993](https://github.com/ruizbjaime/booked/pull/993) y
+  [#994](https://github.com/ruizbjaime/booked/pull/994) de Booked.
+
 ## 0.30.1 — 2026-11-22
 
 - La skill se refiere al anfitrión en vez de a una persona concreta, para que
