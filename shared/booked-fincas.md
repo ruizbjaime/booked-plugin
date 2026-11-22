@@ -1,14 +1,15 @@
 ---
 name: booked-fincas
-description: "Gestiona las fincas del anfitrión en Booked, aunque no se nombre el PMS: disponibilidad, reservas, conjuntos, huéspedes, contactos, calendario, precios, ingresos, gastos, nómina, deudas y comisiones de Airbnb, Booking.com, otros canales o venta directa. Úsala para ver el huésped de una fecha o un teléfono; editar una propiedad; sincronizar calendarios; convertir en cotización o en reserva, o descartar, solicitudes del sitio; guardar, enviar y gestionar cotizaciones; crear o editar tarifas especiales; crear, editar, cambiar de estado o cancelar reservas y conjuntos, y archivar reservas; agregar acompañantes; registrar o anular pagos y mover sus plazos; retener o devolver tras cancelar; convertir bloqueos; administrar contactos y bloqueos; ver TRA/SIRE pendiente, trabajadores, descansos, gastos fijos y eventos; marcar descansos y conceder compensatorios; consultar el libro contable y el presupuesto mensual; preparar informes o liquidaciones; y analizar huéspedes, duplicados, patrones, rendimiento, resultados, caja, lo vendido y la proyección. Para crear registros usa los datos que dé el anfitrión."
+description: "Gestiona fincas en Booked aunque no se nombre el PMS. Consulta disponibilidad, calendario, precios, huéspedes por fecha, teléfonos, TRA/SIRE pendiente, trabajadores, descansos, eventos, gastos fijos, nómina, ingresos, deudas y comisiones de Airbnb, Booking.com, otros canales y venta directa. Edita propiedades, sincroniza calendarios, convierte solicitudes del sitio en cotización o reserva o las descarta, guarda, envía y gestiona cotizaciones, crea, edita o elimina tarifas especiales y gestiona restricciones de estancia. Crea, edita, cambia de estado o cancela reservas y conjuntos, archiva reservas, agrega acompañantes, registra o anula pagos y mueve sus plazos, retiene o devuelve tras cancelar, convierte bloqueos y administra contactos y bloqueos. Marca descansos y concede compensatorios. Consulta libro contable y presupuesto mensual, prepara informes o liquidaciones y analiza huéspedes, duplicados, patrones, rendimiento, resultados, caja, lo vendido y la proyección. Crea registros con datos del anfitrión."
 ---
 
 # Booked — las fincas del anfitrión
 
 Las herramientas `booked` leen el PMS del anfitrión. También permiten
-editar los datos de una propiedad administrada, crear o editar sus tarifas
-especiales, sincronizar ya sus calendarios con las plataformas y cerrar los
-avisos que deja, crear, editar y eliminar bloqueos manuales, crear una
+editar los datos de una propiedad administrada, crear, editar o eliminar sus
+tarifas especiales, gestionar sus restricciones de estancia, sincronizar ya
+sus calendarios con las plataformas y cerrar los avisos que deja, crear,
+editar y eliminar bloqueos manuales, crear una
 reserva directa, comisionada o
 de conjunto, editarla, cambiar su estado, cancelar o archivar una directa,
 añadir una cabaña a un conjunto ya reservado,
@@ -43,6 +44,8 @@ pertenece a una herramienta sino a la respuesta.
 - **Hoy es hoy en Bogotá** (`America/Bogota`). Cualquier cuenta relativa —«esta
   semana», «el mes que viene», «quién está alojado ahora»— parte de ahí, no de
   la fecha del sistema donde corres.
+- **Fechas admitidas.** Las herramientas aceptan fechas de `0001-01-01` a
+  `9999-12-31`. El año `0000` da un error de validación.
 - **Un permiso que falta no es un dato que no existe.** Si una herramienta dice
   que al token le falta un permiso, dilo así. `alcance_del_token` dice qué
   alcanza esta credencial, y el alcance puede ser «todas las propiedades» o una
@@ -664,9 +667,10 @@ La dirección solo se lee y se cambia con «Editar propiedades»
 
 - Usa `preparar_tarifa_especial` para crear y
   `preparar_edicion_de_tarifa_especial` para editar. Identifica la propiedad
-  administrada y, al editar, la tarifa con su `tarifa_id`. `desde` y
-  `hasta` son la primera y la última noche **incluidas**. Booked rechaza
-  cruces con otra tarifa especial de esa propiedad.
+  administrada y, al editar, la tarifa con su `tarifa_id` obtenido de
+  `ver_tarifas_y_restricciones`. `desde` y `hasta` son la primera y la
+  última noche **incluidas**. Booked rechaza cruces con otra tarifa
+  especial de esa propiedad.
 - El nombre es opcional. Si el anfitrión lo da, pide las dos versiones y envía
   `es_name` y `en_name` juntos. En una edición, omitir ambos conserva los
   nombres y enviarlos ambos en `null` los borra. Revisa también `nota` y
@@ -700,6 +704,68 @@ La dirección solo se lee y se cambia con «Editar propiedades»
   perdida, comprueba la tarifa en Booked antes de repetir nada.
 - Preparar requiere `properties:read` y `pricing:read`. Confirmar requiere
   además `properties:update`.
+
+## Consultar tarifas especiales y restricciones de estancia
+
+Usa `ver_tarifas_y_restricciones` con el `propiedad_id` de
+`listar_propiedades`. El `id` de una fila en `tarifas` se envía como
+`tarifa_id` y el de una fila en `restricciones` como `restriccion_id`.
+Envía `desde` y `hasta` juntos para consultar los registros que se cruzan
+con la ventana, u omite ambos para ver los que terminan hoy o después.
+En tarifas y restricciones, `hasta` incluye la última noche. En los
+bloqueos, la fecha final es exclusiva. Si `tarifas_truncadas` o
+`restricciones_truncadas` es `true`, acota la ventana y vuelve a consultar.
+
+### Eliminar una tarifa especial
+
+`eliminar_tarifa_especial` borra toda la tarifa. Para quitar solo un tramo,
+usa el flujo de `preparar_edicion_de_tarifa_especial` y
+`editar_tarifa_especial`.
+
+1. Llama con `propiedad_id` y `tarifa_id`, sin firma. Presenta la propiedad,
+   la tarifa y las consecuencias del `resumen`. Las nuevas cotizaciones
+   vuelven al precio preconfigurado de esas noches y las reservas existentes
+   conservan su precio. Si la tarifa fijaba un mínimo, se vuelve al del
+   tipo de día, sujeto a la restricción de estancia aplicable.
+2. Si `resumen.noches_sin_precio.noches` trae fechas, explica qué noches
+   quedarían sin poder cotizarse y por qué, según su `motivo`.
+   `calendario` indica que falta generar el calendario, `configuracion`
+   que falta el período de precios predeterminado y `canal` que falta
+   precio en los canales que devuelve `plataformas`. En propiedades con
+   cobro por rangos puede afectar solo a algunas ocupaciones. Si
+   `noches_sin_precio.truncado` es `true`, explica que hay más noches
+   afectadas que las que muestra el resumen.
+3. Espera el sí explícito del anfitrión. Repite con los mismos IDs, la
+   `firma` y `confirmado: true`. Si Booked indica que cambiaron las noches
+   sin precio, prepara de nuevo, presenta el aviso actualizado y pide otra
+   confirmación.
+
+### Crear, editar o eliminar una restricción de estancia
+
+- **Crear.** `crear_restriccion_de_estancia` guarda en una llamada, como
+  `crear_bloqueo`. Una restricción para Cabaña El Roble del 10 al 12 abarca
+  tres noches. Envía al menos un límite y, si el anfitrión la da, una `nota`.
+  El mínimo admite de 1 a 30 noches y el máximo de 1 a 365. Si hay ambos,
+  el mínimo debe ser menor o igual al máximo. La restricción puede abarcar
+  hasta 730 noches, debe empezar hoy o después y no puede solaparse con
+  otra de la misma propiedad.
+- **Editar.** Prepara con `editar_restriccion_de_estancia`, los dos IDs y
+  solo los campos que cambian. Omitir un campo conserva su valor. Usa
+  `null` para quitar un límite o la nota. Booked rechaza valores en
+  blanco y exige que quede al menos un límite. Puedes conservar un inicio
+  pasado, pero si lo cambias debe ser hoy o posterior. El fin debe ser hoy
+  o posterior y siguen vigentes las reglas de duración y solape.
+- **Eliminar.** Prepara con `eliminar_restriccion_de_estancia` y los dos
+  IDs. Las nuevas cotizaciones vuelven al mínimo de la tarifa especial
+  aplicable o del tipo de día y quedan sin máximo de estancia. Las
+  reservas existentes se conservan.
+- **Confirmar una edición o eliminación.** La primera llamada va sin
+  firma. Presenta el `resumen` al anfitrión, incluidos el antes y el
+  después si es una edición, y espera su sí explícito. Repite la misma
+  herramienta con solo `propiedad_id`, `restriccion_id`, `firma` y
+  `confirmado: true`. Los cambios de la edición ya están en la firma.
+  Si la firma caduca o Booked indica que la restricción cambió, prepara
+  de nuevo y solicita otro sí.
 
 ## Sincronizar calendarios
 
