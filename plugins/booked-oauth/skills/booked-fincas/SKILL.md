@@ -726,6 +726,14 @@ La dirección solo se lee y se cambia con «Editar propiedades»
   quitan los precios explícitos por plataforma. Los importes de entrada
   de este flujo van en **pesos COP enteros**. Al leer los importes devueltos
   usa su texto en pesos.
+- Si Jaime quiere que todos los canales vinculados cobren el precio directo
+  en una tarifa plana, envía `mismo_valor_en_plataformas: true` al preparar
+  la creación o la edición, y omite `precios_por_plataforma`. Comprueba los
+  importes en `despues.precios_por_plataforma`. Booked rechaza la opción en
+  `per_guest_range` o junto con entradas en `precios_por_plataforma`. Al
+  editar sin la opción, los canales sin cambios explícitos conservan su
+  precio anterior. Si `avisos` lo señala, confirma con Jaime si quiere el
+  precio uniforme antes de volver a preparar.
 - Lee `despues` y, al editar, compáralo con `antes`. Incluye noches,
   nombres y cómo se cobra. Con `lista_para_confirmar: true`, espera el sí
   explícito antes de llamar `crear_tarifa_especial` o `editar_tarifa_especial`
