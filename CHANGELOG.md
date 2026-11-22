@@ -3,6 +3,12 @@
 Cada versión publicada actualiza los manifiestos de los tres paquetes y las
 entradas del marketplace de Claude, y lleva un tag `vX.Y.Z`.
 
+## 0.30.1 — 2026-11-22
+
+- La skill se refiere al anfitrión en vez de a una persona concreta, para que
+  sirva a cualquier anfitrión conectado al MCP de Booked. Los ejemplos usan
+  una propiedad ficticia y la descripción ya no nombra un canal propio.
+
 ## 0.30.0 — 2026-11-22
 
 - `preparar_tarifa_especial` y `preparar_edicion_de_tarifa_especial` aceptan
