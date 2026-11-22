@@ -3,6 +3,14 @@
 Cada versión publicada actualiza los manifiestos de los tres paquetes y las
 entradas del marketplace de Claude, y lleva un tag `vX.Y.Z`.
 
+## 0.30.0 — 2026-11-22
+
+- `preparar_tarifa_especial` y `preparar_edicion_de_tarifa_especial` aceptan
+  `mismo_valor_en_plataformas`, que aplica el precio directo a todos los
+  canales vinculados de una tarifa plana. Al editar sin la opción, `avisos`
+  señala los canales que conservarían el precio anterior. Requiere el
+  [PR #992](https://github.com/ruizbjaime/booked/pull/992) de Booked.
+
 ## 0.29.0 — 2026-11-19
 
 - `preparar_envio_de_cotizacion` y `enviar_cotizacion` permiten enviar por
